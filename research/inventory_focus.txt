@@ -1,0 +1,479 @@
+application-commands GET    /applications/{application.id}/application-command-index       Get Application Command Index              {}
+application-commands GET    /channels/{channel.id}/application-command-index               Get Channel Application Command Index      {}
+application-commands GET    /guilds/{guild.id}/application-command-index                   Get Guild Application Command Index        {}
+application-commands GET    /users/@me/application-command-index                           Get User Application Command Index         {}
+application-commands GET    /applications/{application.id}/commands                        List Global Application Commands           {'Query String Params': ['with_localizations?']}
+application-commands POST   /applications/{application.id}/commands                        Create Global Application Command          {'JSON Params': ['type?', 'name', 'name_localizations?', 'description? ^1^', 'description_localizations?', 'options?', 'default_member_permissions?', 'dm_permission? **(deprecated)**', 'nsfw?', 'integration_types?', 'contexts?', 'handler?']}
+application-commands GET    /applications/{application.id}/commands/{command.id}           Get Global Application Command             {}
+application-commands PATCH  /applications/{application.id}/commands/{command.id}           Modify Global Application Command          {'JSON Params': ['name?', 'name_localizations?', 'description?', 'description_localizations?', 'options?', 'default_member_permissions', 'dm_permission? **(deprecated)**', '~~default_permission?~~', 'nsfw?', 'integration_types?', 'contexts?', 'handler?']}
+application-commands DELETE /applications/{application.id}/commands/{command.id}           Delete Global Application Command          {}
+application-commands PUT    /applications/{application.id}/commands                        Bulk Modify Global Application Commands    {}
+application-commands GET    /applications/{application.id}/guilds/{guild.id}/commands      List Guild Application Commands            {'Query String Params': ['with_localizations?']}
+application-commands POST   /applications/{application.id}/guilds/{guild.id}/commands      Create Guild Application Command           {'JSON Params': ['type?', 'name', 'name_localizations?', 'description', 'description_localizations?', 'options?', 'default_member_permissions?', 'nsfw?']}
+application-commands GET    /applications/{application.id}/guilds/{guild.id}/commands/{command.id} Get Guild Application Command              {}
+application-commands PATCH  /applications/{application.id}/guilds/{guild.id}/commands/{command.id} Modify Guild Application Command           {'JSON Params': ['name?', 'name_localizations?', 'description?', 'description_localizations?', 'options?', 'default_member_permissions?', 'nsfw?']}
+application-commands DELETE /applications/{application.id}/guilds/{guild.id}/commands/{command.id} Delete Guild Application Command           {}
+application-commands PUT    /applications/{application.id}/guilds/{guild.id}/commands      Bulk Modify Guild Application Commands     {}
+application-commands GET    /applications/{application.id}/guilds/{guild.id}/commands/permissions List Guild Application Command Permissio   {}
+application-commands GET    /applications/{application.id}/guilds/{guild.id}/commands/{command.id}/permissions Get Application Command Permissions        {}
+application-commands PUT    /applications/{application.id}/guilds/{guild.id}/commands/{command.id}/permissions Modify Application Command Permissions     {'JSON Params': ['permissions']}
+audit-log          GET    /guilds/{guild.id}/audit-logs                                  List Guild Audit Log Entries               {'Query String Params': ['before?', 'after?', 'limit?', 'user_id?', 'target_id?', 'action_type?'], 'Response Body': ['audit_log_entries', 'application_commands', 'auto_moderation_rules', 'guild_scheduled_events', 'integrations', 'threads', 'users', 'webhooks']}
+auto-moderation    GET    /guilds/{guild.id}/auto-moderation/rules                       List Guild AutoMod Rules                   {}
+auto-moderation    GET    /guilds/{guild.id}/auto-moderation/rules/{automod_rule.id}     Get Guild AutoMod Rule                     {}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/rules                       Create Guild AutoMod Rule                  {'JSON Params': ['name', 'event_type', 'trigger_type', 'trigger_metadata? ^1^', 'actions', 'enabled?', 'exempt_roles?', 'exempt_channels? ^2^']}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/rules/validate              Validate Guild AutoMod Rule                {'JSON Params': ['trigger_metadata ^1^'], 'Response Body': ['trigger_metadata']}
+auto-moderation    PATCH  /guilds/{guild.id}/auto-moderation/rules/{automod_rule.id}     Modify Guild AutoMod Rule                  {'JSON Params': ['name?', 'event_type?', 'trigger_metadata? ^1^', 'actions?', 'enabled?', 'exempt_roles?', 'exempt_channels? ^2^']}
+auto-moderation    DELETE /guilds/{guild.id}/auto-moderation/rules/{automod_rule.id}     Delete Guild AutoMod Rule                  {}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/alert-action                Execute AutoMod Alert Action               {'JSON Params': ['channel_id', 'message_id', 'alert_action_type']}
+auto-moderation    PUT    /guilds/{guild.id}/incident-actions                            Modify AutoMod Incident Actions            {'JSON Params': ['invites_disabled_until?', 'dms_disabled_until?'], 'Response Body': ['invites_disabled_until', 'dms_disabled_until']}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/false-alarm                 Resolve AutoMod Incident                   {'JSON Params': ['alert_message_id', 'reason']}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/report-raid                 Report AutoMod Incident                    {}
+auto-moderation    POST   /guilds/{guild.id}/auto-moderation/clear-mention-raid          Clear Mention Raid Incident                {}
+channel            GET    /users/@me/channels                                            List Private Channels                      {}
+channel            GET    /users/@me/dms/{user.id}                                       Get DM Channel                             {}
+channel            POST   /users/@me/channels                                            Create Private Channel                     {'JSON Params': ['recipient_id? **(deprecated)**', 'recipients? ^1^', 'access_tokens? ^2^', 'nicks? ^3^']}
+channel            POST   /users/@me/channels/group-dm-shell                             Create Group DM Shell                      {'JSON Params': ['recipient_id']}
+channel            GET    /guilds/{guild.id}/channels                                    List Guild Channels                        {'Query String Params': ['permissions? ^1^', 'with_can_link_lobby? ^2^']}
+channel            GET    /guilds/{guild.id}/top-read-channels                           List Guild Top Read Channels               {}
+channel            POST   /guilds/{guild.id}/channels                                    Create Guild Channel                       {'JSON Params': ['name', 'position?', 'type?', 'topic?', 'nsfw?', 'rate_limit_per_user?', 'bitrate? ^1^', 'user_limit? ^2^', 'permission_overwrites?', 'parent_id?', 'rtc_region?', 'video_quality_mode?', 'sku_id', 'branch_id?', 'default_auto_archive_duration?', 'default_thread_rate_limit_per_user?', 'available_tags? ^3^', 'default_reaction_emoji?', 'default_forum_layout?', 'default_sort_order?', 'default_tag_setting?', 'flags?']}
+channel            PATCH  /guilds/{guild.id}/channels                                    Modify Guild Channel Positions             {'JSON Params': ['id', 'position?', 'lock_permissions?', 'parent_id?']}
+channel            GET    /channels/{channel.id}                                         Get Channel                                {}
+channel            PATCH  /channels/{channel.id}                                         Modify Channel                             {'JSON Params': ['name?', 'type?', 'position?', 'topic?', 'icon?', 'nsfw?', 'rate_limit_per_user?', 'bitrate? ^1^', 'user_limit? ^2^', 'permission_overwrites?', 'parent_id?', 'owner?', 'rtc_region?', 'video_quality_mode?', 'default_auto_archive_duration?', 'default_thread_rate_limit_per_user?', 'auto_archive_duration?', 'archived?', 'locked?', 'invitable?', 'flags?', 'available_tags? ^3^', 'applied_tags?', 'default_reaction_emoji?', 'default_forum_layout?', 'default_sort_order?', 'default_tag_setting?', 'icon_emoji?', 'theme_color?', 'template? ^4^']}
+channel            DELETE /channels/{channel.id}                                         Delete Channel                             {'Query String Params': ['silent?']}
+channel            POST   /users/@me/channels/bulk-leave                                 Bulk Leave Group DMs                       {'JSON Params': ['channel_ids']}
+channel            PUT    /channels/{channel.id}/voice-status                            Modify Channel Status                      {'JSON Params': ['status']}
+channel            PUT    /channels/{channel.id}/permissions/{overwrite.id}              Modify Channel Permissions                 {'JSON Params': ['type', 'allow?', 'deny?']}
+channel            DELETE /channels/{channel.id}/permissions/{overwrite.id}              Delete Channel Permission                  {}
+channel            POST   /channels/{channel.id}/followers                               Follow Channel                             {'JSON Params': ['webhook_channel_id']}
+channel            POST   /channels/{channel.id}/typing                                  Trigger Typing Indicator                   {'Response Body': ['message_send_cooldown_ms?', 'thread_create_cooldown_ms?']}
+channel            GET    /channels/{channel.id}/call                                    Get Call Eligibility                       {'Response Body': ['ringable']}
+channel            PATCH  /channels/{channel.id}/call                                    Modify Call                                {'JSON Params': ['region?']}
+channel            POST   /channels/{channel.id}/call/ring                               Ring Channel Recipients                    {'JSON Params': ['recipients?']}
+channel            POST   /channels/{channel.id}/call/stop-ringing                       Stop Ringing Channel Recipients            {'JSON Params': ['recipients?']}
+channel            PUT    /channels/{channel.id}/recipients/{user.id}                    Add Channel Recipient                      {'JSON Params': ['access_token? ^1^', 'nick? ^2^']}
+channel            DELETE /channels/{channel.id}/recipients/{user.id}                    Remove Channel Recipient                   {}
+channel            PUT    /channels/{channel.id}/recipients/@me                          Update Message Request                     {'JSON Params': ['consent_status']}
+channel            DELETE /channels/{channel.id}/recipients/@me                          Reject Message Request                     {}
+channel            PUT    /channels/recipients/@me/batch-reject                          Batch Reject Message Requests              {'JSON Params': ['channel_ids']}
+channel            GET    /users/@me/message-requests/supplemental-data                  Get Supplemental Message Request Data      {'Query String Params': ['channel_ids']}
+channel            POST   /channels/{channel.id}/blocked-user-warning-dismissal          Acknowledge Blocked User Warning           {}
+channel            POST   /channels/{channel.id}/safety-warnings/ack                     Acknowledge Safety Warnings                {'JSON Params': ['warning_ids']}
+channel            POST   /channels/{channel.id}/add-safety-warning                      Add Safety Warning                         {'JSON Params': ['safety_warning_type']}
+channel            DELETE /channels/{channel.id}/safety-warnings                         Delete Safety Warnings                     {}
+channel            POST   /channels/{channel.id}/safety-warning/report-false-positive    Report Safety Warning False Positive       {}
+channel            GET    /guilds/{guild.id}/threads/active                              List Guild Active Threads                  {'Response Body': ['threads', 'members']}
+channel            GET    /channels/{channel.id}/threads/active                          List Active Threads                        {'Response Body': ['threads', 'members']}
+channel            GET    /channels/{channel.id}/threads/archived/public                 List Public Archived Threads               {'Query String Params': ['before?', 'limit?'], 'Response Body': ['threads', 'members', 'has_more']}
+channel            GET    /channels/{channel.id}/threads/archived/private                List Private Archived Threads              {'Query String Params': ['before?', 'limit?'], 'Response Body': ['threads', 'members', 'has_more']}
+channel            GET    /channels/{channel.id}/users/@me/threads/archived/private      List Joined Private Archived Threads       {'Query String Params': ['before?', 'limit?'], 'Response Body': ['threads', 'members', 'has_more']}
+channel            GET    /channels/{channel.id}/threads/search                          Search Threads                             {'Query String Params': ['name?', 'slop?', 'tag?', 'tag_setting?', 'archived?', 'sort_by?', 'sort_order?', 'limit?', 'offset?', 'max_id? ^1^', 'min_id? ^1^'], 'Response Body': ['threads', 'members', 'has_more', 'total_results', 'first_messages? ^1^']}
+channel            POST   /channels/{channel.id}/messages/{message.id}/threads           Create Thread from Message                 {'JSON Params': ['name', 'auto_archive_duration?', 'rate_limit_per_user?', 'location?']}
+channel            POST   /channels/{channel.id}/threads                                 Create Thread                              {'JSON/Form Params': ['name', 'auto_archive_duration?', 'rate_limit_per_user?', 'location?', 'type? ^1^', 'invitable?', 'applied_tags?', 'message? ^1^']}
+channel            POST   /channels/{channel.id}/post-data                               Get Channel Post Data                      {'JSON Params': ['thread_ids'], 'Response Body': ['threads']}
+channel            GET    /channels/{channel.id}/thread-members                          List Thread Members                        {'Query String Params': ['with_member?', 'after?', 'limit?']}
+channel            GET    /channels/{channel.id}/thread-members/{user.id}                Get Thread Member                          {'Query String Params': ['with_member?']}
+channel            PUT    /channels/{channel.id}/thread-members/@me                      Join Thread                                {'Query String Params': ['location?']}
+channel            PUT    /channels/{channel.id}/thread-members/{user.id}                Add Thread Member                          {'Query String Params': ['location?']}
+channel            PATCH  /channels/{channel.id}/thread-members/@me/settings             Modify Thread Settings                     {'JSON Params': ['flags?', 'muted?', 'mute_config?']}
+channel            DELETE /channels/{channel.id}/thread-members/@me                      Leave Thread                               {'Query String Params': ['location?']}
+channel            DELETE /channels/{channel.id}/thread-members/{user.id}                Remove Thread Member                       {'Query String Params': ['location?']}
+channel            POST   /channels/{channel.id}/tags                                    Create Channel Tag                         {'JSON Params': ['name', 'moderated?', 'emoji_id? ^1^', 'emoji_name? ^1^']}
+channel            PUT    /channels/{channel.id}/tags/{forum_tag.id}                     Modify Channel Tag                         {'JSON Params': ['name', 'moderated?', 'emoji_id? ^1^', 'emoji_name? ^1^']}
+channel            DELETE /channels/{channel.id}/tags/{forum_tag.id}                     Delete Channel Tag                         {}
+channel            GET    /channels/{channel.id}/linked-accounts                         Get Channel Linked Accounts                {'Query String Params': ['user_ids?'], 'Response Body': ['linked_accounts']}
+channel            DELETE /channels/{channel.id}/linked-lobby                            Remove Lobby Link                          {}
+emoji              GET    /guilds/{guild.id}/emojis                                      List Guild Emojis                          {}
+emoji              GET    /guilds/{guild.id}/emojis/{emoji.id}                           Get Guild Emoji                            {}
+emoji              GET    /guilds/{guild.id}/top-emojis                                  List Guild Top Emojis                      {'Response Body': ['items']}
+emoji              GET    /emojis/{emoji.id}/guild                                       Get Emoji Guild                            {}
+emoji              GET    /emojis/{emoji.id}/source                                      Get Emoji Source                           {'Response Body': ['type', 'guild', 'application']}
+emoji              POST   /guilds/{guild.id}/emojis                                      Create Guild Emoji                         {'JSON Params': ['name', 'image', 'roles?']}
+emoji              PATCH  /guilds/{guild.id}/emojis/{emoji.id}                           Modify Guild Emoji                         {'JSON Params': ['name?', 'roles?']}
+emoji              DELETE /guilds/{guild.id}/emojis/{emoji.id}                           Delete Guild Emoji                         {}
+emoji              GET    /applications/{application.id}/emojis                          List Application Emojis                    {'Response Body': ['items']}
+emoji              GET    /applications/{application.id}/emojis/{emoji.id}               Get Application Emoji                      {}
+emoji              POST   /applications/{application.id}/emojis                          Create Application Emoji                   {'JSON Params': ['name ^1^', 'image']}
+emoji              PATCH  /applications/{application.id}/emojis/{emoji.id}               Modify Application Emoji                   {'JSON Params': ['name? ^1^']}
+emoji              DELETE /applications/{application.id}/emojis/{emoji.id}               Delete Application Emoji                   {}
+guild-scheduled-event GET    /users/@me/scheduled-events                                    List User Guild Scheduled Events           {'Query String Params': ['guild_ids']}
+guild-scheduled-event GET    /guilds/{guild.id}/scheduled-events                            List Guild Scheduled Events                {'Query String Params': ['with_user_count?']}
+guild-scheduled-event GET    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id} Get Guild Scheduled Event                  {'Query String Params': ['with_user_count?']}
+guild-scheduled-event POST   /guilds/{guild.id}/scheduled-events                            Create Guild Scheduled Event               {'JSON Params': ['channel_id? ^1^', 'entity_metadata? ^2^', 'name', 'privacy_level', 'scheduled_start_time', 'scheduled_end_time? ^2^', 'description?', 'entity_type', 'image?', 'recurrence_rule?']}
+guild-scheduled-event PATCH  /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id} Modify Guild Scheduled Event               {'JSON Params': ['channel_id? ^1^', 'entity_metadata?', 'name?', 'privacy_level?', 'scheduled_start_time?', 'scheduled_end_time? ^1^', 'description?', 'entity_type? ^1^', 'status? ^2^', 'image?', 'recurrence_rule? ^3^']}
+guild-scheduled-event DELETE /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id} Delete Guild Scheduled Event               {}
+guild-scheduled-event POST   /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/exceptions Create Guild Scheduled Event Exception     {'JSON Params': ['original_scheduled_start_time', 'is_canceled? ^1^', 'scheduled_start_time? ^1^', 'scheduled_end_time? ^1^']}
+guild-scheduled-event PATCH  /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/exceptions/{guild_scheduled_event_exception.id} Modify Guild Scheduled Event Exception     {'JSON Params': ['is_canceled?', 'scheduled_start_time?', 'scheduled_end_time?']}
+guild-scheduled-event DELETE /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/exceptions/{guild_scheduled_event_exception.id} Delete Guild Scheduled Event Exception     {}
+guild-scheduled-event GET    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users/counts Get Guild Scheduled Event User Count       {'Query String Params': ['guild_scheduled_event_exception_ids?'], 'Response Body': ['guild_scheduled_event_count', 'guild_scheduled_event_exception_counts']}
+guild-scheduled-event GET    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users List Guild Scheduled Event Users           {'Query String Params': ['before?', 'after?', 'limit?', 'with_member?', 'upgrade_response_type? ^1^'], 'Response Body': ['users']}
+guild-scheduled-event PUT    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users/@me Create Guild Scheduled Event User          {}
+guild-scheduled-event DELETE /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users/@me Delete Guild Scheduled Event User          {}
+guild-scheduled-event GET    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/{guild_scheduled_event_exception.id}/users List Guild Scheduled Event Exception Use   {'Query String Params': ['before?', 'after?', 'limit?', 'with_member?']}
+guild-scheduled-event PUT    /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/{guild_scheduled_event_exception.id}/users/@me Create Guild Scheduled Event Exception U   {'JSON Params': ['response']}
+guild-scheduled-event DELETE /guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/{guild_scheduled_event_exception.id}/users/@me Delete Guild Scheduled Event Exception U   {}
+guild-template     GET    /guilds/templates/{template.code}                              Get Guild Template                         {}
+guild-template     POST   /guilds/templates/{template.code}                              Use Guild Template                         {'JSON Params': ['name', 'icon?']}
+guild-template     GET    /guilds/{guild.id}/templates                                   List Guild Templates                       {}
+guild-template     POST   /guilds/{guild.id}/templates                                   Create Guild Template                      {'JSON Params': ['name', 'description?']}
+guild-template     PUT    /guilds/{guild.id}/templates/{template.code}                   Sync Guild Template                        {}
+guild-template     PATCH  /guilds/{guild.id}/templates/{template.code}                   Modify Guild Template                      {'JSON Params': ['name?', 'description?']}
+guild-template     DELETE /guilds/{guild.id}/templates/{template.code}                   Delete Guild Template                      {}
+guild              GET    /users/@me/guilds                                              List User Guilds                           {'Query String Params': ['before?', 'after?', 'limit?', 'with_counts? ^1^']}
+guild              GET    /users/@me/join-request-guilds                                 List Join Request Guilds                   {}
+guild              DELETE /users/@me/guilds/{guild.id}                                   Leave Guild                                {'JSON Params': ['lurking?']}
+guild              POST   /guilds                                                        Create Guild                               {'JSON Params': ['name', 'description?', 'region? **(deprecated)**', 'icon?', 'verification_level?', 'default_message_notifications?', 'explicit_content_filter?', 'preferred_locale?', 'roles? ^1^', 'channels? ^2^', 'afk_channel_id?', 'afk_timeout?', 'system_channel_id?', 'system_channel_flags?', 'guild_template_code?', 'staff_only? ^3^']}
+guild              GET    /guilds/{guild.id}                                             Get Guild                                  {'Query String Params': ['with_counts?']}
+guild              GET    /guilds/{guild.id}/basic                                       Get Guild Basic                            {}
+guild              GET    /guilds/{guild.id}/preview                                     Get Guild Preview                          {}
+guild              PATCH  /guilds/{guild.id}                                             Modify Guild                               {'JSON Params': ['name?', 'icon?', 'banner?', 'home_header?', 'splash?', 'discovery_splash?', 'owner_id?', 'code? ^2^', 'description?', 'region? **(deprecated)**', 'afk_channel_id?', 'afk_timeout?', 'verification_level?', 'default_message_notifications?', 'explicit_content_filter?', 'features?', 'system_channel_id? ^1^', 'system_channel_flags?', 'rules_channel_id? ^1^', 'public_updates_channel_id?', 'safety_alerts_channel_id?', 'preferred_locale?', 'owner_configured_content_level?', 'premium_progress_bar_enabled?']}
+guild              POST   /guilds/{guild.id}/mfa                                         Modify Guild MFA Level                     {'JSON Params / Response Body': ['level']}
+guild              PUT    /guilds/{guild.id}/pincode                                     Get Guild Ownership Transfer Code          {}
+guild              DELETE /guilds/{guild.id}                                             Delete Guild                               {}
+guild              GET    /guilds/{guild.id}/members                                     List Guild Members                         {'Query String Params': ['limit?', 'after?']}
+guild              GET    /guilds/{guild.id}/members/search                              Query Guild Members                        {'Query String Params': ['query', 'limit?']}
+guild              POST   /guilds/{guild.id}/members-search                              Search Guild Members                       {'JSON Params': ['limit?', 'sort?', 'or_query?', 'and_query?', 'before?', 'after?'], 'Response Body': ['guild_id', 'members', 'page_result_count', 'total_result_count']}
+guild              POST   /guilds/{guild.id}/members/supplemental                        List Guild Members Supplemental            {'JSON Params': ['user_ids']}
+guild              GET    /guilds/{guild.id}/members/unusual-dm-activity                 List Guild Members With Unusual DM Activ   {'Query String Params': ['limit?', 'after?']}
+guild              GET    /users/@me/guilds/{guild.id}/member                            Get Current Guild Member                   {}
+guild              GET    /guilds/{guild.id}/members/{user.id}                           Get Guild Member                           {}
+guild              PUT    /guilds/{guild.id}/members/@me                                 Join Guild                                 {'Query String Params': ['lurker? ^1^', 'session_id?', 'location?', 'recommendation_load_id?'], 'Response Body Extra Fields': ['show_verification_form?', 'welcome_screen?']}
+guild              PUT    /guilds/{guild.id}/members/{user.id}                           Add Guild Member                           {'JSON Params': ['access_token', 'nick?', 'roles?', 'mute?', 'deaf?', 'flags? ^1^']}
+guild              PATCH  /guilds/{guild.id}/members/{user.id}                           Modify Guild Member                        {'JSON Params': ['nick?', 'roles?', 'mute? ^1^', 'deaf? ^1^', 'channel_id? ^1^', 'communication_disabled_until? ^2^', 'flags?']}
+guild              PATCH  /guilds/{guild.id}/members/@me                                 Modify Current Guild Member                {'JSON Params': ['nick?', 'avatar?', 'avatar_description?', 'avatar_id?', 'avatar_decoration_sku_id?', 'collectibles?', 'display_name_font_id?', 'display_name_effect_id?', 'display_name_colors?', 'pronouns?', 'bio?', 'banner?']}
+guild              PATCH  /guilds/{guild.id}/members/@me/nick                            Modify Current Guild Member Nick           {}
+guild              PATCH  /guilds/{guild.id}/profile/@me                                 Modify Guild Member Profile                {'JSON Params': ['pronouns?', 'bio?', 'banner?', 'accent_color?', 'theme_colors?', 'popout_animation_particle_type? **(deprecated)**', 'emoji_id? **(deprecated)**', 'profile_effect_id?']}
+guild              PUT    /guilds/{guild.id}/members/{user.id}/roles/{role.id}           Add Guild Member Role                      {}
+guild              DELETE /guilds/{guild.id}/members/{user.id}/roles/{role.id}           Remove Guild Member Role                   {}
+guild              DELETE /guilds/{guild.id}/members/{user.id}                           Remove Guild Member                        {}
+guild              POST   /users/@me/guilds/{guild.id}/member/ack-dm-upsell-settings     Acknowledge DM Settings Upsell Modal       {}
+guild              GET    /guilds/{guild.id}/bans                                        List Guild Bans                            {'Query String Params': ['before? ^1^', 'after? ^1^', 'limit? ^2^']}
+guild              GET    /guilds/{guild.id}/bans/search                                 Search Guild Bans                          {'Query String Params': ['query?', 'user_ids?', 'limit?']}
+guild              GET    /guilds/{guild.id}/bans/{user.id}                              Get Guild Ban                              {}
+guild              PUT    /guilds/{guild.id}/bans/{user.id}                              Create Guild Ban                           {'JSON Params': ['delete_message_days? **(deprecated)**', 'delete_message_seconds?']}
+guild              POST   /guilds/{guild.id}/bulk-ban                                    Bulk Guild Ban                             {'JSON Params': ['user_ids', 'delete_message_seconds?'], 'Response Body': ['banned_users', 'failed_users ^1^']}
+guild              POST   /guilds/{guild.id}/bulk-ban/v2                                 Bulk Guild Ban V2                          {'JSON Params': ['user_ids ^1^', 'delete_message_seconds?']}
+guild              DELETE /guilds/{guild.id}/bans/{user.id}                              Delete Guild Ban                           {}
+guild              GET    /guilds/{guild.id}/roles                                       List Guild Roles                           {}
+guild              GET    /guilds/{guild.id}/roles/{role.id}                             Get Guild Role                             {}
+guild              GET    /guilds/{guild.id}/roles/member-counts                         Get Guild Role Member Counts               {}
+guild              GET    /guilds/{guild.id}/roles/{role.id}/member-ids                  List Guild Role Members                    {}
+guild              PATCH  /guilds/{guild.id}/roles/{role.id}/members                     Add Guild Role Members                     {'JSON Params': ['member_ids']}
+guild              GET    /guilds/{guild.id}/roles/connections-configurations            List Guild Role Connections Configuratio   {}
+guild              GET    /guilds/{guild.id}/roles/{role.id}/connections/configuration   Get Guild Role Connection Configuration    {}
+guild              PUT    /guilds/{guild.id}/roles/{role.id}/connections/configuration   Modify Guild Role Connection Configurati   {}
+guild              GET    /guilds/{guild.id}/roles/{role.id}/connections/eligibility     Get Guild Role Connection Eligibility      {}
+guild              PUT    /guilds/{guild.id}/roles/{role.id}/connections/assign          Assign Guild Role Connection               {}
+guild              POST   /guilds/{guild.id}/roles/{role.id}/connections/unassign        Unassign Guild Role Connection             {}
+guild              POST   /guilds/{guild.id}/roles                                       Create Guild Role                          {'JSON Params': ['name?', 'description?', 'color? **(deprecated)** ^1^', 'colors? ^1^ ^2^', 'hoist?', 'icon?', 'unicode_emoji?', 'permissions?', 'mentionable?']}
+guild              PATCH  /guilds/{guild.id}/roles                                       Modify Guild Role Positions                {'JSON Params': ['id', 'position?']}
+guild              PATCH  /guilds/{guild.id}/roles/{role.id}                             Modify Guild Role                          {'JSON Params': ['name?', 'description?', 'color? **(deprecated)** ^1^', 'colors? ^1^ ^2^', 'hoist?', 'icon?', 'unicode_emoji?', 'permissions?', 'mentionable?']}
+guild              DELETE /guilds/{guild.id}/roles/{role.id}                             Delete Guild Role                          {}
+guild              GET    /guilds/{guild.id}/prune                                       Get Guild Prune                            {'Query String Params': ['days?', 'include_roles?'], 'Response Body': ['pruned']}
+guild              POST   /guilds/{guild.id}/prune                                       Prune Guild                                {'JSON Params': ['days?', 'compute_prune_count?', 'include_roles?'], 'Response Body': ['pruned']}
+guild              GET    /guilds/{guild.id}/widget                                      Get Guild Widget Settings                  {}
+guild              PATCH  /guilds/{guild.id}/widget                                      Modify Guild Widget                        {'JSON Params': ['enabled?', 'channel_id?']}
+guild              GET    /guilds/{guild.id}/widget.json                                 Get Guild Widget                           {}
+guild              GET    /guilds/{guild.id}/widget.png                                  Get Guild Widget Image                     {'Query String Params': ['style?']}
+guild              GET    /guilds/{guild.id}/vanity-url                                  Get Guild Vanity Invite                    {'Response Body': ['code', 'uses']}
+guild              PATCH  /guilds/{guild.id}/vanity-url                                  Modify Guild Vanity Invite                 {'JSON Params': ['code'], 'Response Body': ['code', 'uses']}
+guild              GET    /guilds/{guild.id}/member-verification                         Get Guild Member Verification              {'Query String Params': ['with_guild? ^1^', 'invite_code?']}
+guild              PATCH  /guilds/{guild.id}/member-verification                         Modify Guild Member Verification           {'JSON Params': ['enabled?', 'form_fields?', 'description?', 'bulk_action?']}
+guild              GET    /guilds/{guild.id}/requests                                    List Guild Join Requests                   {'Query String Params': ['status? ^1^', 'limit?', 'before?', 'after?'], 'Response Body': ['guild_join_requests', 'total?']}
+guild              GET    /join-requests/{guild_join_request.id}                         Get Guild Join Request                     {}
+guild              GET    /guilds/{guild.id}/requests/@me                                Get Current User Guild Join Request        {}
+guild              GET    /guilds/{guild.id}/requests/@me/cooldown                       Get Guild Join Request Cooldown            {'Response Body': ['cooldown']}
+guild              PUT    /guilds/{guild.id}/requests/@me                                Create Guild Join Request                  {'JSON Params': ['form_fields ^1^', 'version']}
+guild              POST   /guilds/{guild.id}/requests/@me                                Reset Guild Join Request                   {}
+guild              POST   /guilds/{guild.id}/requests/{guild_join_request.id}/ack        Acknowledge Guild Join Request             {}
+guild              DELETE /guilds/{guild.id}/requests/@me                                Delete Guild Join Request                  {}
+guild              POST   /join-requests/{guild_join_request.id}/interview               Create Guild Join Request Interview        {}
+guild              PATCH  /guilds/{guild.id}/requests/{guild_join_request.id}            Action Guild Join Request                  {'JSON Params': ['action', 'rejection_reason?']}
+guild              PATCH  /guilds/{guild.id}/requests/id/{guild_join_request.id}         Action Guild Join Request by ID            {}
+guild              PATCH  /guilds/{guild.id}/requests                                    Bulk Action Guild Join Requests            {'JSON Params': ['action']}
+guild              GET    /guilds/{guild.id}/requests/users/{user.id}                    List User Guild Join Requests              {}
+guild              GET    /guilds/{guild.id}/welcome-screen                              Get Guild Welcome Screen                   {}
+guild              PATCH  /guilds/{guild.id}/welcome-screen                              Modify Guild Welcome Screen                {'JSON Params': ['enabled?', 'description?', 'welcome_channels?']}
+guild              GET    /guilds/{guild.id}/onboarding                                  Get Guild Onboarding                       {}
+guild              PUT    /guilds/{guild.id}/onboarding                                  Modify Guild Onboarding                    {'JSON Params': ['prompts?', 'default_channel_ids?', 'enabled?', 'mode?']}
+guild              GET    /guilds/{guild.id}/onboarding/allowed-applications             List Guild Onboarding Allowed Applicatio   {'Response Body': ['application_ids']}
+guild              POST   /guilds/{guild.id}/onboarding-responses                        Create Guild Onboarding Responses          {'JSON Params': ['onboarding_responses?', 'onboarding_prompts_seen?', 'onboarding_responses_seen?']}
+guild              PUT    /guilds/{guild.id}/onboarding-responses                        Modify Guild Onboarding Responses          {'JSON Params': ['onboarding_responses?', 'onboarding_prompts_seen?', 'onboarding_responses_seen?']}
+guild              GET    /guilds/{guild.id}/new-member-welcome                          Get Guild New Member Welcome               {}
+guild              PUT    /guilds/{guild.id}/new-member-welcome                          Modify Guild New Member Welcome            {'JSON Params': ['enabled?', 'welcome_message?', 'new_member_actions? ^1^', 'resource_channels? ^2^']}
+guild              PATCH  /guilds/{guild.id}/new-member-actions/{channel.id}             Modify Guild New Member Action             {'JSON Params': ['icon?']}
+guild              PUT    /guilds/{guild.id}/resource-channels/{channel.id}              Modify Guild Resource Channel              {'JSON Params': ['icon?']}
+guild              GET    /guilds/{guild.id}/new-member-actions                          Get Guild New Member Actions               {}
+guild              POST   /guilds/{guild.id}/new-member-action/{channel.id}              Complete Guild New Member Action           {}
+guild              GET    /guilds/{guild.id}/top-games                                   List Guild Top Games                       {'Response Body': ['top_games']}
+guild              GET    /guilds/{guild.id}/premium/subscriptions                       List Premium Guild Subscriptions           {'Query String Params': ['include_ended?']}
+guild              PUT    /guilds/{guild.id}/premium/subscriptions                       Create Premium Guild Subscriptions         {'JSON Params': ['user_premium_guild_subscription_slot_ids', 'disable_powerup_auto_apply?']}
+guild              DELETE /guilds/{guild.id}/premium/subscriptions/{premium_guild_subscription.id} Delete Premium Guild Subscription          {}
+guild              GET    /guilds/{guild.id}/powerups                                    List Guild Powerups                        {'Query String Params': ['include_ends_at?']}
+guild              POST   /guilds/{guild.id}/skus/{sku.id}                               Add Guild Powerup                          {'JSON Params': ['game_server_name?', 'game_server_region?']}
+guild              PATCH  /guilds/{guild.id}/entitlements/{entitlement.id}               Modify Guild Powerup                       {'JSON Params': ['game_server_name?', 'sku_id?']}
+guild              DELETE /guilds/{guild.id}/skus/{sku.id}                               Remove Guild Powerup                       {'Query String Params': ['entitlement_id?']}
+guild              GET    /guilds/{guild.id}/game-servers                                List Guild Game Servers                    {}
+guild              GET    /guilds/{guild.id}/game-server-regions                         List Guild Game Server Regions             {}
+guild              POST   /guilds/{guild.id}/game-servers/{game_server.id}/wake          Wake Guild Game Server                     {}
+guild              GET    /guilds/{guild.id}/admin-server-eligibility                    Get Admin Community Eligibility            {'Response Body': ['eligible_for_admin_server']}
+guild              POST   /guilds/{guild.id}/join-admin-server                           Join Admin Community                       {}
+guild              POST   /guilds/{guild.id}/migrate-pin-permission                      Migrate Pin Permission                     {}
+guild              POST   /guilds/{guild.id}/migrate-bypass-slowmode-permission          Migrate Bypass Slowmode Permission         {}
+guild              POST   /guilds/automations/email-domain-lookup                        Query Student Hubs                         {'JSON Params': ['email', 'use_verification_code? ^1^', 'allow_multiple_guilds? ^2^', 'guild_id? ^2^'], 'Response Body': ['has_matching_guild', 'guilds_info? ^1^']}
+guild              POST   /guilds/automations/email-domain-lookup/verify-code            Join Student Hub                           {'JSON Params': ['email', 'guild_id', 'code'], 'Response Body': ['joined', 'guild?']}
+guild              POST   /hub-waitlist/signup                                           Join Student Hub Waitlist                  {'JSON Params': ['email', 'school'], 'Response Body': ['email', 'email_domain', 'school', 'user_id']}
+guild              GET    /guilds/{guild.id}/role-subscriptions/settings                 Get Guild Role Subscriptions Settings      {}
+guild              PATCH  /guilds/{guild.id}/role-subscriptions/settings                 Modify Guild Role Subscriptions Settings   {'JSON Params': ['full_server_gate?', 'description?', 'server_shop_tab_order?', 'store_page_enabled?', 'store_page_primary_color?', 'store_page_trailer_url?', 'store_page_show_subscriber_count?', 'store_page_guild_products_default_sort?']}
+guild              POST   /guilds/{guild.id}/role-subscriptions/group-listings           Create Guild Role Subscription Group Lis   {'JSON Params': ['description?']}
+guild              GET    /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id} Get Guild Role Subscription Group Listin   {}
+guild              GET    /guilds/{guild.id}/role-subscriptions/group-listings           List Guild Role Subscription Group Listi   {}
+guild              PATCH  /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id} Modify Guild Role Subscription Group Lis   {'JSON Params': ['description?']}
+guild              DELETE /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id} Delete Guild Role Subscription Group Lis   {}
+guild              POST   /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id}/subscription-listings Create Guild Role Subscription Listing     {'JSON Params': ['name', 'description', 'image', 'price_tier', 'benefits', 'can_access_all_channels?']}
+guild              PATCH  /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id}/subscription-listings/{subscription_listing.id} Modify Guild Role Subscription Listing     {'JSON Params': ['name?', 'description?', 'image?', 'price_tier?', 'benefits?', 'can_access_all_channels?']}
+guild              DELETE /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id}/subscription-listings/{subscription_listing.id} Delete Guild Role Subscription Listing     {}
+guild              POST   /guilds/{guild.id}/role-subscriptions/group-listings/{subscription_group_listing.id}/subscription-listings/{subscription_listing.id}/archive Archive Guild Role Subscription Listing    {}
+guild              GET    /guilds/{guild.id}/role-subscriptions/trials                   List Guild Role Subscription Trials        {}
+guild              PATCH  /guilds/{guild.id}/role-subscriptions/subscription-listings/{subscription_listing.id}/trial Modify Guild Role Subscription Listing T   {'JSON Params': ['trial?', 'max_num_active_trial_users?']}
+guild              GET    /guilds/{guild.id}/role-subscriptions/templates                List Guild Role Subscription Listing Tem   {'Response Body': ['templates']}
+guild              GET    /guilds/{guild.id}/role-subscriptions/subscription-listings/{subscription_listing.id}/trial/{subscription_trial.id}/eligibility Get Guild Role Subscription Listing Tria   {'Response Body': ['is_eligible']}
+guild              GET    /guilds/{guild.id}/creator-monetization/requirements           Get Creator Monetization Eligibility       {'Response Body': ['guild_id', 'can_apply?', 'sufficient?', 'country?', 'mfa?', 'size?', 'safe_environment?', 'health_score?', 'health_score_pending?', 'nsfw_properties?', 'retention_healthy?', 'engagement_healthy?', 'age?', 'owner_age?', 'minimum_age_in_days?', 'minimum_owner_age_in_years?', 'minimum_size?', 'latest_request?', 'rejection?']}
+guild              POST   /guilds/{guild.id}/creator-monetization/enable-requests        Create Creator Monetization Enable Reque   {}
+guild              POST   /guilds/{guild.id}/creator-monetization/enable-requests/{creator_monetization_request.id}/accept-terms Accept Creator Monetization Enable Reque   {}
+guild              POST   /guilds/{guild.id}/creator-monetization/accept-terms           Accept Creator Monetization Terms          {}
+guild              GET    /guilds/{guild.id}/creator-monetization/restrictions           Get Creator Monetization Restrictions      {'Response Body': ['restrictions']}
+guild              GET    /guilds/{guild.id}/creator-monetization/marketing/onboarding   Get Creator Monetization Marketing Onboa   {'Response Body': ['sections']}
+guild              POST   /guilds/{guild.id}/creator-monetization/ownership-transfer/onboarding Update Creator Monetization Team           {'JSON Params': ['team_id'], 'Response Body': ['application']}
+guild              POST   /guilds/{guild.id}/creator-monetization/accept-new-terms-demonetized Accept Creator Monetization New Terms De   {}
+guild              POST   /guilds/{guild.id}/creator-monetization/remove-monetization    Remove Creator Monetization                {}
+guild              POST   /guilds/{guild.id}/products                                    Create Guild Product Listing               {'JSON Params': ['name', 'description?', 'price_tier?', 'create_new_role?', 'image', 'image_name', 'attachments? ^1^']}
+guild              GET    /guilds/{guild.id}/products/listings                           List Guild Product Listings                {'Response Body': ['listings']}
+guild              GET    /guilds/{guild.id}/products/listings/{product_listing.id}      Get Guild Product Listing                  {}
+guild              PATCH  /guilds/{guild.id}/products/listings/{product_listing.id}      Modify Guild Product Listing               {'JSON Params': ['name?', 'description?', 'price_tier?', 'create_new_role?', 'image?', 'image_name?', 'unlink_role?', 'attachments? ^1^']}
+guild              DELETE /guilds/{guild.id}/products/listings/{product_listing.id}      Delete Guild Product Listing               {}
+guild              POST   /guilds/{guild.id}/products/listings/{product_listing.id}/attachments/{attachment.id}/download Get Guild Product Listing Attachment URL   {'Response Body': ['url']}
+invite             GET    /invites/{invite.code}                                         Get Invite                                 {'Query String Params': ['with_counts?', 'with_permissions?', 'guild_scheduled_event_id?']}
+invite             GET    /invites/{invite.code}/friend-members                          List Invite Friend Members                 {'Response Body': ['friend_member_ids']}
+invite             GET    /invites/{invite.code}/target-users                            List Invite Target Users                   {}
+invite             PUT    /invites/{invite.code}/target-users                            Update Invite Target Users                 {'Form Params': ['target_users_file ^1^']}
+invite             GET    /invites/{invite.code}/target-users/job-status                 Get Invite Target Users Job Status         {}
+invite             POST   /invites/{invite.code}                                         Accept Invite                              {'JSON Params': ['session_id?']}
+invite             DELETE /invites/{invite.code}                                         Delete Invite                              {}
+invite             GET    /guilds/{guild.id}/invites                                     List Guild Invites                         {}
+invite             GET    /channels/{channel.id}/invites                                 List Channel Invites                       {}
+invite             POST   /channels/{channel.id}/invites                                 Create Channel Invite                      {'JSON/Form Params': ['flags? ^1^', 'max_age? ^2^', 'max_uses?', 'temporary?', 'unique?', 'target_type?', 'target_user_id?', 'target_application_id?', 'target_users_file? ^3^', 'role_ids? ^4^']}
+invite             GET    /users/@me/invites                                             List User Invites                          {}
+invite             POST   /users/@me/invites                                             Create User Invite                         {'JSON Params': ['code?']}
+invite             DELETE /users/@me/invites                                             Revoke User Invites                        {}
+message            GET    /channels/{channel.id}/messages                                List Messages                              {'Query String Params': ['around?', 'before?', 'after?', 'limit']}
+message            GET    /users/{user.id}/messages                                      List DM Messages                           {'Query String Params': ['limit']}
+message            POST   /channels/preload-messages                                     Preload Messages                           {'JSON Body': ['channel_ids']}
+message            GET    /guilds/{guild.id}/messages/search                             Search Guild Messages                      {'Query String Params': ['limit?', 'offset?', 'max_id? ^6^', 'min_id? ^6^', 'slop?', 'content?', 'contents?', 'channel_id? ^1^', 'author_type?', 'author_id?', 'mentions?', 'mentions_role_id?', 'mention_everyone?', 'replied_to_user_id?', 'replied_to_message_id?', 'pinned?', 'has?', 'embed_type?', 'embed_provider?', 'link_hostname?', 'attachment_filename?', 'attachment_extension?', 'command_id? ^3^ ^4^', 'command_name? ^3^ ^4^', 'sort_by? ^2^', 'sort_order? ^2^', 'include_nsfw? ^5^'], 'Response Body': ['analytics_id', 'doing_deep_historical_index', 'documents_indexed?', 'total_results', 'messages ^1^', 'channels? ^2^', 'threads?', 'members?']}
+message            GET    /channels/{channel.id}/messages/search                         Search Channel Messages                    {}
+message            POST   /guilds/{guild.id}/messages/search/tabs                        Search Guild Messages by Tab               {'JSON Params': ['tabs', 'channel_ids? ^1^', 'include_nsfw? ^2^', 'track_exact_total_hits?'], 'Response Body': ['analytics_id', 'doing_deep_historical_index', 'documents_indexed?', 'tabs']}
+message            POST   /channels/{channel.id}/messages/search/tabs                    Search Channel Messages by Tab             {}
+message            POST   /users/@me/messages/search/tabs                                Search User Messages by Tab                {}
+message            GET    /channels/{channel.id}/messages/{message.id}                   Get Message                                {}
+message            POST   /channels/{channel.id}/messages                                Create Message                             {'JSON/Form Params': ['content?', 'tts?', 'embeds? ^2^', 'nonce? ^3^', 'allowed_mentions?', 'message_reference?', 'components? ^2^', 'sticker_ids?', 'activity?', 'application_id?', 'flags?', 'files[n]? ^1^', 'attachments? ^1^', 'poll?', 'confetti_potion?', 'shared_client_theme?', 'with_checkpoint?']}
+message            POST   /users/{user.id}/messages                                      Create DM Message                          {'Extra JSON Params': ['metadata?']}
+message            POST   /channels/{channel.id}/greet                                   Create Greet Message                       {'JSON Params': ['sticker_ids', 'allowed_mentions?', 'message_reference?']}
+message            PATCH  /channels/{channel.id}/explicit-media                          Scan Explicit Media                        {'JSON Params': ['message_ids']}
+message            PATCH  /messages/explicit-media                                       Bulk Scan Explicit Media                   {'JSON Params': ['messages']}
+message            POST   /attachments/sender-report-false-positive                      Report Sent Explicit Content False Posit   {'JSON Params': ['channel_id', 'message_id', 'attachment_ids', 'filenames']}
+message            POST   /attachments/report-false-positive                             Report Explicit Content False Positive     {}
+message            POST   /channels/{channel.id}/messages/{message.id}/crosspost         Crosspost Message                          {}
+message            POST   /channels/{channel.id}/messages/{message.id}/hide-guild-feed   Hide Message from Guild Feed               {}
+message            DELETE /channels/{channel.id}/messages/{message.id}/hide-guild-feed   Unhide Message from Guild Feed             {}
+message            GET    /channels/{channel.id}/messages/{message.id}/reactions/{emoji} List Reactions                             {'Query String Params': ['after?', 'limit?', 'type?']}
+message            PUT    /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me Create Reaction                            {'Query String Params': ['type?']}
+message            DELETE /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{reaction_type}/@me Delete Own Reaction                        {}
+message            DELETE /channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{reaction_type}/{user.id} Delete Reaction                            {}
+message            DELETE /channels/{channel.id}/messages/{message.id}/reactions/{emoji} Delete Reaction Emoji                      {}
+message            DELETE /channels/{channel.id}/messages/{message.id}/reactions         Delete All Reactions                       {}
+message            GET    /channels/{channel.id}/messages/{message.id}/interaction-data  Get Message Interaction Data               {'Response Body': ['id', 'type', 'name', 'application_command', 'options?']}
+message            PATCH  /channels/{channel.id}/messages/{message.id}                   Edit Message                               {'JSON/Form Params': ['content?', 'embeds? ^2^', 'allowed_mentions?', 'components? ^2^', 'flags?', 'files[n] ^1^', 'attachments ^1^']}
+message            PATCH  /users/{user.id}/messages/{message.id}                         Edit DM Message                            {'JSON/Form Params': ['content?']}
+message            DELETE /channels/{channel.id}/messages/{message.id}                   Delete Message                             {}
+message            DELETE /users/{user.id}/messages/{message.id}                         Delete DM Message                          {}
+message            POST   /channels/{channel.id}/messages/bulk-delete                    Bulk Delete Messages                       {'JSON Params': ['messages']}
+message            GET    /channels/{channel.id}/messages/pins                           List Message Pins                          {'Query String Params': ['before?', 'limit?'], 'Response Body': ['items', 'has_more']}
+message            GET    /channels/{channel.id}/pins                                    List Pinned Messages                       {}
+message            PUT    /channels/{channel.id}/messages/pins/{message.id}              Pin Message                                {}
+message            DELETE /channels/{channel.id}/messages/pins/{message.id}              Unpin Message                              {}
+message            GET    /channels/{channel.id}/media-post-preview                      Get Channel Media Preview                  {'Response Body': ['media']}
+message            POST   /unfurler/unfurl                                               Unfurl Embed                               {'JSON Params': ['url'], 'Response Body': ['response?', 'error?', 'context_errors', 'embeds?']}
+message            POST   /unfurler/embed-urls                                           Unfurl Embeds                              {'JSON Params': ['urls'], 'Response Body': ['embeds']}
+message            GET    /channels/{channel.id}/polls/{message.id}/answers/{poll_answer.id} List Poll Answer Voters                    {'Query String Params': ['after?', 'limit?'], 'Response Body': ['users']}
+message            POST   /channels/{channel.id}/polls/{message.id}/expire               End Poll                                   {}
+message            PUT    /channels/{channel.id}/polls/{message.id}/answers/@me          Create Poll Vote                           {'JSON Params': ['answer_ids']}
+message            GET    /channels/{channel.id}/summaries                               List Conversation Summaries                {'Response Body': ['summaries']}
+message            DELETE /channels/{channel.id}/summaries/{summary.id}                  Delete Conversation Summary                {}
+message            GET    /partner-sdk/users/@me/channels                                List User Message Summaries                {}
+message            PUT    /partner-sdk/dms/{user_1.id}/{user_2.id}/messages/{message.id}/moderation-metadata Update User Message Moderation Metadata    {}
+presence           GET    /presences                                                     List Presences                             {'Response Body': ['guilds', 'presences', 'applications']}
+presence           GET    /consoles/xbox/presences                                       List Presences for Xbox                    {'Response Body': ['guilds', 'presences', 'applications', 'connected_account_ids']}
+presence           POST   /presences                                                     Update Presence                            {'JSON Params': ['package_name', 'update?']}
+presence           GET    /activities                                                    List Global Activity Statistics            {'Query String Params': ['with_users?', 'with_applications?']}
+presence           GET    /activities/statistics/applications/{application.id}           List Application Activity Statistics       {}
+presence           GET    /users/@me/activities/statistics/applications                  List User Application Activity Statistic   {}
+presence           POST   /activities                                                    Update Activity Session                    {'JSON Params': ['token?', 'application_id', 'duration?', 'share_activity?', 'distributor?', 'exe_path?', 'voice_channel_id?', 'session_id?', 'media_session_id?', 'closed?'], 'Response Body': ['token']}
+presence           POST   /users/@me/headless-sessions                                   Create Headless Session                    {'JSON Params': ['activities ^1^', 'token?'], 'Response Body': ['activities', 'token']}
+presence           POST   /users/@me/headless-sessions/delete                            Delete Headless Session                    {'JSON Params': ['token']}
+presence           GET    /users/{user.id}/sessions/{session_id}/activities/{application.id}/metadata Get Activity Metadata                      {}
+presence           GET    /users/{user.id}/sessions/{session_id}/activities/{application.id}/{activity_action_type} Get Activity Secret                        {'Query String Params': ['channel_id?', 'message_id?'], 'Response Body': ['secret']}
+presence           POST   /users/@me/activities/subscribe                                Update Activity Subscriptions              {}
+relationships      GET    /users/@me/relationships                                       List Relationships                         {}
+relationships      POST   /users/@me/relationships                                       Send Friend Request                        {'JSON Params': ['username', 'discriminator ^1^', 'note?']}
+relationships      PUT    /users/@me/relationships/{user.id}                             Create Relationship                        {'JSON Params': ['type?', 'from_friend_suggestion?', 'confirm_stranger_request?', 'note?']}
+relationships      PUT    /users/@me/relationships/{user.id}/ignore                      Ignore User                                {}
+relationships      DELETE /users/@me/relationships/{user.id}/ignore                      Unignore User                              {}
+relationships      PATCH  /users/@me/relationships/{user.id}                             Modify Relationship                        {'JSON Params': ['nickname? ^1^']}
+relationships      DELETE /users/@me/relationships/{user.id}                             Remove Relationship                        {}
+relationships      DELETE /users/@me/relationships                                       Bulk Remove Relationships                  {'Query String Params': ['relationship_type?', 'only_spam? **(deprecated)**'], 'JSON Params': ['filters?']}
+relationships      POST   /users/@me/relationships/bulk                                  Bulk Add Relationships                     {'JSON Params': ['user_ids', 'token'], 'Response Body': ['failed_requests', 'successful_requests']}
+relationships      GET    /users/@me/game-relationships                                  List Game Relationships                    {}
+relationships      POST   /users/@me/game-relationships                                  Send Game Friend Request                   {'JSON Params': ['username']}
+relationships      PUT    /users/@me/game-relationships/{user.id}                        Create Game Relationship                   {}
+relationships      PUT    /users/@me/game-relationships/{user.id}/{application.id}       Create Game Relationship by Application    {}
+relationships      DELETE /users/@me/game-relationships/{user.id}                        Remove Game Relationship                   {}
+relationships      DELETE /users/@me/game-relationships/{user.id}/{application.id}       Remove Game Relationship by Application    {}
+relationships      GET    /friend-suggestions                                            List Friend Suggestions                    {}
+relationships      DELETE /friend-suggestions/{user.id}                                  Remove Friend Suggestion                   {}
+soundboard         GET    /soundboard-default-sounds                                     List Default Soundboard Sounds             {}
+soundboard         GET    /guilds/{guild.id}/soundboard-sounds                           List Guild Soundboard Sounds               {'Response Body': ['items']}
+soundboard         GET    /guilds/{guild.id}/soundboard-sounds/{sound.id}                Get Guild Soundboard Sound                 {}
+soundboard         POST   /guilds/{guild.id}/soundboard-sounds                           Create Guild Soundboard Sound              {'JSON Params': ['name', 'sound', 'volume?', 'emoji_id?', 'emoji_name?']}
+soundboard         PATCH  /guilds/{guild.id}/soundboard-sounds/{sound.id}                Modify Guild Soundboard Sound              {'JSON Params': ['name?', 'volume?', 'emoji_id?', 'emoji_name?']}
+soundboard         DELETE /guilds/{guild.id}/soundboard-sounds/{sound.id}                Delete Guild Soundboard Sound              {}
+soundboard         GET    /soundboard-sounds/{sound.id}/guild/{guild.id}                 Get Soundboard Sound Guild                 {}
+soundboard         POST   /channels/{channel.id}/send-soundboard-sound                   Send Soundboard Sound                      {'JSON Params': ['sound_id', 'source_guild_id?']}
+stage-instance     POST   /stage-instances                                               Create Stage Instance                      {'JSON Params': ['channel_id', 'topic', 'privacy_level?', 'guild_scheduled_event_id? ^1^', 'send_start_notification? ^2^']}
+stage-instance     GET    /stage-instances/{channel.id}                                  Get Stage Instance                         {}
+stage-instance     PATCH  /stage-instances/{channel.id}                                  Modify Stage Instance                      {'JSON Params': ['topic?', 'privacy_level?']}
+stage-instance     DELETE /stage-instances/{channel.id}                                  Delete Stage Instance                      {}
+sticker            GET    /sticker-packs                                                 List Sticker Packs                         {'Response Body': ['sticker_packs']}
+sticker            GET    /sticker-packs/{sticker_pack.id}                               Get Sticker Pack                           {}
+sticker            GET    /stickers/{sticker.id}                                         Get Sticker                                {}
+sticker            GET    /stickers/{sticker.id}/guild                                   Get Sticker Guild                          {}
+sticker            GET    /guilds/{guild.id}/stickers                                    List Guild Stickers                        {}
+sticker            GET    /guilds/{guild.id}/stickers/{sticker.id}                       Get Guild Sticker                          {}
+sticker            POST   /guilds/{guild.id}/stickers                                    Create Guild Sticker                       {'Form Params': ['name', 'description', 'tags', 'file']}
+sticker            PATCH  /guilds/{guild.id}/stickers/{sticker.id}                       Modify Guild Sticker                       {'JSON Params': ['name?', 'description?', 'tags?']}
+sticker            DELETE /guilds/{guild.id}/stickers/{sticker.id}                       Delete Guild Sticker                       {}
+user-settings      GET    /users/@me/settings                                            Get User Settings                          {}
+user-settings      PATCH  /users/@me/settings                                            Modify User Settings                       {'JSON Params': ['activity_joining_restricted_guild_ids?', 'activity_restricted_guild_ids?', 'afk_timeout?', 'allow_accessibility_detection?', 'animate_emoji?', 'animate_stickers?', 'contact_sync_enabled?', 'convert_emoticons?', 'custom_status?', 'default_guilds_restricted?', 'detect_platform_accounts?', 'developer_mode?', 'disable_games_tab?', 'enable_tts_command?', 'explicit_content_filter?', 'friend_discovery_flags?', 'friend_source_flags?', 'gif_auto_play?', 'guild_folders?', 'inline_attachment_media?', 'inline_embed_media?', 'locale?', 'message_display_compact?', 'native_phone_integration_enabled?', 'passwordless? **(deprecated)**', 'render_embeds?', 'render_reactions?', 'restricted_guilds?', 'show_current_game?', 'slayer_sdk_receive_dms_in_game?', 'status?', 'stream_notifications_enabled?', 'theme?', 'timezone_offset?', 'view_nsfw_guilds?']}
+user-settings      GET    /users/@me/consent                                             Get User Consents                          {}
+user-settings      POST   /users/@me/consent                                             Modify User Consents                       {'JSON Params': ['grant', 'revoke']}
+user-settings      GET    /users/@me/email-settings                                      Get Email Settings                         {}
+user-settings      PATCH  /users/@me/email-settings                                      Modify Email Settings                      {'JSON Params': ['settings']}
+user-settings      PATCH  /users/@me/notification-settings                               Modify Notification Settings               {'JSON Params': ['flags?']}
+user-settings      GET    /users/@me/notification-settings/snapshots                     List Notification Settings Snapshots       {}
+user-settings      POST   /users/@me/notification-settings/snapshots                     Create Notification Settings Snapshot      {'JSON Params': ['label?']}
+user-settings      POST   /users/@me/notification-settings/snapshots/{notification_settings_snapshot.id}/restore-guilds Restore Notification Settings Snapshot     {}
+user-settings      DELETE /users/@me/notification-settings/snapshots/{notification_settings_snapshot.id} Delete Notification Settings Snapshot      {}
+user-settings      PATCH  /users/@me/guilds/{guild.id}/settings                          Modify User Guild Settings                 {}
+user-settings      PATCH  /users/@me/guilds/settings                                     Bulk Modify User Guild Settings            {'JSON Params': ['guilds']}
+user-settings      PATCH  /users/@me/audio-settings/{audio_context_type}/{user.id}       Modify Audio Settings                      {'JSON Params': ['muted?', 'volume?', 'soundboard_muted?']}
+user-settings      GET    /users/@me/video-filters/assets                                List Video Filter Assets                   {}
+user-settings      POST   /users/@me/video-filters/assets                                Create Video Filter Asset                  {'JSON Params': ['type', 'asset']}
+user-settings      DELETE /users/@me/video-filters/assets/{video_filter_asset.id}        Delete Video Filter Asset                  {}
+user-settings      POST   /users/@me/video-filters/assets/{video_filter_asset.id}/last-used Mark Video Filter Asset Last Used          {}
+user               GET    /users/@me                                                     Get Current User                           {'Query String Params': ['with_analytics_token?']}
+user               PATCH  /users/@me/account                                             Modify Current User Account                {'JSON Params': ['global_name?']}
+user               POST   /users/@me/meaningfully-online                                 Report Meaningfully Online                 {}
+user               GET    /users/@me/avatars                                             List Recent Avatars                        {'Response Body': ['avatars']}
+user               DELETE /users/@me/avatars/{avatar.id}                                 Delete Recent Avatar                       {}
+user               GET    /users/{user.id}                                               Get User                                   {}
+user               GET    /users/{user.id}/profile                                       Get User Profile                           {'Query String Params': ['with_mutual_guilds?', 'with_mutual_friends?', 'with_mutual_friends_count?', 'guild_id?', 'connections_role_id?', 'join_request_id?', 'type?'], 'Response Body': ['application?', 'user', 'user_profile ^1^', 'badges ^1^', 'guild_member? ^1^', 'guild_member_profile? ^1^', 'guild_badges ^1^', 'widgets? ^1^', 'legacy_username? ^1^ ^2^', 'mutual_guilds? ^1^', 'mutual_friends? ^1^ ^3^', 'mutual_friends_count? ^1^ ^3^', 'connected_accounts', 'application_role_connections?', 'premium_type ^1^', 'premium_since ^1^', 'premium_guild_since ^1^', 'private? ^4^']}
+user               PATCH  /users/@me/profile                                             Modify User Profile                        {'JSON Params': ['pronouns?', 'bio?', 'banner?', 'accent_color?', 'theme_colors?', 'popout_animation_particle_type? **(deprecated)**', 'emoji_id? **(deprecated)**', 'profile_effect_id?']}
+user               GET    /users/{user.id}/relationships                                 List Mutual Relationships                  {}
+user               POST   /users/@me/mfa/totp/enable                                     Enable TOTP MFA                            {'JSON Params': ['password', 'secret?', 'code?'], 'Response Body': ['token', 'backup_codes']}
+user               POST   /users/@me/mfa/totp/disable                                    Disable TOTP MFA                           {'Response Body': ['token']}
+user               POST   /users/@me/mfa/sms/enable                                      Enable SMS MFA                             {'JSON Params': ['password']}
+user               POST   /users/@me/mfa/sms/disable                                     Disable SMS MFA                            {'JSON Params': ['password']}
+user               GET    /users/@me/mfa/webauthn/credentials                            List WebAuthn Authenticators               {}
+user               POST   /users/@me/mfa/webauthn/credentials                            Create WebAuthn Authenticator              {'JSON Params': ['name?', 'ticket?', 'credential?'], 'Response Body': ['ticket ^1^', 'challenge ^1^', 'id ^2^', 'type ^2^', 'name ^2^', 'backup_codes ^2^']}
+user               PATCH  /users/@me/mfa/webauthn/credentials/{authenticator.id}         Modify WebAuthn Authenticator              {'JSON Params': ['name?']}
+user               DELETE /users/@me/mfa/webauthn/credentials/{authenticator.id}         Delete WebAuthn Authenticator              {}
+user               POST   /auth/verify/view-backup-codes-challenge                       Send Backup Codes Challenge                {'JSON Params': ['password'], 'Response Body': ['nonce', 'regenerate_nonce']}
+user               POST   /users/@me/mfa/codes-verification                              Get Backup Codes                           {'JSON Params': ['key ^1^', 'nonce ^1^ ^2^', 'regenerate ^2^'], 'Response Body': ['backup_codes']}
+user               POST   /users/@me/disable                                             Disable User Account                       {'JSON Params': ['password']}
+user               POST   /users/@me/delete                                              Delete User Account                        {'JSON Params': ['password']}
+user               POST   /users/@me/captcha/verify                                      Verify User Captcha                        {'JSON Params': ['captcha_key']}
+user               PATCH  /users/@me/agreements                                          Modify User Agreements                     {'JSON Params': ['terms?', 'privacy?']}
+user               GET    /users/@me/pomelo-suggestions                                  Get Unique Username Suggestions            {'Response Body': ['username']}
+user               POST   /users/@me/pomelo-attempt                                      Get Unique Username Eligibility            {'JSON Params': ['username'], 'Response Body': ['taken']}
+user               POST   /users/@me/pomelo                                              Create Unique Username                     {'JSON Params': ['username']}
+user               PUT    /users/@me/clan                                                Set Guild Identity                         {'JSON Params': ['identity_enabled?', 'identity_guild_id?']}
+user               GET    /users/@me/mentions                                            List Recent Mentions                       {'Query String Params': ['before?', 'limit?', 'guild_id?', 'roles?', 'everyone?']}
+user               DELETE /users/@me/mentions/{message.id}                               Delete Recent Mention                      {}
+user               GET    /users/@me/harvest                                             Get User Harvest                           {}
+user               POST   /users/@me/harvest                                             Create User Harvest                        {'JSON Params': ['backends? ^1^', 'email ^2^']}
+user               GET    /users/@me/survey                                              Get User Survey                            {'Query String Params': ['disable_auto_seen?', 'survey_override? ^1^'], 'Response Body': ['survey']}
+user               POST   /users/@me/survey/{survey.id}/seen                             Acknowledge User Survey                    {}
+user               GET    /users/@me/notes                                               Get User Notes                             {}
+user               GET    /users/@me/notes/{user.id}                                     Get User Note                              {'Response Body': ['note', 'note_user_id', 'user_id']}
+user               PUT    /users/@me/notes/{user.id}                                     Modify User Note                           {'JSON Params': ['note']}
+user               GET    /users/@me/affinities/users                                    List User Affinities                       {'Response Body': ['user_affinities']}
+user               GET    /users/@me/affinities/v2/users                                 List User Affinities v2                    {'Response Body': ['user_affinities']}
+user               GET    /users/@me/affinities/guilds                                   List Guild Affinities                      {'Response Body': ['guild_affinities']}
+user               GET    /users/@me/affinities/channels                                 List Channel Affinities                    {'Response Body': ['channel_affinities']}
+user               GET    /tutorial                                                      Get Tutorial                               {}
+user               PUT    /tutorial/indicators/{indicator}                               Confirm Tutorial Indicator                 {}
+user               POST   /tutorial/indicators/suppress                                  Suppress Tutorial                          {}
+user               POST   /hypesquad/online                                              Join HypeSquad Online                      {'JSON Params': ['house_id']}
+user               DELETE /hypesquad/online                                              Leave HypeSquad Online                     {}
+user               POST   /dev-portal-csat-survey-response                               Submit Developer Portal CSAT Survey        {'JSON Params': ['user_id', 'csat_response']}
+user               GET    /users/@me/premium-usage                                       Get User Premium Usage                     {'Response Body': ['nitro_sticker_sends', 'total_animated_emojis', 'total_global_emojis', 'total_large_uploads', 'total_hd_streams', 'hd_hours_streamed']}
+user               GET    /users/@me/saved-messages                                      List Saved Messages                        {'Response Body': ['results']}
+user               PUT    /users/@me/saved-messages/{channel.id}/{message.id}            Save Message                               {'JSON Params': ['due_at?']}
+user               DELETE /users/@me/saved-messages/{channel.id}/{message.id}            Unsave Message                             {}
+user               POST   /age-verification/verify                                       Verify Age                                 {'Response Body': ['verification_request_id', 'verification_vendor_name', 'verification_webview_url']}
+user               POST   /users/@me/identity/verification                               Create User Identity Verification          {'JSON Params': ['return_url']}
+user               GET    /users/@me/identity/verification                               Get User Identity Verification             {}
+voice              GET    /voice/regions                                                 List Voice Regions                         {}
+voice              GET    /guilds/{guild.id}/regions                                     List Guild Voice Regions                   {}
+voice              PUT    /voice/public-keys                                             Upload Voice Public Key                    {'JSON Params': ['key_version', 'public_key', 'signature']}
+voice              POST   /voice/{user.id}/match-public-key                              Verify Voice Public Key                    {'JSON Params': ['key_version', 'public_key'], 'Response Body': ['is_match']}
+voice              GET    /guilds/{guild.id}/voice-states/@me                            Get Current User Voice State               {}
+voice              GET    /guilds/{guild.id}/voice-states/{user.id}                      Get User Voice State                       {}
+voice              PATCH  /guilds/{guild.id}/voice-states/@me                            Modify Current User Voice State            {'JSON Params': ['channel_id?', 'suppress?', 'request_to_speak_timestamp?', 'silent?']}
+voice              PATCH  /guilds/{guild.id}/voice-states/{user.id}                      Modify User Voice State                    {'JSON Params': ['channel_id', 'suppress?']}
+voice              POST   /channels/{channel.id}/voice-channel-effects                   Send Voice Channel Effect                  {'JSON Params': ['animation_type?', 'animation_id? ^1^', 'emoji_id?', 'emoji_name?']}
+voice              POST   /channels/{channel.id}/custom-call-sounds                      Send Custom Call Sound                     {'JSON Params': ['animation_type', 'animation_id ^1^']}
+voice              PATCH  /streams/{stream_key}/stream                                   Modify Stream                              {'JSON Params': ['region?']}
+voice              GET    /streams/{stream_key}/preview                                  Get Stream Preview                         {'Response Body': ['url']}
+voice              POST   /streams/{stream_key}/preview                                  Upload Stream Preview                      {'JSON Params': ['thumbnail']}
+voice              POST   /streams/{stream_key}/preview/video                            Upload Video Stream Preview                {'Form Params': ['file']}
+voice              POST   /streams/{stream_key}/notify                                   Broadcast Stream Notification              {}
+webhook            POST   /channels/{channel.id}/webhooks                                Create Webhook                             {'JSON Params': ['name', 'avatar?']}
+webhook            GET    /channels/{channel.id}/webhooks                                List Channel Webhooks                      {}
+webhook            GET    /guilds/{guild.id}/webhooks                                    List Guild Webhooks                        {}
+webhook            GET    /webhooks/{webhook.id}                                         Get Webhook                                {}
+webhook            GET    /webhooks/{webhook.id}/{webhook.token}                         Get Webhook with Token                     {}
+webhook            PATCH  /webhooks/{webhook.id}                                         Modify Webhook                             {'JSON Params': ['name?', 'avatar?', 'channel_id?']}
+webhook            PATCH  /webhooks/{webhook.id}/{webhook.token}                         Modify Webhook with Token                  {'JSON Params': ['name?', 'avatar?']}
+webhook            DELETE /webhooks/{webhook.id}                                         Delete Webhook                             {}
+webhook            DELETE /webhooks/{webhook.id}/{webhook.token}                         Delete Webhook with Token                  {}
+webhook            POST   /webhooks/{webhook.id}/{webhook.token}                         Execute Webhook                            {'Query String Params': ['wait?', 'thread_id?'], 'JSON/Form Params': ['username?', 'avatar_url?', 'thread_name?', 'applied_tags?', 'content?', 'tts?', 'embeds?', 'allowed_mentions?', 'components? ^2^', 'flags?', 'files[n]? ^1^', 'attachments? ^1^', 'poll?']}
+webhook            GET    /webhooks/{webhook.id}/{webhook.token}/{webhook_service}       Get Service Webhook                        {}
+webhook            POST   /webhooks/{webhook.id}/{webhook.token}/{webhook_service}       Execute Service Webhook                    {'Query String Params': ['wait?', 'thread_id?']}
+webhook            GET    /webhooks/{webhook.id}/{webhook.token}/messages/{message.id}   Get Webhook Message                        {}
+webhook            PATCH  /webhooks/{webhook.id}/{webhook.token}/messages/{message.id}   Edit Webhook Message                       {'JSON/Form Params': ['content?', 'tts?', 'embeds?', 'allowed_mentions?', 'components? ^2^', 'flags?', 'files[n]? ^1^', 'attachments? ^1^']}
+webhook            DELETE /webhooks/{webhook.id}/{webhook.token}/messages/{message.id}   Delete Webhook Message                     {}
+widgets            PUT    /users/@me/widgets                                             Modify Profile Widgets                     {'JSON Params': ['widgets']}
+widgets            GET    /users/@me/widgets/suggested-games                             Get Profile Widgets Suggested Games        {'Response Body': ['suggested_games', 'suggested_wishlist_games']}
+widgets            POST   /application-identities                                        List Bulk Application Identities           {'JSON Params': ['user_ids ^1^']}
+widgets            GET    /applications/{application.id}/users/{user.id}/identities/{external_user_id}/profile Get User Application Profile               {}
+widgets            PATCH  /applications/{application.id}/users/{user.id}/identities/{external_user_id}/profile Modify User Application Profile            {'JSON Params': ['username?', 'metadata?', 'data?']}
+widgets            GET    /users/{user.id}/application-identities                        List User Application Identities           {'Query String Params': ['with_profiles?'], 'Response Body': ['identities']}
+widgets            PATCH  /users/@me/application-identities/{application.id}/{external_user_id}/config Modify User Application Profile Config     {'JSON Params': ['connection_visible?']}
+widgets            GET    /widget-configs/featured                                       List Featured Application Widget Configs   {'Response Body': ['application_ids', 'configs']}
+widgets            GET    /widget-configs/developer                                      Get Developer Application Widget Configs   {'Response Body': ['configs']}
+widgets            GET    /widget-configs/layout-definitions                             Get Layout Definitions                     {'Response Body': ['configs']}
+widgets            GET    /applications/{application.id}/widget-configs                  List Application Widget Configs            {}
+widgets            POST   /applications/{application.id}/widget-configs                  Create Application Widget Config           {'JSON Params': ['display_name', 'surfaces']}
+widgets            DELETE /applications/{application.id}/widget-configs/{widget_config.id} Delete Application Widget Config           {}
+widgets            PATCH  /applications/{application.id}/widget-configs/{widget_config.id} Modify Application Widget Config           {'JSON Params': ['display_name?', 'surfaces']}
+widgets            POST   /applications/{application.id}/widget-configs/{widget_config.id}/publish Publish Application Widget Config          {}
+widgets            POST   /applications/{application.id}/widget-configs/{widget_config.id}/unpublish Unpublish Application Widget Config        {}

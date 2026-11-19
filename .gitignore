@@ -1,0 +1,26 @@
+# Local state, secrets and the embedded interpreter never go in git.
+.python-embed/
+local/
+.env
+token
+
+# Generated documentation mirror. Upstream pages contain token-shaped examples
+# that trigger GitHub push protection; only the derived endpoint inventory is
+# source-controlled.
+research/.mdx-cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.venv/
+
+# Runtime state produced by the server
+approvals.sqlite3*
+audit.jsonl*
+approval-console.json
+uploads/
