@@ -59,11 +59,13 @@ Read this before calling anything:
    `status: "approval_required"` with an `approval_id`.
 3. A human must approve that exact request in the local dashboard. You cannot approve,
    and there is no tool to do so. Never claim an operation succeeded because you called it.
-4. Use `check_approval` with the `approval_id` to collect the result. Do not retry the original
+4. Give the human `console.dashboard_url` from the response. It contains the request ID but
+   never the dashboard access token; do not invent a port or ask for that token in chat.
+5. Use `check_approval` with the `approval_id` to collect the result. Do not retry the original
    call: that only creates a second pending request.
-5. High-risk operations (admin, destructive, sensitive) additionally require the operator to
+6. High-risk operations (admin, destructive, sensitive) additionally require the operator to
    type APPROVE. `cancel_approval` only cancels pending requests.
-6. This server uses a user token. Bot tokens are not supported and will be rejected.
+7. This server uses a user token. Bot tokens are not supported and will be rejected.
 
 Typical flow: list_my_guilds -> list_guild_channels -> list_messages -> send_message
 (wait for approval) -> check_approval.

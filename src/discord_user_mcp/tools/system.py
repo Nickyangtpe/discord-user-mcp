@@ -60,7 +60,9 @@ def _endpoint_public(endpoint: Endpoint, *, include_params: bool) -> dict[str, A
     description=(
         "Health check for this MCP server: whether the token was verified, which account is "
         "connected, read-only mode, approval TTL, tool and endpoint counts, and current rate "
-        "limit state. Call this first when something looks wrong. Local only; no Discord request."
+        "limit state. It also returns mode.approval_console.dashboard_url, a safe locked "
+        "Dashboard address that can be shown to the human (it never contains the access token). "
+        "Call this first when something looks wrong. Local only; no Discord request."
     ),
     risk=Risk.READ,
     endpoint_id=None,
@@ -200,9 +202,11 @@ async def check_approval(
     context = _context()
     record = context.approvals.check(approval_id)
     if record["status"] == "pending":
+        record["console"] = context.console_info(approval_id)
         record["message"] = (
-            "Still waiting for a human decision. Ask the operator to open the approval console; "
-            "do not retry the original tool call, which would create a second request."
+            "Still waiting for a human decision. Give the operator console.dashboard_url and "
+            "ask them to open the local dashboard; do not retry the original tool call, which "
+            "would create a second request."
         )
     return record
 

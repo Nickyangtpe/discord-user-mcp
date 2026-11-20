@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import httpx
 import pytest
@@ -12,12 +13,30 @@ import pytest
 from discord_user_mcp.config import load_dashboard_settings
 from discord_user_mcp.security.approval import ApprovalManager, ApprovalStore, ToolRequest
 from discord_user_mcp.security.audit import AuditLogger
-from discord_user_mcp.security.console import ApprovalConsole
+from discord_user_mcp.security.console import ApprovalConsole, _ConsoleServer
 from discord_user_mcp.security.permissions import Risk
 
 from conftest import make_settings
 
 HEADERS = {"X-Approval-Token": "test-token"}
+
+
+@pytest.mark.parametrize("error", [ConnectionResetError(), BrokenPipeError()])
+def test_console_suppresses_expected_disconnects(error: Exception) -> None:
+    with patch("discord_user_mcp.security.console.sys.exc_info", return_value=(type(error), error, None)):
+        with patch("http.server.ThreadingHTTPServer.handle_error") as report:
+            _ConsoleServer.handle_error(Mock(), None, ("127.0.0.1", 12345))
+    report.assert_not_called()
+
+
+def test_console_reports_unexpected_connection_errors() -> None:
+    error = RuntimeError("unexpected failure")
+    with patch("discord_user_mcp.security.console.sys.exc_info", return_value=(type(error), error, None)):
+        with patch("http.server.ThreadingHTTPServer.handle_error") as report:
+            # Use a real instance without binding a listening socket.
+            server = object.__new__(_ConsoleServer)
+            server.handle_error(None, ("127.0.0.1", 12345))
+    report.assert_called_once_with(None, ("127.0.0.1", 12345))
 
 
 class Setup:
@@ -53,6 +72,20 @@ async def test_console_rejects_missing_and_wrong_token(console_setup: Setup) -> 
         page = await http.get("/?t=nope")
         assert page.status_code == 401
         assert "<!doctype html" not in page.text.lower()
+
+
+async def test_safe_dashboard_address_opens_a_locked_landing_page(
+    console_setup: Setup,
+) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        page = await http.get("/?request=ap_example")
+        api = await http.get("/api/status")
+    assert page.status_code == 200
+    assert "Dashboard locked" in page.text
+    assert "approval-console.json" in page.text
+    assert "requestId" in page.text
+    assert "test-token" not in page.text
+    assert api.status_code == 401
 
 
 async def test_console_accepts_token_in_header_and_query(console_setup: Setup) -> None:
@@ -124,6 +157,28 @@ async def test_console_denies_a_pending_request(console_setup: Setup) -> None:
         )
     assert response.status_code == 200, response.text
     assert response.json()["status"] == "denied"
+
+
+async def test_request_id_cannot_unlock_or_approve(console_setup: Setup) -> None:
+    approval = await console_setup.manager.request(
+        ToolRequest(
+            tool="send_message", endpoint_id="messages.create", risk=Risk.WRITE,
+            summary="Send a message", target="channel_id=123",
+            args={"channel_id": "123", "content": "hi"},
+        )
+    )
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        assert (await http.get(f"/?request={approval.id}")).status_code == 200
+        assert (await http.get(f"/api/state?request={approval.id}")).status_code == 401
+        assert (await http.get(f"/?t={approval.id}")).status_code == 401
+        for headers in ({}, {"X-Approval-Token": approval.id}):
+            response = await http.post(
+                f"/api/approve?request={approval.id}", headers=headers,
+                json={"id": approval.id},
+            )
+            assert response.status_code == 401
+            assert response.headers["connection"] == "close"
+    assert console_setup.manager.check(approval.id)["status"] == "pending"
 
 
 async def test_console_blocks_sensitive_without_typed_confirmation(

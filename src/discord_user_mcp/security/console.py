@@ -26,6 +26,7 @@ import logging
 import os
 import secrets
 import socket
+import sys
 import threading
 import time
 from http import HTTPStatus
@@ -65,6 +66,105 @@ APPROVAL_STATUSES = {
     "cancelled",
 }
 
+LOCKED_PAGE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discord MCP Dashboard</title>
+<style>
+  :root { color-scheme:dark; --bg:#171819; --panel:#1e2022; --line:#343638;
+    --text:#e8e9eb; --muted:#a2a5a9; --brand:#536f94; --bad:#df9292; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:24px;
+    background:var(--bg); color:var(--text); font:14px/1.55 system-ui,"Segoe UI",sans-serif; }
+  main { width:min(100%,480px); padding:32px; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); }
+  .brand { display:flex; align-items:center; gap:11px; margin-bottom:24px; }
+  .mark { width:34px; height:34px; display:grid; place-items:center; border-radius:6px;
+    background:#292c30; border:1px solid var(--line); color:#d2d8e0; font-size:10px; font-weight:650; }
+  .brand strong { display:block; } .brand span,p,.hint { color:var(--muted); }
+  h1 { margin:0 0 10px; font-size:18px; font-weight:600; } p { margin:0 0 24px; }
+  label { display:block; margin-bottom:7px; font-size:12px; font-weight:650; }
+  .controls { display:flex; gap:8px; }
+  input { min-width:0; flex:1; padding:10px 12px; color:var(--text); background:var(--bg);
+    border:1px solid var(--line); border-radius:5px; outline:none; }
+  input:focus { border-color:#7e9abf; }
+  button { padding:10px 16px; border:1px solid #6d86a8; border-radius:5px; cursor:pointer;
+    color:white; background:var(--brand); font-weight:650; }
+  .hint { margin-top:13px; font-size:11px; }
+  .error { min-height:20px; margin-top:8px; color:var(--bad); font-size:12px; }
+  .brand { justify-content:space-between; }
+  .brand-identity { display:flex; align-items:center; gap:11px; }
+  select { max-width:120px; padding:6px; color:var(--muted); background:var(--bg);
+    border:1px solid var(--line); border-radius:5px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><div class="brand-identity"><div class="mark">MCP</div><div><strong>Discord MCP</strong><span data-i18n="subtitle">Local security dashboard</span></div></div>
+    <select id="language" aria-label="Language"><option value="zh-TW">繁體中文</option><option value="en">English</option></select></div>
+  <h1 data-i18n="title">Dashboard locked</h1>
+  <p data-i18n="description">This safe address does not contain approval credentials. Enter the local dashboard access token to continue.</p>
+  <label for="access-token" data-i18n="token">Dashboard access token</label>
+  <div class="controls"><input id="access-token" type="password" autocomplete="off" spellcheck="false"><button id="unlock" data-i18n="unlock">Unlock</button></div>
+  <div class="error" id="error" role="alert"></div>
+  <div class="hint" data-i18n="hint">Find it in the server startup output or approval-console.json. The AI deliberately cannot retrieve this token.</div>
+</main>
+<script>
+const input = document.getElementById('access-token');
+const error = document.getElementById('error');
+const requestId = new URLSearchParams(location.search).get('request') || '';
+const LOCKED_STRINGS = {
+  'en': {subtitle:'Local security dashboard', title:'Dashboard locked',
+    description:'This safe address does not contain approval credentials. Enter the local dashboard access token to continue.',
+    token:'Dashboard access token', unlock:'Unlock', missing:'Enter the access token.',
+    hint:'Find it in the server startup output or approval-console.json. The AI deliberately cannot retrieve this token.'},
+  'zh-TW': {subtitle:'本機安全控制台', title:'控制台已鎖定',
+    description:'此安全位址不含批准憑證。請輸入本機 Dashboard 存取權杖以繼續。',
+    token:'Dashboard 存取權杖', unlock:'解鎖', missing:'請輸入存取權杖。',
+    hint:'可在伺服器啟動訊息或 approval-console.json 找到；AI 無法取得此權杖。'}
+};
+let lockedLocale = String(navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-TW' : 'en';
+try {
+  const saved = localStorage.getItem('discord-mcp-language');
+  const cookie = document.cookie.split('; ').find(value => value.startsWith('discord_mcp_language='));
+  const preference = saved || (cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : '');
+  if (LOCKED_STRINGS[preference]) lockedLocale = preference;
+} catch (_) {}
+function renderLockedLocale() {
+  document.documentElement.lang = lockedLocale;
+  document.querySelectorAll('[data-i18n]').forEach(node => {
+    node.textContent = LOCKED_STRINGS[lockedLocale][node.dataset.i18n];
+  });
+  document.getElementById('language').value = lockedLocale;
+  if (error.textContent) error.textContent = LOCKED_STRINGS[lockedLocale].missing;
+}
+document.getElementById('language').addEventListener('change', event => {
+  if (!LOCKED_STRINGS[event.target.value]) return;
+  lockedLocale = event.target.value;
+  try { localStorage.setItem('discord-mcp-language', lockedLocale); } catch (_) {}
+  document.cookie = 'discord_mcp_language=' + encodeURIComponent(lockedLocale) +
+    '; Max-Age=31536000; Path=/; SameSite=Strict';
+  renderLockedLocale();
+});
+renderLockedLocale();
+function unlock() {
+  const value = input.value.trim();
+  if (!value) { error.textContent = LOCKED_STRINGS[lockedLocale].missing; return; }
+  const target = new URL('/', location.origin);
+  target.searchParams.set('t', value);
+  if (requestId.startsWith('ap_')) target.searchParams.set('request', requestId);
+  location.replace(target.pathname + target.search);
+}
+document.getElementById('unlock').addEventListener('click', unlock);
+input.addEventListener('keydown', event => { if (event.key === 'Enter') unlock(); });
+input.focus();
+</script>
+</body>
+</html>
+"""
+
 PAGE = """<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -72,106 +172,120 @@ PAGE = """<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Discord MCP Dashboard</title>
 <style>
-  :root { color-scheme:dark; --bg:#0d1117; --panel:#151a23; --panel2:#1b212c;
-    --line:#252c3b; --line2:#343e52; --text:#f3f5fb; --muted:#8e98aa;
-    --brand:#5865f2; --brand2:#5865f2; --ok:#45c98e; --no:#ed6674; --warn:#e6ac43;
+  :root { color-scheme:dark; --bg:#171819; --panel:#1e2022; --panel2:#242629;
+    --line:#303235; --line2:#414449; --text:#e8e9eb; --muted:#a2a5a9;
+    --brand:#536f94; --brand2:#536f94; --ok:#88b69a; --no:#df9292; --warn:#ceb181;
     --shadow:none; }
   * { box-sizing:border-box; }
   html { min-height:100%; background:var(--bg); }
   body { margin:0; min-height:100vh; color:var(--text); overflow-x:hidden;
     font:14px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI","Noto Sans TC",sans-serif;
     background:var(--bg); }
-  header { max-width:1120px; margin:0 auto; padding:28px 24px 20px; display:flex;
+  header { max-width:1240px; margin:0 auto 26px; padding:22px 28px; display:flex;
+    border-bottom:1px solid var(--line);
     justify-content:space-between; align-items:center; gap:18px; position:relative; }
   .brand { display:flex; align-items:center; gap:12px; }
-  .brand-mark { width:42px; height:42px; display:grid; place-items:center; border-radius:13px;
-    color:white; font-size:13px; font-weight:750; letter-spacing:-.2px;
-    background:var(--brand); border:1px solid #6975f4; box-shadow:none; }
-  h1 { font-size:17px; margin:0; font-weight:720; letter-spacing:-.2px; }
+  .brand-mark { width:34px; height:34px; display:grid; place-items:center; border-radius:6px;
+    color:#d2d8e0; font-size:10px; font-weight:650; letter-spacing:.3px;
+    background:#292c30; border:1px solid var(--line2); box-shadow:none; }
+  h1 { font-size:15px; margin:0; font-weight:650; letter-spacing:-.1px; }
   .brand-copy { color:var(--muted); font-size:12px; margin-top:1px; }
-  .status-chip { display:flex; align-items:center; gap:8px; max-width:520px; padding:8px 12px;
-    border:1px solid var(--line); border-radius:8px; color:#b9c1d1; background:var(--panel);
+  .status-chip { display:flex; align-items:center; gap:8px; max-width:520px; padding:8px 0;
+    color:var(--muted); background:transparent;
     font-size:12px; }
   .status-dot { width:7px; height:7px; border-radius:50%; flex:0 0 auto; background:var(--ok);
-    box-shadow:0 0 0 3px rgba(69,201,142,.1); }
-  .header-actions { display:flex; align-items:center; gap:8px; }
-  .language-select { width:auto; min-height:34px; padding:7px 30px 7px 10px; border-radius:8px;
-    color:#c4ccda; background-color:var(--panel); border-color:var(--line); font-size:12px; }
+    box-shadow:none; }
+  .header-actions { display:flex; align-items:center; gap:20px; }
+  .language-select { width:auto; min-height:32px; padding:6px 10px; border-radius:5px;
+    color:var(--muted); background-color:var(--bg); border-color:var(--line); font-size:12px; }
   .sub,.help { color:var(--muted); font-size:12px; }
   .help { margin-top:7px; } .help.warn { color:var(--warn); }
-  .workspace { max-width:1120px; margin:0 auto; padding:0 24px 36px; position:relative; }
-  nav { display:flex; gap:4px; width:max-content; max-width:100%; padding:5px; margin-bottom:22px;
-    border:1px solid var(--line); border-radius:10px; background:var(--panel); overflow:auto; }
-  nav button { border:0; border-radius:9px; background:transparent; color:var(--muted); min-width:86px;
-    padding:8px 14px; font-weight:650; white-space:nowrap; box-shadow:none; }
-  nav button:hover { color:var(--text); background:rgba(255,255,255,.035); }
-  nav button.active { color:#fff; background:#2b3240; box-shadow:inset 0 0 0 1px rgba(255,255,255,.04); }
+  .workspace { max-width:1240px; margin:0 auto; padding:0 28px 28px; position:relative;
+    display:grid; grid-template-columns:160px minmax(0,1fr); column-gap:32px; }
+  nav { display:flex; flex-direction:column; gap:4px; align-self:start; padding:0;
+    position:sticky; top:24px; }
+  nav button { display:flex; align-items:center; border:0; border-radius:5px; background:transparent;
+    color:var(--muted); padding:11px 13px; font-weight:500; text-align:left; white-space:nowrap; box-shadow:none; }
+  nav button:hover { color:var(--text); background:var(--panel); }
+  nav button.active { color:var(--text); background:#2a2d31; box-shadow:inset 2px 0 0 #91a7c4; }
   .nav-count { display:none; margin-left:6px; min-width:19px; height:19px; padding:0 6px;
-    align-items:center; justify-content:center; border-radius:10px; color:#251800;
-    background:var(--warn); font-size:10px; font-weight:800; }
-  main { display:grid; gap:18px; }
+    align-items:center; justify-content:center; border-radius:4px; color:#ddc49b;
+    background:#393229; font-size:10px; font-weight:600; }
+  main { display:grid; gap:18px; min-width:0; }
   section { animation:none; }
-  .section-head { display:flex; align-items:end; justify-content:space-between; gap:14px; margin:0 2px 14px; }
-  .section-head h2 { margin:0; font-size:20px; letter-spacing:-.4px; }
-  .section-head p { margin:2px 0 0; color:var(--muted); font-size:12px; }
+  .section-head { display:flex; align-items:end; justify-content:space-between; gap:14px; margin:0 0 22px; }
+  .section-head h2 { margin:0; font-size:21px; font-weight:600; letter-spacing:-.3px; }
+  .section-head p { margin:5px 0 0; color:var(--muted); font-size:12px; }
   .card { background:var(--panel);
-    border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:var(--shadow); }
-  .card:hover { border-color:#30394d; }
+    border:1px solid var(--line); border-radius:7px; padding:20px; box-shadow:var(--shadow); }
   .hero { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:18px; align-items:center;
-    padding:22px; overflow:hidden; position:relative; background:var(--panel2);
-    border-left:3px solid var(--brand); }
-  .hero h2 { margin:0 0 4px; font-size:22px; letter-spacing:-.45px; }
-  .hero p { margin:0; color:#aeb7c8; }
-  .hero-state { display:flex; align-items:center; gap:8px; z-index:1; padding:9px 13px;
-    border:1px solid var(--line2); border-radius:8px; background:var(--panel); }
-  .overview-stack { display:grid; gap:14px; }
-  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-  .stat { padding:16px; min-height:104px; display:flex; flex-direction:column; justify-content:space-between; }
-  .stat-label,.label { color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.5px; }
-  .stat-value { font-size:23px; line-height:1; font-weight:760; letter-spacing:-.5px; }
+    padding:0 0 22px; overflow:hidden; position:relative; background:transparent;
+    border:0; border-bottom:1px solid var(--line); border-radius:0; }
+  .hero h2 { margin:0 0 5px; font-size:21px; font-weight:600; letter-spacing:-.3px; }
+  .hero p { margin:0; color:var(--muted); font-size:12px; }
+  .hero-state { display:flex; align-items:center; gap:8px; padding:7px 10px; font-size:12px;
+    border:1px solid var(--line); border-radius:5px; background:transparent; color:var(--muted); }
+  .overview-stack { display:grid; gap:22px; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0;
+    border:1px solid var(--line); border-radius:7px; overflow:hidden; background:var(--panel); }
+  .stat { padding:18px 20px; min-height:106px; display:flex; flex-direction:column; justify-content:space-between;
+    border:0; border-right:1px solid var(--line); border-radius:0; }
+  .stat:last-child { border-right:0; }
+  .stat-label,.label { color:var(--muted); font-size:12px; font-weight:500; }
+  .stat-value { font-size:22px; line-height:1.2; font-weight:600; letter-spacing:-.4px; font-variant-numeric:tabular-nums; }
   .stat-note { color:var(--muted); font-size:11px; }
-  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
-  .card-title { margin:0 0 13px; font-size:14px; font-weight:720; }
+  .two-col { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start; }
+  .card-title { margin:0 0 16px; padding-bottom:12px; border-bottom:1px solid var(--line); font-size:13px; font-weight:600; }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; align-items:start; }
   .row { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center; }
   .tool { font-size:14px; font-weight:680; }
-  .badge { flex:0 0 auto; font-size:10px; font-weight:800; letter-spacing:.35px; padding:4px 9px;
-    border-radius:999px; border:1px solid var(--line2); color:#bac3d4; background:rgba(255,255,255,.025); }
-  .badge.read,.badge.completed { color:#78e7b5; border-color:rgba(78,217,155,.28); background:rgba(78,217,155,.07); }
-  .badge.write,.badge.approved,.badge.executing { color:#8dc0ff; border-color:rgba(94,156,255,.28); background:rgba(94,156,255,.08); }
-  .badge.admin,.badge.pending { color:#f7c96c; border-color:rgba(245,185,76,.3); background:rgba(245,185,76,.08); }
-  .badge.destructive,.badge.failed,.badge.expired,.badge.denied,.badge.cancelled { color:#ff929e;
-    border-color:rgba(255,107,122,.3); background:rgba(255,107,122,.08); }
-  .badge.sensitive { color:#dea8ff; border-color:rgba(203,132,255,.3); background:rgba(203,132,255,.08); }
-  #pending { display:grid; gap:12px; }
-  .card.pending { padding:19px; border-color:#30394c; box-shadow:0 15px 45px rgba(0,0,0,.2); }
+  .badge { flex:0 0 auto; font-size:11px; font-weight:500; padding:3px 8px;
+    border-radius:4px; border:1px solid var(--line2); color:var(--muted); background:transparent; }
+  .badge.read,.badge.completed { color:#9fc4ad; border-color:#3a5143; background:#232d27; }
+  .badge.write,.badge.approved,.badge.executing { color:#a5bbd6; border-color:#3d4c60; background:#242b35; }
+  .badge.admin,.badge.pending { color:#d5bb94; border-color:#574a36; background:#302b23; }
+  .badge.destructive,.badge.failed,.badge.expired,.badge.denied,.badge.cancelled { color:#dfa2a2;
+    border-color:#614343; background:#322727; }
+  .badge.sensitive { color:#bcb0cf; border-color:#4f465c; background:#2c2832; }
+  #pending { display:grid; gap:16px; }
+  .card.pending { padding:22px; box-shadow:none; }
+  .card.pending.requested { border-color:#738aa8; box-shadow:inset 3px 0 0 #738aa8; }
   .request-head { display:flex; gap:12px; align-items:center; min-width:0; }
-  .request-icon { width:39px; height:39px; border-radius:11px; display:grid; place-items:center; flex:0 0 auto;
-    background:#242b39; color:#b7c0d2; border:1px solid var(--line2); font-size:15px; font-weight:750; }
-  .request-title { margin:0; font-size:16px; font-weight:730; letter-spacing:-.15px; }
+  .request-icon { width:32px; height:32px; border-radius:5px; display:grid; place-items:center; flex:0 0 auto;
+    background:#282b2f; color:#b5bbc4; border:1px solid var(--line); font-size:13px; font-weight:600; }
+  .request-title { margin:0; font-size:15px; font-weight:600; letter-spacing:-.1px; }
   .target { color:var(--muted); margin:12px 0 0; font-size:12px; }
+  .protected-value { display:inline; min-width:0; padding:0 2px; border:0; border-radius:4px;
+    color:#c5cad2; background:transparent; font:inherit; vertical-align:baseline; box-shadow:none; }
+  .protected-value:hover { transform:none; color:#fff; background:#303338; }
+  .protected-value.masked { min-width:64px; color:#929cad; letter-spacing:1px;
+    filter:blur(2.5px); user-select:none; }
+  .protected-value.masked:hover { filter:blur(1.5px); }
   details.tech { margin-top:13px; border-top:1px solid var(--line); padding-top:11px; }
   details.tech summary { width:max-content; color:var(--muted); cursor:pointer; font-size:12px; user-select:none; }
   details.tech summary:hover { color:var(--text); }
-  pre { background:#090c13; border:1px solid var(--line); border-radius:11px; padding:13px; overflow:auto;
+  pre { background:#171819; border:1px solid var(--line); border-radius:5px; padding:14px; overflow:auto;
     max-height:310px; color:#b7c0d1; font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace; }
   .actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:15px; align-items:center; }
-  button { border-radius:10px; border:1px solid var(--line2); background:#222938; color:var(--text);
-    padding:9px 15px; cursor:pointer; font:650 13px/1.2 inherit; transition:.16s ease; }
-  button:hover { transform:translateY(-1px); border-color:#46526b; }
-  button.ok { border-color:#6874f4; background:var(--brand); color:#fff; box-shadow:none; }
-  button.no { background:transparent; border-color:#3b3440; color:#c7aab0; }
-  button.no:hover { color:#ff9ba5; border-color:#73424c; background:rgba(255,107,122,.05); }
+  button { border-radius:5px; border:1px solid var(--line2); background:#2c2f33; color:var(--text);
+    padding:9px 14px; cursor:pointer; font-family:inherit; font-size:13px; font-weight:500; line-height:1.2;
+    transition:background-color .12s,border-color .12s; }
+  button:hover { border-color:#6b717a; background:#34383d; }
+  button.ok { border-color:#6d86a8; background:var(--brand); color:#fff; box-shadow:none; }
+  button.ok:hover { background:#607fa7; }
+  button.no { background:transparent; border-color:#514040; color:#d5a5a5; }
+  button.no:hover { color:#ecc0c0; border-color:#865757; background:#332828; }
   button:disabled { opacity:.42; cursor:not-allowed; transform:none; }
-  input[type=text],input[type=number],select { width:100%; min-height:38px; color:var(--text); background:#0c1018;
-    border:1px solid var(--line); border-radius:9px; padding:8px 11px; font:13px ui-sans-serif,system-ui,sans-serif;
+  input[type=text],input[type=number],select { width:100%; min-height:36px; color:var(--text); background:var(--bg);
+    border:1px solid var(--line2); border-radius:5px; padding:8px 11px; font:13px ui-sans-serif,system-ui,sans-serif;
     outline:none; transition:border-color .15s,box-shadow .15s; }
-  input:focus,select:focus { border-color:#665bd1; box-shadow:0 0 0 3px rgba(139,124,255,.1); }
+  input:focus,select:focus { border-color:#91a7c4; box-shadow:none; }
+  :focus-visible { outline:2px solid #91a7c4; outline-offset:3px; }
   input[type=checkbox] { width:38px; height:21px; margin:0; appearance:none; border-radius:20px; cursor:pointer;
-    background:#303747; border:1px solid #414a5e; position:relative; transition:.18s; }
+    background:#34373b; border:1px solid #50555c; position:relative; transition:.18s; }
   input[type=checkbox]:before { content:""; position:absolute; top:2px; left:2px; width:15px; height:15px;
     border-radius:50%; background:#aab3c2; transition:.18s; }
-  input[type=checkbox]:checked { background:var(--brand); border-color:#6975f4; }
+  input[type=checkbox]:checked { background:var(--brand); border-color:#7b94b6; }
   input[type=checkbox]:checked:before { transform:translateX(17px); background:white; }
   input[type=checkbox]:disabled { opacity:.45; cursor:not-allowed; }
   .activity-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:14px; align-items:start; }
@@ -181,7 +295,7 @@ PAGE = """<!doctype html>
   .entry { border-top:1px solid var(--line); padding:12px 0; }
   .entry:first-child { border-top:0; }
   .entry .row { cursor:pointer; flex-wrap:nowrap; }
-  .entry .row:hover .tool { color:#c2baff; }
+  .entry .row:hover .tool { color:#bbcce1; }
   .entry pre { margin-bottom:0; }
   .settings-stack { display:grid; gap:14px; }
   .settings-group { padding:0; overflow:hidden; }
@@ -189,7 +303,7 @@ PAGE = """<!doctype html>
   .settings-group-head h3 { margin:0; font-size:14px; }
   .settings-group-head p { margin:3px 0 0; color:var(--muted); font-size:11px; }
   .setting-row { min-height:64px; display:grid; grid-template-columns:minmax(0,1fr) minmax(120px,190px);
-    gap:18px; align-items:center; padding:12px 18px; border-top:1px solid rgba(37,44,59,.72); }
+     gap:18px; align-items:center; padding:14px 20px; border-top:1px solid var(--line); }
   .setting-row:first-child { border-top:0; }
   .setting-row.bool { grid-template-columns:minmax(0,1fr) auto; }
   .setting-name { display:block; font-weight:650; }
@@ -197,26 +311,31 @@ PAGE = """<!doctype html>
   .settings-save { display:flex; justify-content:space-between; gap:14px; align-items:center; padding:16px 18px; }
   .settings-save .actions { margin:0; }
   .confirm-wrap { max-width:360px; flex:1; }
-  .kv { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:7px 14px; margin:11px 0 0; }
-  .kv dt { color:var(--muted); font-size:11px; }
-  .kv dd { margin:0; color:#c2c9d6; font:11px ui-monospace,Consolas,monospace; word-break:break-all; }
+  .kv { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:12px 20px; margin:0; }
+  .kv dt { color:var(--muted); font-size:12px; }
+  .kv dd { margin:0; color:#c5cad2; font:12px/1.55 ui-monospace,Consolas,monospace; overflow-wrap:anywhere; }
   .empty { color:var(--muted); text-align:center; padding:42px 14px; }
-  .empty-mark { width:45px; height:45px; margin:0 auto 11px; border:1px solid var(--line); border-radius:14px;
-    display:grid; place-items:center; color:#697386; font-size:20px; background:#0e121b; }
+  .empty-mark { width:32px; height:32px; margin:0 auto 12px; border:1px solid var(--line); border-radius:5px;
+    display:grid; place-items:center; color:var(--muted); font-size:16px; background:transparent; }
   .toast { position:fixed; right:22px; bottom:22px; z-index:50; max-width:460px; display:none;
-    padding:11px 15px; border:1px solid #3d485d; border-radius:11px; color:#eef1f7;
-    background:rgba(26,31,44,.96); box-shadow:0 16px 44px rgba(0,0,0,.4); backdrop-filter:blur(12px); }
-  .toast.show { display:block; animation:toast-in .18s ease-out; }
-  @keyframes toast-in { from { transform:translateY(8px); opacity:0; } }
-  footer { color:#697386; font-size:11px; padding:5px 2px 0; text-align:center; }
+    padding:12px 16px; border:1px solid var(--line2); border-radius:5px; color:var(--text);
+    background:#292c30; box-shadow:none; }
+  .toast.show { display:block; }
+  footer { grid-column:2; color:var(--muted); font-size:11px; margin-top:28px;
+    padding-top:14px; border-top:1px solid var(--line); text-align:left; }
   code { font-family:ui-monospace,Consolas,monospace; }
   [hidden] { display:none !important; }
   @media (max-width:760px) {
-    header { padding:20px 16px 16px; align-items:flex-start; }
+    header { padding:18px 16px; margin-bottom:18px; align-items:flex-start; }
     .header-actions { align-items:flex-end; flex-direction:column-reverse; }
-    .status-chip { max-width:100%; } .workspace { padding:0 14px 28px; }
-    nav { width:100%; } nav button { min-width:auto; flex:1; }
+    .status-chip { max-width:100%; } .workspace { display:block; padding:0 16px 24px; }
+    nav { position:static; flex-direction:row; width:100%; margin-bottom:24px; border-bottom:1px solid var(--line);
+      gap:0; overflow:auto; }
+    nav button { min-width:auto; flex:1; justify-content:center; border-radius:0; padding:12px 10px; }
+    nav button.active { background:transparent; box-shadow:inset 0 -2px 0 #91a7c4; }
     .stat-grid { grid-template-columns:1fr 1fr; }
+    .stat:nth-child(2) { border-right:0; }
+    .stat:nth-child(-n+2) { border-bottom:1px solid var(--line); }
     .two-col,.activity-grid { grid-template-columns:1fr; }
     .hero { grid-template-columns:1fr; } .hero-state { width:max-content; }
     .setting-row { grid-template-columns:1fr; gap:8px; }
@@ -224,6 +343,14 @@ PAGE = """<!doctype html>
     .settings-save { align-items:stretch; flex-direction:column; }
     .confirm-wrap { max-width:none; }
   }
+  @media (max-width:420px) {
+    .header-actions { gap:5px; } .status-chip { font-size:10px; }
+    .brand-copy { font-size:10px; } .brand { gap:8px; }
+    .brand-mark { display:none; } .hero h2 { font-size:19px; }
+    .stat { padding:16px; } .card.pending { padding:16px; }
+    .kv { gap:10px 12px; } .request-head { gap:8px; }
+  }
+  @media (prefers-reduced-motion:reduce) { *,*::before { transition:none !important; } }
 </style>
 </head>
 <body>
@@ -272,9 +399,16 @@ PAGE = """<!doctype html>
 </div>
 <div class="toast" id="toast"></div>
 <script>
-const token = new URLSearchParams(location.search).get('t') || '';
+const query = new URLSearchParams(location.search);
+const token = query.get('t') || '';
+const requestedApproval = query.get('request') || '';
+if (token) {
+  const cleanUrl = new URL(location.href);
+  cleanUrl.searchParams.delete('t');
+  window.history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+}
 const TAB_NAMES = ['overview', 'approvals', 'activity', 'settings'];
-const state = {tab: 'overview', settings: null, pendingSignature: '', historySignature: '', auditSignature: ''};
+const state = {tab: 'overview', settings: null, pendingSignature: null, historySignature: null, auditSignature: null};
 const statusEl = document.getElementById('status');
 const toastEl = document.getElementById('toast');
 
@@ -292,7 +426,7 @@ const STRINGS = {
     'field.authCheck':'啟動時驗證 Token', 'field.authCheckHelp':'確認登入身分是否有效；變更後需重新啟動。',
     'field.approvalTtl':'允許請求有效時間', 'field.approvalTtlHelp':'逾時後請求無法再被執行（30–3600 秒）。',
     'field.uploads':'允許上傳附件', 'field.uploadsHelp':'仍會受到允許目錄與檔案大小限制。',
-    'field.uploadBytes':'單次上傳大小上限', 'field.uploadBytesHelp':'以 bytes 計算。',
+    'field.uploadBytes':'單次上傳大小上限', 'field.uploadBytesHelp':'以位元組計算。',
     'field.uploadFiles':'單次檔案數量上限', 'field.httpTimeout':'HTTP 逾時時間',
     'field.networkRetries':'網路錯誤重試次數', 'field.rateRetries':'速率限制重試次數',
     'field.logLevel':'系統記錄等級',
@@ -320,7 +454,7 @@ const STRINGS = {
     'overview.pending':'待處理', 'overview.needsDecision':'需要人工決策', 'overview.noPending':'目前無待辦',
     'overview.mode':'執行模式', 'overview.readOnly':'唯讀', 'overview.controlledWrite':'受控寫入',
     'overview.auditOn':'稽核記錄開啟', 'overview.auditOff':'稽核記錄關閉',
-    'overview.tools':'可用工具', 'overview.endpointCount':'{value} 個 API endpoint',
+    'overview.tools':'可用工具', 'overview.endpointCount':'{value} 個 API 端點',
     'overview.uptime':'運作時間', 'overview.version':'版本 {value}',
     'overview.account':'帳號與驗證', 'overview.identity':'目前身分',
     'overview.notVerified':'本次工作階段尚未驗證', 'overview.unknownUser':'未知使用者', 'overview.tokenSource':'Token 來源',
@@ -328,10 +462,10 @@ const STRINGS = {
     'overview.credentialValue':'Discord User Token（不支援 Bot Token）',
     'overview.system':'系統與安全', 'overview.approvalTtl':'允許有效時間',
     'overview.uploads':'附件上傳', 'common.enabled':'啟用', 'common.disabled':'停用',
-    'overview.rateRoutes':'追蹤速率限制', 'overview.routes':'{value} 個 route',
-    'overview.globalLimit':'全域限制', 'common.none':'無', 'common.unset':'未設定', 'overview.registry':'Endpoint registry',
+    'overview.rateRoutes':'追蹤速率限制', 'overview.routes':'{value} 個路由',
+    'overview.globalLimit':'全域限制', 'common.none':'無', 'common.unset':'未設定', 'overview.registry':'端點目錄',
     'overview.registryValue':'{total}（{implemented} 已實作）', 'overview.auditPath':'稽核記錄位置',
-    'request.targetLine':'目標：{target}  •  {time}後逾時  •  ID {id}',
+    'request.targetLabel':'目標：', 'request.expiresIn':'{time}後逾時', 'request.idLabel':'ID ',
     'request.technical':'查看技術細節', 'request.allow':'允許並執行', 'request.deny':'拒絕',
     'request.highRiskPlaceholder':'高風險操作：輸入 {phrase}',
     'request.highRiskHelp':'必須輸入 {phrase} 才能執行。',
@@ -349,6 +483,7 @@ const STRINGS = {
     'settings.noChanges':'沒有需要儲存的變更。', 'settings.confirmRequired':'請輸入 ENABLE WRITES 才能關閉唯讀模式。',
     'settings.saved':'已儲存：{fields}', 'settings.savedNone':'沒有變更。',
     'settings.restart':'{fields} 會在重新啟動後生效。',
+    'privacy.reveal':'點擊顯示敏感資訊', 'privacy.hide':'點擊再次隱藏',
     'status.running':'運作中 · {pending} 個待處理 · 已運作 {uptime}',
     'status.disconnected':'控制台連線中斷：{message}',
     'error.settingsLocked':'此設定只能透過環境變數或 .env 修改。',
@@ -360,7 +495,11 @@ const STRINGS = {
     'error.alreadyDecided':'此請求已經處理，不能再次使用。',
     'error.expired':'此請求已逾時，無法執行。',
     'error.notFound':'找不到此允許請求。', 'error.tampered':'請求參數完整性驗證失敗。',
-    'error.approvalFailed':'無法完成此允許決策。'
+    'error.approvalFailed':'無法完成此允許決策。',
+    'log.DEBUG':'除錯', 'log.INFO':'資訊', 'log.WARNING':'警告', 'log.ERROR':'錯誤',
+    'error.unauthorized':'Dashboard 已鎖定或憑證無效，請重新解鎖。',
+    'error.rateLimited':'失敗嘗試過多，請稍後再試。',
+    'error.network':'無法連線至 Dashboard。', 'error.http':'請求失敗（HTTP {status}）。'
   },
   'en': {
     'app.subtitle':'Local security console', 'status.connecting':'Connecting…',
@@ -413,7 +552,7 @@ const STRINGS = {
     'overview.rateRoutes':'Tracked rate limits', 'overview.routes':'{value} routes',
     'overview.globalLimit':'Global limit', 'common.none':'None', 'common.unset':'Not configured', 'overview.registry':'Endpoint registry',
     'overview.registryValue':'{total} ({implemented} implemented)', 'overview.auditPath':'Audit log path',
-    'request.targetLine':'Target: {target}  •  expires in {time}  •  ID {id}',
+    'request.targetLabel':'Target: ', 'request.expiresIn':'expires in {time}', 'request.idLabel':'ID ',
     'request.technical':'View technical details', 'request.allow':'Allow and execute', 'request.deny':'Deny',
     'request.highRiskPlaceholder':'High-risk operation: type {phrase}',
     'request.highRiskHelp':'Type {phrase} before this operation can execute.',
@@ -431,6 +570,7 @@ const STRINGS = {
     'settings.noChanges':'There are no changes to save.', 'settings.confirmRequired':'Type ENABLE WRITES to disable read-only mode.',
     'settings.saved':'Saved: {fields}', 'settings.savedNone':'No changes.',
     'settings.restart':'{fields} will take effect after restart.',
+    'privacy.reveal':'Click to reveal sensitive information', 'privacy.hide':'Click to hide again',
     'status.running':'Running · {pending} pending · up {uptime}',
     'status.disconnected':'Dashboard disconnected: {message}',
     'error.settingsLocked':'This setting can only be changed through the environment or .env.',
@@ -442,7 +582,11 @@ const STRINGS = {
     'error.alreadyDecided':'This request has already been decided and cannot be reused.',
     'error.expired':'This request has expired and cannot execute.',
     'error.notFound':'The approval request was not found.', 'error.tampered':'The request argument integrity check failed.',
-    'error.approvalFailed':'The approval decision could not be completed.'
+    'error.approvalFailed':'The approval decision could not be completed.',
+    'log.DEBUG':'Debug', 'log.INFO':'Information', 'log.WARNING':'Warning', 'log.ERROR':'Error',
+    'error.unauthorized':'The dashboard is locked or the credential is invalid. Unlock it again.',
+    'error.rateLimited':'Too many failed attempts. Try again later.',
+    'error.network':'Could not connect to the dashboard.', 'error.http':'Request failed (HTTP {status}).'
   }
 };
 
@@ -471,8 +615,21 @@ function t(key, values) {
 function applyStaticTranslations() {
   document.documentElement.lang = locale;
   document.querySelectorAll('[data-i18n]').forEach(node => {
-    node.textContent = t(node.dataset.i18n);
+    node.textContent = t(node.dataset.i18n, JSON.parse(node.dataset.i18nValues || '{}'));
   });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(node => {
+    node.placeholder = t(node.dataset.i18nPlaceholder, JSON.parse(node.dataset.i18nValues || '{}'));
+  });
+  document.querySelectorAll('[data-i18n-label]').forEach(node => {
+    node.setAttribute('aria-label', t(node.dataset.i18nLabel, JSON.parse(node.dataset.i18nValues || '{}')));
+  });
+  document.querySelectorAll('[data-tool]').forEach(node => {
+    node.textContent = friendlyTool(node.dataset.tool);
+  });
+  document.querySelectorAll('[data-time]').forEach(node => { node.textContent = formatTime(node.dataset.time); });
+  document.querySelectorAll('.protected-value').forEach(node => node.refreshLocale());
+  document.querySelectorAll('.countdown').forEach(node => node.refreshLocale());
+  if (toastEl.renderLocale) toastEl.renderLocale();
   const select = document.getElementById('language');
   if (select) select.value = locale;
 }
@@ -486,13 +643,9 @@ function changeLocale(next) {
       '; Max-Age=31536000; Path=/; SameSite=Strict';
   } catch (_) {}
   applyStaticTranslations();
-  state.pendingSignature = '';
-  state.historySignature = '';
-  state.auditSignature = '';
+  // Translate the existing DOM, including empty states. Do not discard draft
+  // settings, typed approval phrases, expanded details, or reveal choices.
   refreshStatus();
-  if (state.tab === 'approvals') loadApprovals();
-  if (state.tab === 'activity') { loadHistory(); loadAudit(); }
-  if (state.tab === 'settings') loadSettings();
 }
 
 const FIELD_DEFS = [
@@ -555,7 +708,8 @@ const OBJECT_LABELS = {friend_request:'好友邀請', notification:'通知', gro
   my_notification_settings:'通知設定', my_profile:'個人資料', my_settings:'使用者設定', poll:'投票'};
 
 function toast(msg, bad) {
-  toastEl.textContent = msg;
+  toastEl.renderLocale = () => { toastEl.textContent = typeof msg === 'function' ? msg() : msg; };
+  toastEl.renderLocale();
   toastEl.style.borderColor = bad ? '#7a2a2a' : '#1f6b3c';
   toastEl.classList.add('show');
   setTimeout(() => toastEl.classList.remove('show'), 5000);
@@ -564,11 +718,14 @@ function toast(msg, bad) {
 async function api(path, options) {
   const opts = options || {};
   opts.headers = Object.assign({'X-Approval-Token': token}, opts.headers || {});
-  const res = await fetch(path, opts);
+  let res;
+  try { res = await fetch(path, opts); }
+  catch (_) { throw localizedError('error.network'); }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) {
     const key = ERROR_LABELS[body.code];
-    throw new Error(key ? t(key) : (body.message || ('HTTP ' + res.status)));
+    throw localizedError(key || (res.status === 401 ? 'error.unauthorized' :
+      res.status === 429 ? 'error.rateLimited' : 'error.http'), {status:res.status});
   }
   return body;
 }
@@ -577,6 +734,31 @@ function el(tag, cls, text) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
   if (text !== undefined && text !== null) node.textContent = text;
+  return node;
+}
+
+function localizedError(key, values) {
+  const error = new Error();
+  Object.defineProperty(error, 'message', {get:() => t(key, values)});
+  return error;
+}
+
+function translated(tag, cls, key, values) {
+  const node = el(tag, cls, t(key, values));
+  node.dataset.i18n = key;
+  if (values) node.dataset.i18nValues = JSON.stringify(values);
+  return node;
+}
+
+function toolTitle(tag, cls, name) {
+  const node = el(tag, cls, friendlyTool(name));
+  node.dataset.tool = name || '';
+  return node;
+}
+
+function timeLabel(tag, cls, value) {
+  const node = el(tag, cls, formatTime(value));
+  node.dataset.time = value || '';
   return node;
 }
 
@@ -632,8 +814,32 @@ function formatList(items) {
 function emptyState(message) {
   const box = el('div', 'empty');
   box.appendChild(el('div', 'empty-mark', '✓'));
-  box.appendChild(el('div', null, message));
+  box.appendChild(translated('div', null, message));
   return box;
+}
+
+function protectedValue(value) {
+  const actual = () => {
+    const result = typeof value === 'function' ? value() : value;
+    return String(result === undefined || result === null ? '—' : result);
+  };
+  const button = el('button', 'protected-value masked', '••••••••');
+  let revealed = false;
+  const render = () => {
+    button.textContent = revealed ? actual() : '••••••••';
+    button.classList.toggle('masked', !revealed);
+    button.setAttribute('aria-label', t(revealed ? 'privacy.hide' : 'privacy.reveal'));
+    button.title = t(revealed ? 'privacy.hide' : 'privacy.reveal');
+  };
+  button.refreshLocale = render;
+  button.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    revealed = !revealed;
+    render();
+  });
+  render();
+  return button;
 }
 
 function activate(name) {
@@ -659,7 +865,10 @@ function card(title, pairs) {
   const dl = el('dl', 'kv');
   pairs.forEach(pair => {
     dl.appendChild(el('dt', null, pair[0]));
-    dl.appendChild(el('dd', null, pair[1]));
+    const value = el('dd');
+    if (pair[1] instanceof Node) value.appendChild(pair[1]);
+    else value.textContent = pair[1];
+    dl.appendChild(value);
   });
   box.appendChild(dl);
   return box;
@@ -708,9 +917,9 @@ function renderOverview(s) {
 
   const columns = el('div', 'two-col');
   columns.appendChild(card(t('overview.account'), [
-    [t('overview.identity'), identity],
-    [t('overview.tokenSource'), s.token.source],
-    [t('overview.tokenFingerprint'), s.token.fingerprint],
+    [t('overview.identity'), protectedValue(identity)],
+    [t('overview.tokenSource'), protectedValue(s.token.source)],
+    [t('overview.tokenFingerprint'), protectedValue(s.token.fingerprint)],
     [t('overview.credentialType'), t('overview.credentialValue')]
   ]));
   columns.appendChild(card(t('overview.system'), [
@@ -721,30 +930,45 @@ function renderOverview(s) {
       ? t('duration.seconds', {value:s.rate_limits.global_blocked_for_seconds}) : t('common.none')],
     [t('overview.registry'), t('overview.registryValue', {
       total:registry.total || 0, implemented:byStatus.implemented || 0})],
-    [t('overview.auditPath'), s.mode.audit_path || t('common.unset')]
+    [t('overview.auditPath'), protectedValue(s.mode.audit_path || t('common.unset'))]
   ]));
   root.appendChild(columns);
 }
 
-function targetLine(a) {
-  return t('request.targetLine', {target:friendlyTarget(a.target),
-    time:formatDuration(a.expires_in_seconds), id:a.approval_id.slice(0, 12)});
+function renderTargetLine(a) {
+  const line = el('div', 'target');
+  line.appendChild(translated('span', null, 'request.targetLabel'));
+  line.appendChild(protectedValue(() => friendlyTarget(a.target)));
+  line.appendChild(document.createTextNode('  •  '));
+  const countdown = el('span', 'countdown',
+    t('request.expiresIn', {time:formatDuration(a.expires_in_seconds)}));
+  countdown.dataset.seconds = a.expires_in_seconds;
+  countdown.refreshLocale = () => {
+    countdown.textContent = t('request.expiresIn', {time:formatDuration(countdown.dataset.seconds)});
+  };
+  line.appendChild(countdown);
+  line.appendChild(document.createTextNode('  •  '));
+  line.appendChild(translated('span', null, 'request.idLabel'));
+  line.appendChild(protectedValue(a.approval_id));
+  return line;
 }
 
 function renderPending(a) {
   const box = el('div', 'card pending');
+  box.dataset.approvalId = a.approval_id;
+  if (a.approval_id === requestedApproval) box.classList.add('requested');
   const row = el('div', 'row');
   const left = el('div', 'request-head');
   const copy = el('div');
-  copy.appendChild(el('div', 'request-title', friendlyTool(a.tool, a.summary)));
+  copy.appendChild(toolTitle('div', 'request-title', a.tool));
   left.appendChild(copy);
   row.appendChild(left);
-  row.appendChild(el('span', 'badge ' + a.risk, RISK_LABELS[a.risk] ? t(RISK_LABELS[a.risk]) : a.risk));
+  row.appendChild(translated('span', 'badge ' + a.risk, RISK_LABELS[a.risk] || 'event.unknown'));
   box.appendChild(row);
-  box.appendChild(el('div', 'target', targetLine(a)));
+  box.appendChild(renderTargetLine(a));
 
   const technical = el('details', 'tech');
-  technical.appendChild(el('summary', null, t('request.technical')));
+  technical.appendChild(translated('summary', null, 'request.technical'));
   const pre = el('pre');
   pre.textContent = JSON.stringify({
     tool: a.tool,
@@ -759,8 +983,8 @@ function renderPending(a) {
   box.appendChild(technical);
 
   const actions = el('div', 'actions');
-  const approve = el('button', 'ok', t('request.allow'));
-  const deny = el('button', 'no', t('request.deny'));
+  const approve = translated('button', 'ok', 'request.allow');
+  const deny = translated('button', 'no', 'request.deny');
   let confirmInput = null;
   if (a.requires_typed_confirmation) {
     const confirmWrap = el('div', 'confirm-wrap');
@@ -768,9 +992,12 @@ function renderPending(a) {
     confirmInput.type = 'text';
     confirmInput.placeholder = t('request.highRiskPlaceholder', {phrase:a.approval_phrase});
     confirmInput.setAttribute('aria-label', confirmInput.placeholder);
+    confirmInput.dataset.i18nPlaceholder = 'request.highRiskPlaceholder';
+    confirmInput.dataset.i18nLabel = 'request.highRiskPlaceholder';
+    confirmInput.dataset.i18nValues = JSON.stringify({phrase:a.approval_phrase});
     confirmWrap.appendChild(confirmInput);
-    confirmWrap.appendChild(el('div', 'help warn',
-      t('request.highRiskHelp', {phrase:a.approval_phrase})));
+    confirmWrap.appendChild(translated('div', 'help warn',
+      'request.highRiskHelp', {phrase:a.approval_phrase}));
     actions.appendChild(confirmWrap);
     approve.disabled = true;
     confirmInput.addEventListener('input', () => {
@@ -785,9 +1012,10 @@ function renderPending(a) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id: a.approval_id, confirmation: confirmInput ? confirmInput.value : null})
       });
-      toast(t('request.approved'));
+      toast(() => t('request.approved'));
       loadApprovals();
-    } catch (err) { toast(err.message, true); approve.disabled = false; }
+    } catch (err) { toast(() => err.message, true); approve.disabled =
+      !!confirmInput && confirmInput.value.trim() !== a.approval_phrase; }
   });
   deny.addEventListener('click', async () => {
     deny.disabled = true; approve.disabled = true;
@@ -797,9 +1025,9 @@ function renderPending(a) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({id: a.approval_id, reason: 'denied in dashboard'})
       });
-      toast(t('request.denied'));
+      toast(() => t('request.denied'));
       loadApprovals();
-    } catch (err) { toast(err.message, true); deny.disabled = false; }
+    } catch (err) { toast(() => err.message, true); deny.disabled = false; }
   });
   actions.appendChild(approve);
   actions.appendChild(deny);
@@ -824,16 +1052,21 @@ function detailEntry(left, badge, payload) {
 function renderHistory(items) {
   const root = document.getElementById('history');
   root.textContent = '';
-  if (!items.length) { root.appendChild(emptyState(t('history.empty'))); return; }
+  if (!items.length) { root.appendChild(emptyState('history.empty')); return; }
   items.forEach(a => {
     const left = el('div');
-    const title = el('div', 'tool', friendlyTool(a.tool, a.summary));
+    const title = toolTitle('div', 'tool', a.tool);
     left.appendChild(title);
-    left.appendChild(el('div', 'sub',
-      friendlyTarget(a.target) + ' \u2022 ' + formatTime(a.decided_at || a.created_at) +
-      ' \u2022 ID ' + a.approval_id.slice(0, 12)));
-    root.appendChild(detailEntry(left, el('span', 'badge ' + a.status,
-      STATUS_LABELS[a.status] ? t(STATUS_LABELS[a.status]) : a.status), {
+    const meta = el('div', 'sub');
+    meta.appendChild(protectedValue(() => friendlyTarget(a.target)));
+    meta.appendChild(document.createTextNode(' \u2022 '));
+    meta.appendChild(timeLabel('span', null, a.decided_at || a.created_at));
+    meta.appendChild(document.createTextNode(' \u2022 '));
+    meta.appendChild(translated('span', null, 'request.idLabel'));
+    meta.appendChild(protectedValue(a.approval_id));
+    left.appendChild(meta);
+    root.appendChild(detailEntry(left, translated('span', 'badge ' + a.status,
+      STATUS_LABELS[a.status] || 'event.unknown'), {
       approval_id: a.approval_id,
       tool: a.tool,
       endpoint: a.endpoint,
@@ -857,21 +1090,24 @@ function renderAudit(payload) {
   const root = document.getElementById('audit');
   root.textContent = '';
   if (!payload.enabled) {
-    root.appendChild(el('div', 'help warn',
-      t('audit.disabled')));
+    root.appendChild(translated('div', 'help warn', 'audit.disabled'));
   }
-  if (!payload.entries.length) { root.appendChild(emptyState(t('audit.empty'))); return; }
+  if (!payload.entries.length) { root.appendChild(emptyState('audit.empty')); return; }
   payload.entries.slice().reverse().forEach(entry => {
     const left = el('div');
-    left.appendChild(el('div', 'tool', EVENT_LABELS[entry.event] ? t(EVENT_LABELS[entry.event]) :
-      (entry.event ? String(entry.event).split('_').join(' ') : t('event.unknown'))));
-    const bits = [];
-    if (entry.tool) bits.push(friendlyTool(entry.tool));
-    if (entry.risk) bits.push(RISK_LABELS[entry.risk] ? t(RISK_LABELS[entry.risk]) : entry.risk);
-    if (entry.actor) bits.push(entry.actor);
-    if (entry.approval_id) bits.push(String(entry.approval_id).slice(0, 12));
-    left.appendChild(el('div', 'sub', bits.join(' \u2022 ')));
-    root.appendChild(detailEntry(left, el('span', 'sub', formatTime(entry.ts)), entry));
+    left.appendChild(translated('div', 'tool', EVENT_LABELS[entry.event] || 'event.unknown'));
+    const meta = el('div', 'sub');
+    const appendPart = value => {
+      if (meta.childNodes.length) meta.appendChild(document.createTextNode(' \u2022 '));
+      if (value instanceof Node) meta.appendChild(value);
+      else meta.appendChild(document.createTextNode(value));
+    };
+    if (entry.tool) appendPart(toolTitle('span', null, entry.tool));
+    if (entry.risk) appendPart(translated('span', null, RISK_LABELS[entry.risk] || 'event.unknown'));
+    if (entry.actor) appendPart(protectedValue(entry.actor));
+    if (entry.approval_id) appendPart(protectedValue(entry.approval_id));
+    left.appendChild(meta);
+    root.appendChild(detailEntry(left, timeLabel('span', 'sub', entry.ts), entry));
   });
 }
 
@@ -884,15 +1120,15 @@ function renderSettings(payload) {
   Object.keys(GROUPS).forEach(groupName => {
     const box = el('div', 'card settings-group');
     const head = el('div', 'settings-group-head');
-    head.appendChild(el('h3', null, t(GROUPS[groupName][0])));
-    head.appendChild(el('p', null, t(GROUPS[groupName][1])));
+    head.appendChild(translated('h3', null, GROUPS[groupName][0]));
+    head.appendChild(translated('p', null, GROUPS[groupName][1]));
     box.appendChild(head);
     const body = el('div');
     FIELD_DEFS.filter(def => def.group === groupName).forEach(def => {
       const row = el('label', 'setting-row' + (def.type === 'bool' ? ' bool' : ''));
       const copy = el('span');
-      copy.appendChild(el('span', 'setting-name', t(def.label)));
-      if (def.help) copy.appendChild(el('span', 'setting-help', t(def.help)));
+      copy.appendChild(translated('span', 'setting-name', def.label));
+      if (def.help) copy.appendChild(translated('span', 'setting-help', def.help));
       row.appendChild(copy);
       let input;
       if (def.type === 'bool') {
@@ -902,7 +1138,7 @@ function renderSettings(payload) {
       } else if (def.type === 'select') {
         input = el('select');
         def.options.forEach(option => {
-          const node = el('option', null, option);
+          const node = translated('option', null, 'log.' + option);
           node.value = option;
           input.appendChild(node);
         });
@@ -917,9 +1153,10 @@ function renderSettings(payload) {
       }
       input.id = 'set-' + def.key;
       input.setAttribute('aria-label', t(def.label));
+      input.dataset.i18nLabel = def.label;
       if (def.key === 'read_only' && payload.read_only_locked) {
         input.disabled = true;
-        copy.appendChild(el('span', 'setting-help', t('settings.readOnlyLocked')));
+        copy.appendChild(translated('span', 'setting-help', 'settings.readOnlyLocked'));
       }
       row.appendChild(input);
       body.appendChild(row);
@@ -929,17 +1166,19 @@ function renderSettings(payload) {
   });
 
   const lockedBox = el('details', 'card tech');
-  lockedBox.appendChild(el('summary', null, t('settings.protected')));
+  lockedBox.appendChild(translated('summary', null, 'settings.protected'));
   const dl = el('dl', 'kv');
   const lockedLabels = {token_source:'settings.tokenSource', token_fingerprint:'settings.tokenFingerprint',
     api_base:'settings.apiBase', console_url:'settings.consoleUrl', state_dir:'settings.stateDir'};
   Object.keys(payload.locked).forEach(key => {
     if (key === 'reason') return;
-    dl.appendChild(el('dt', null, lockedLabels[key] ? t(lockedLabels[key]) : key));
-    dl.appendChild(el('dd', null, String(payload.locked[key])));
+    dl.appendChild(lockedLabels[key] ? translated('dt', null, lockedLabels[key]) : el('dt', null, key));
+    const value = el('dd');
+    value.appendChild(protectedValue(payload.locked[key]));
+    dl.appendChild(value);
   });
   lockedBox.appendChild(dl);
-  lockedBox.appendChild(el('div', 'help', t('settings.protectedHelp')));
+  lockedBox.appendChild(translated('div', 'help', 'settings.protectedHelp'));
   root.appendChild(lockedBox);
 
   const saveBox = el('div', 'card settings-save');
@@ -949,10 +1188,13 @@ function renderSettings(payload) {
   confirm.id = 'settings-confirm';
   confirm.setAttribute('aria-label', t('settings.confirmLabel'));
   confirm.placeholder = t('settings.confirmPlaceholder', {phrase:payload.confirmation_phrase});
+  confirm.dataset.i18nPlaceholder = 'settings.confirmPlaceholder';
+  confirm.dataset.i18nLabel = 'settings.confirmLabel';
+  confirm.dataset.i18nValues = JSON.stringify({phrase:payload.confirmation_phrase});
   confirmWrap.appendChild(confirm);
-  confirmWrap.appendChild(el('div', 'help warn',
-    t('settings.confirmHelp', {phrase:payload.confirmation_phrase})));
-  const save = el('button', 'ok', t('settings.save'));
+  confirmWrap.appendChild(translated('div', 'help warn',
+    'settings.confirmHelp', {phrase:payload.confirmation_phrase}));
+  const save = translated('button', 'ok', 'settings.save');
   save.addEventListener('click', saveSettings);
   const actions = el('div', 'actions');
   actions.appendChild(save);
@@ -979,11 +1221,11 @@ async function saveSettings() {
     else value = Number(input.value);
     if (value !== state.settings[def.key]) patch[def.key] = value;
   });
-  if (!Object.keys(patch).length) { toast(t('settings.noChanges')); return; }
+  if (!Object.keys(patch).length) { toast(() => t('settings.noChanges')); return; }
   if (state.settings.read_only && patch.read_only === false) {
     const typed = (document.getElementById('settings-confirm').value || '').trim();
     if (typed !== 'ENABLE WRITES') {
-      toast(t('settings.confirmRequired'), true);
+      toast(() => t('settings.confirmRequired'), true);
       return;
     }
     patch.confirmation = typed;
@@ -995,22 +1237,24 @@ async function saveSettings() {
       body: JSON.stringify(patch)
     });
     renderSettings(result);
-    const changedLabels = result.changed.map(key => {
-      const def = FIELD_DEFS.find(item => item.key === key);
-      return def ? t(def.label) : key;
+    toast(() => {
+      const changedLabels = result.changed.map(key => {
+        const def = FIELD_DEFS.find(item => item.key === key);
+        return def ? t(def.label) : key;
+      });
+      const restartLabels = result.restart_required.map(key => {
+        const def = FIELD_DEFS.find(item => item.key === key);
+        return def ? t(def.label) : key;
+      });
+      const changed = changedLabels.length
+        ? t('settings.saved', {fields:formatList(changedLabels)}) : t('settings.savedNone');
+      const restart = result.restart_required.length
+        ? ' ' + t('settings.restart', {fields:formatList(restartLabels)})
+        : '';
+      return changed + restart;
     });
-    const restartLabels = result.restart_required.map(key => {
-      const def = FIELD_DEFS.find(item => item.key === key);
-      return def ? t(def.label) : key;
-    });
-    const changed = changedLabels.length
-      ? t('settings.saved', {fields:formatList(changedLabels)}) : t('settings.savedNone');
-    const restart = result.restart_required.length
-      ? ' ' + t('settings.restart', {fields:formatList(restartLabels)})
-      : '';
-    toast(changed + restart);
     refreshStatus();
-  } catch (err) { toast(err.message, true); }
+  } catch (err) { toast(() => err.message, true); }
 }
 
 async function loadApprovals() {
@@ -1021,9 +1265,12 @@ async function loadApprovals() {
     // Rebuild only when the set of requests changes, so a button under the
     // pointer never detaches mid-click. Countdowns are refreshed in place.
     if (signature === state.pendingSignature && root.childElementCount) {
-      const lines = root.querySelectorAll('.target');
+      const lines = root.querySelectorAll('.countdown');
       data.approvals.forEach((a, index) => {
-        if (lines[index]) lines[index].textContent = targetLine(a);
+        if (lines[index]) {
+          lines[index].dataset.seconds = a.expires_in_seconds;
+          lines[index].refreshLocale();
+        }
       });
       return;
     }
@@ -1031,12 +1278,18 @@ async function loadApprovals() {
     root.textContent = '';
     if (!data.approvals.length) {
       const empty = el('div', 'card');
-      empty.appendChild(emptyState(t('request.empty')));
+      empty.appendChild(emptyState('request.empty'));
       root.appendChild(empty);
     } else {
       data.approvals.forEach(a => root.appendChild(renderPending(a)));
     }
-  } catch (err) { toast(err.message, true); }
+    if (requestedApproval) {
+      const requested = Array.from(root.children).find(
+        node => node.dataset && node.dataset.approvalId === requestedApproval
+      );
+      if (requested) requestAnimationFrame(() => requested.scrollIntoView({block:'center'}));
+    }
+  } catch (err) { toast(() => err.message, true); }
 }
 
 async function loadHistory() {
@@ -1046,7 +1299,7 @@ async function loadHistory() {
     if (signature === state.historySignature) return;
     state.historySignature = signature;
     renderHistory(data.approvals);
-  } catch (err) { toast(err.message, true); }
+  } catch (err) { toast(() => err.message, true); }
 }
 
 async function loadAudit() {
@@ -1057,13 +1310,13 @@ async function loadAudit() {
     if (signature === state.auditSignature) return;
     state.auditSignature = signature;
     renderAudit(data);
-  } catch (err) { toast(err.message, true); }
+  } catch (err) { toast(() => err.message, true); }
 }
 
 async function loadSettings() {
   try {
     renderSettings(await api('/api/settings'));
-  } catch (err) { toast(err.message, true); }
+  } catch (err) { toast(() => err.message, true); }
 }
 
 async function refreshStatus() {
@@ -1088,7 +1341,7 @@ document.querySelectorAll('nav button').forEach(btn => {
 document.getElementById('language').addEventListener('change', event => changeLocale(event.target.value));
 window.addEventListener('hashchange', () => activate(location.hash.slice(1)));
 applyStaticTranslations();
-activate(location.hash.slice(1));
+activate(location.hash.slice(1) || (requestedApproval ? 'approvals' : 'overview'));
 refreshStatus();
 setInterval(refreshStatus, 3000);
 </script>
@@ -1112,6 +1365,8 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
+        if self.close_connection:
+            self.send_header("Connection", "close")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("Cache-Control", "no-store")
@@ -1128,17 +1383,24 @@ class _Handler(BaseHTTPRequestHandler):
         self._send(status, body, "application/json")
 
     def _error(self, status: int, message: str, code: str = "console_error") -> None:
+        # Early rejection may leave an unread body. Never parse its bytes as
+        # the next request on a persistent connection.
+        self.close_connection = True
         self._json(status, {"code": code, "message": message})
+
+    def _supplied_token(self) -> str:
+        supplied = self.headers.get("X-Approval-Token") or ""
+        if not supplied:
+            query = parse_qs(urlparse(self.path).query)
+            supplied = (query.get("t") or [""])[0]
+        return supplied
 
     def _auth_ok(self) -> bool:
         console = self.server.console  # type: ignore[attr-defined]
         if console.locked_out(self.client_address[0]):
             self._error(HTTPStatus.TOO_MANY_REQUESTS, "Too many failed attempts; wait a minute.")
             return False
-        supplied = self.headers.get("X-Approval-Token") or ""
-        if not supplied:
-            query = parse_qs(urlparse(self.path).query)
-            supplied = (query.get("t") or [""])[0]
+        supplied = self._supplied_token()
         if hmac.compare_digest(supplied, console.token):
             console.note_success(self.client_address[0])
             return True
@@ -1189,6 +1451,13 @@ class _Handler(BaseHTTPRequestHandler):
         path = parsed.path
         query = parse_qs(parsed.query)
         if path in {"/", "/index.html"}:
+            if not self._supplied_token():
+                self._send(
+                    HTTPStatus.OK,
+                    LOCKED_PAGE.encode("utf-8"),
+                    "text/html; charset=utf-8",
+                )
+                return
             if not self._auth_ok():
                 return
             self._send(HTTPStatus.OK, PAGE.encode("utf-8"), "text/html; charset=utf-8")
@@ -1391,6 +1660,14 @@ class _ConsoleServer(ThreadingHTTPServer):
     def __init__(self, address: tuple[str, int], handler: type[BaseHTTPRequestHandler]) -> None:
         self.address_family = socket.AF_INET6 if ":" in address[0] else socket.AF_INET
         super().__init__(address, handler)
+
+    def handle_error(self, request: Any, client_address: Any) -> None:
+        """Browsers routinely reset idle keep-alive sockets; do not print a traceback."""
+        error = sys.exc_info()[1]
+        if isinstance(error, (ConnectionResetError, BrokenPipeError)):
+            logger.debug("dashboard client disconnected: %s", client_address[0])
+            return
+        super().handle_error(request, client_address)
 
 
 class ApprovalConsole:

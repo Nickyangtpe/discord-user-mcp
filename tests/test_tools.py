@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 
@@ -36,6 +37,24 @@ async def test_write_tool_creates_approval_and_sends_nothing(harness) -> None:
     assert len(harness.requests) == before
     pending = harness.store.list(statuses=["pending"])
     assert [record.id for record in pending] == [result["approval_id"]]
+
+
+async def test_mutation_returns_request_scoped_safe_dashboard_url(harness) -> None:
+    class Dashboard:
+        running = True
+        safe_url = "http://127.0.0.1:54321/"
+
+    harness.context.console = Dashboard()
+    result = await TOOL_SPECS["send_message"].wrapper(
+        channel_id="123456789012345678", content="hi"
+    )
+    info = result["console"]
+    assert info["request_id"] == result["approval_id"]
+    assert info["dashboard_url"] == (
+        f"http://127.0.0.1:54321/?request={result['approval_id']}"
+    )
+    assert "t" not in parse_qs(urlparse(info["dashboard_url"]).query)
+    assert info["unlock_required"] is True
 
 
 async def test_dry_run_does_not_create_an_approval(harness) -> None:
@@ -73,7 +92,7 @@ async def test_check_approval_reports_pending_then_completed(harness) -> None:
     )
     pending = (await check_approval(created["approval_id"]))["data"]
     assert pending["status"] == "pending"
-    assert "approval console" in pending["message"]
+    assert "dashboard" in pending["message"]
 
     await harness.approvals.approve(
         created["approval_id"], actor="console:test", confirmation=None

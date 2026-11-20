@@ -178,10 +178,70 @@ The console URL printed at startup opens a local dashboard with four tabs:
 | Activity | approval outcomes plus the redacted JSONL security trail |
 | Settings | the editable settings, with locked values shown read-only |
 
-It is served by the server on loopback, every request needs the console token,
-and there are no CORS headers. The token stays in the address bar and is never
-exposed to an MCP tool. The page refreshes every three seconds but updates
-countdowns in place, so a button never detaches under your pointer.
+### Screenshots
+
+English interface, captured with local test data. Sensitive values
+remain hidden; no real Discord account or credential is shown.
+
+**Overview — server status and security controls**
+
+![Dashboard overview with server status and masked account information](docs/images/dashboard-overview.png)
+
+**Requests — human approval and typed confirmation for high-risk operations**
+
+![Pending requests with masked targets and a required APPROVE confirmation](docs/images/dashboard-requests.png)
+
+<details>
+<summary>Settings — editable security, upload and connection options</summary>
+
+![Dashboard settings with localized controls and protected advanced settings](docs/images/dashboard-settings.png)
+
+</details>
+
+### Access and privacy
+
+It is served by the server on loopback and there are no CORS headers. Opening the
+safe base address without a credential shows only a locked landing page; every
+dashboard data/API request still requires the per-process dashboard token. The
+token stays in the human's browser and is never exposed to an MCP tool. The page
+refreshes every three seconds but updates countdowns in place, so a button never
+detaches under your pointer.
+
+### Dashboard address reported by the AI
+
+`get_server_status` returns a safe address in
+`mode.approval_console.dashboard_url`. Every `approval_required` response returns
+a request-specific address in `console.dashboard_url`:
+
+```text
+http://127.0.0.1:<port>/?request=ap_<request-id>
+```
+
+The AI should give this address to the user automatically. It contains an
+approval **request ID**, not the dashboard token, so knowing it cannot authorise
+anything. Opening it shows the locked page; the human unlocks locally using the
+authenticated startup link or token in `approval-console.json`. After unlocking,
+the dashboard opens the Requests tab and highlights that approval.
+
+The AI-facing handoff should look like this Markdown:
+
+```markdown
+### Waiting for approval
+
+- **Operation:** Delete message
+- **Target:** verified channel/message
+- **Risk:** destructive
+- **Approval ID:** `ap_...`
+- **Dashboard:** <http://127.0.0.1:54321/?request=ap_...>
+
+Open the dashboard locally and unlock it using the server startup link or
+`approval-console.json`. The dashboard access token is deliberately unavailable
+to the AI.
+```
+
+Do not change request IDs into authentication credentials: the AI receives the
+request ID itself, so using it to unlock approvals would let the AI approve its
+own work.
 
 The interface supports **Traditional Chinese and English**. It selects a
 language from the browser on first use, provides a language menu in the header,
@@ -190,6 +250,21 @@ names (for example, `Delete message` / `刪除訊息`) are used as headings. The
 exact tool name (`delete_message`), endpoint, approval ID, risk, argument hash
 and full JSON remain available under **Technical details**, preserving the
 information needed to audit a decision.
+
+Language changes update empty states, controls, log-level labels, hints and
+errors in place, without clearing unsaved settings or typed confirmations. The
+locked entry page uses the same saved language preference. Exact tool names,
+JSON keys/payloads, IDs and confirmation phrases remain unchanged for auditing.
+
+Potentially sensitive values are hidden by default: account identity, target and
+approval IDs, token source/fingerprint, actors, local paths, console URL and
+state-directory details. Each value must be clicked to reveal it. Full request
+arguments and execution/audit payloads require a separate manual expansion.
+
+Masking protects against accidental on-screen disclosure; it is not encryption
+or a substitute for authentication. After unlocking, the browser removes `t`
+from the address bar and keeps the credential in page memory. Reloading the safe
+URL requires unlocking again.
 
 Editable settings: read-only mode, log level, audit on/off, startup token
 verification, approval lifetime, upload limits, and HTTP timeout/retry counts.
@@ -206,8 +281,8 @@ when `DISCORD_MCP_READ_ONLY=1` is set. Changes apply immediately, except
 
 1. The agent calls a mutating tool and gets `status: "approval_required"` with the
    full arguments, a risk label and an expiry.
-2. Open the dashboard URL and approve, deny, or (for high-risk) type `APPROVE`
-   first.
+2. Open the request-specific safe dashboard URL reported by the agent, unlock it
+   locally, then approve, deny, or (for high-risk) type `APPROVE` first.
 3. Approving schedules execution **inside the server**; the agent never sends the
    request itself.
 4. The agent calls `check_approval(approval_id)` to collect the result. The status
@@ -215,6 +290,28 @@ when `DISCORD_MCP_READ_ONLY=1` is set. Changes apply immediately, except
    `denied` / `cancelled` / `expired`.
 
 If the console is closed or disabled, nothing can be approved. That is deliberate.
+
+## Agent skill and API routing
+
+`skills/discord-user/SKILL.md` is the short operational router loaded by an AI
+client. It maps user intent to the correct discovery/read tool before a mutation,
+defines the approval handoff, and requires the agent to include the safe
+request-specific Dashboard address.
+
+`skills/discord-user/API_GUIDE.md` is the detailed API map. It groups all **118
+tools** by domain:
+
+- server, registry and approvals;
+- users, account, profile and settings;
+- guilds, channels, messages and DMs;
+- members, moderation and roles;
+- threads, reactions, pins and polls;
+- invites and scheduled events;
+- friends, relationships, assets, audit and application commands.
+
+The skill uses a fast path: known intents go directly through the router, while
+unfamiliar requests fall back to `search_api_endpoints` and `get_api_endpoint`.
+It never invents a tool or substitutes arbitrary HTTP.
 
 ## Tools
 
@@ -319,7 +416,9 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 .\.python-embed\python.exe -m pytest -q
 ```
 
-106 tests, all against mocks and a stub Discord server (no token, no network):
+116 tests using mocks and a local stub Discord server (no real token or Discord requests).
+The JavaScript locale regression tests require Node.js; pytest reports them as
+skipped if Node.js is unavailable.
 
 - configuration and token rejection (bot tokens, placeholders, loopback console)
 - registry consistency (tool ↔ endpoint, risk equality, no invented endpoints)
@@ -327,10 +426,17 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
   no POST retry on network errors, header shape, response cap)
 - approval gate (approve, deny, expiry, tampering, replay, single execution,
   restart fail-closed, audit trail)
-- console (token required, wrong token, typed confirmation, replay, bad bodies)
-- dashboard (status, pending/history, audit, multilingual hardened page, settings persist and apply live,
-  locked/unknown/invalid fields, typed `ENABLE WRITES`, environment read-only lock)
+- console (token required, wrong token, request IDs cannot unlock/approve, typed
+  confirmation, replay, bad bodies, safe connection closure after rejection,
+  expected disconnects suppressed and unexpected errors still reported)
+- dashboard (safe locked landing page, request-scoped token-free URLs, status,
+  pending/history, audit, multilingual hardened page, settings persist/apply
+  live, locked/unknown/invalid fields, typed `ENABLE WRITES`, environment
+  read-only lock)
 - tool dispatch (reads run, writes stop, dry runs create nothing, read-only mode)
+- skill/API guide completeness and safe Dashboard-link instructions
+- JavaScript locale switching (empty states, log-level options, errors, locked
+  entry page, preserving drafts, typed confirmations and expanded details)
 - upload path restriction and size limits
 - redaction and audit logging
 - an end-to-end stdio session: MCP client → gate → console approval → stub HTTP
@@ -359,7 +465,9 @@ src/discord_user_mcp/
   utils/               snowflake/emoji validation, redaction
 tools/                 registry + inventory builders (development only)
 research/              extracted docs inventory and curation overrides
-skills/discord-user/   agent-facing skill instructions
+skills/discord-user/
+  SKILL.md             fast intent router, approval and dashboard protocol
+  API_GUIDE.md         complete 118-tool domain guide
 tests/                 pytest suite
 ```
 

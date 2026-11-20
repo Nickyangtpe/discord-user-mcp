@@ -1,113 +1,191 @@
 ---
 name: discord-user
-description: Operate a Discord user account through the discord-user-mcp server. Use when the user asks you to read or change something on their own Discord account (guilds, channels, messages, DMs, friends, roles, scheduled events), when you need to find the right tool for a Discord operation, or when a Discord tool returned approval_required and you must wait for the human approval dashboard. Covers the approval protocol, risk levels, pagination, registry lookup and error codes.
+description: Route Discord user-account requests to the correct discord-user-mcp tools quickly. Use for guilds, channels, messages, DMs, members, roles, threads, reactions, invites, scheduled events, friends, profiles, settings, endpoint discovery, approvals, and dashboard guidance. Enforces read-before-write, human approval, safe dashboard-link reporting, pagination, and error handling.
 ---
 
-# Discord user operations
+# Discord user API router
 
-This skill is for the `discord-user-mcp` MCP server. It authenticates with a
-Discord **user** token and changes a real account. There is no bot account and no
-gateway: everything is request/response, so you see only what you ask for.
+Use this skill with the `discord-user-mcp` server. It authenticates a real
+Discord **user** account. Bot tokens, arbitrary HTTP, gateway events, and bypasses
+for Discord security checks are not available.
 
-## The one rule
+## Non-negotiable safety
 
-You cannot perform a write. You can only **propose** one.
+- A write is only a **proposal**. Tools with risk `write`, `admin`,
+  `destructive`, or `sensitive` create a pending approval without contacting
+  Discord.
+- Only the human dashboard can approve. Never claim success until
+  `check_approval` returns `completed`.
+- Call a mutating tool once. Calling it again creates another approval and can
+  duplicate the effect.
+- Verify names and IDs with a read tool before proposing a change. Never invent
+  a snowflake.
+- Never request, print, or repeat a Discord token or dashboard access token in
+  chat.
 
-Every tool with risk `write`, `admin`, `destructive` or `sensitive` creates a
-pending approval and returns without contacting Discord. A human approves it in a
-local dashboard. Until `check_approval` reports `completed`, the operation has **not
-happened**. Never tell the user it did.
+## Start fast
 
-## Standard loop
+At the start of a Discord task, call `get_server_status` once unless a recent
+result is already present. Check:
 
-1. **Orient.** `get_server_status` (token verified? read-only? console running?) and
-   `get_current_user` (which account is this?).
-2. **Discover ids.** `list_my_guilds` → `list_guild_channels` → `get_channel` /
-   `list_messages`. Ids are snowflakes (digits); never invent one.
-3. **Read first.** Confirm names, permissions and targets with a read tool before
-   proposing a change. Do not guess a channel id or role id.
-4. **Propose the change.** Call the mutating tool once. Use `dry_run=true` first
-   when you want to show the user the exact request without creating a request.
-5. **Report the approval id and what it authorises.** The response contains the
-   full arguments, the risk label, the expiry and the dashboard status. Ask the
-   operator to approve it in the dashboard.
-6. **Poll.** `check_approval(approval_id)` until the status is terminal:
-   `completed` (use `result`), `failed` (read `error`), `denied`, `cancelled` or
-   `expired`.
+1. `identity` — which account is connected.
+2. `mode.read_only` — whether writes are disabled.
+3. `mode.approval_console.enabled` — whether approval is possible.
+4. `mode.approval_console.dashboard_url` — the safe local dashboard address.
 
-Do **not** retry the original tool call while a request is pending: that creates a
-second pending approval and duplicates any side effect once both are approved.
+If the user asks for the dashboard, or a call returns `approval_required`, quote
+`dashboard_url` directly. Never invent a port. The safe address opens a locked
+local page and contains no credential. The authenticated link/access token is
+available only in the server startup output and local `approval-console.json`.
+
+Use this response shape for pending work:
+
+```text
+Waiting for your approval: <plain-language operation>
+Target: <verified name and id>
+Risk: <risk> · Expires: <expires_at>
+Approval ID: <approval_id>
+Dashboard: <console.dashboard_url>
+
+Open the dashboard locally and unlock it using the server startup link or
+approval-console.json. I cannot access that credential. Tell me after you decide.
+```
+
+The mutation response already contains `console.dashboard_url`; use that value.
+Fall back to the value from `get_server_status` only if needed.
+
+The request-specific URL may contain `?request=ap_...`; this is navigation only,
+not authentication. In the dashboard, identity, target/approval IDs, token
+fingerprints, actors and local paths are masked until the human clicks to reveal
+them. Exact arguments remain behind **Technical details**. Do not ask the user to
+copy any revealed secret back into chat.
+
+## Intent → tool router
+
+Use this table before searching the endpoint registry.
+
+| Intent | Discover / verify first | Primary tools |
+|---|---|---|
+| Server, dashboard, approvals | `get_server_status`, `list_approvals`, `check_approval` | `cancel_approval`, `get_audit_log`, `get_rate_limit_status` |
+| Current account or another user | `get_current_user`, `get_user`, `get_user_profile` | `update_my_account`, `update_my_profile`, `set_custom_status` |
+| Guilds and channels | `list_my_guilds`, `get_guild`, `list_guild_channels`, `get_channel` | `create_guild_channel`, `update_channel`, `delete_channel`, `reorder_channels`, channel-permission tools |
+| Messages and search | `list_messages`, `get_message`, `search_channel_messages`, `search_guild_messages`, `list_mentions` | `send_message`, `edit_message`, `delete_message`, `forward_message`, `trigger_typing` |
+| DMs and group DMs | `list_private_channels`, `get_dm_channel` | `open_dm`, `close_dm`, `create_group_dm`, recipient tools, `leave_group_dm` |
+| Members and moderation | `list_guild_members`, `search_guild_members`, `get_guild_member`, `get_my_guild_member` | `update_guild_member`, `set_my_guild_nickname`, `kick_guild_member`, `ban_guild_member`, `unban_guild_member` |
+| Roles | `list_guild_roles`, `get_guild_role` | `create_guild_role`, `update_guild_role`, `delete_guild_role`, `reorder_guild_roles`, add/remove role tools |
+| Threads | `list_active_threads`, `list_archived_threads`, `list_guild_active_threads`, `search_threads` | `create_thread`, `start_thread_from_message`, `join_thread`, `leave_thread`, thread-member tools |
+| Reactions, pins, polls | `list_reactions`, `list_channel_pins`, `list_poll_voters` | reaction-removal tools, `add_reaction`, `pin_message`, `unpin_message`, `vote_poll` |
+| Invites | `list_channel_invites`, `list_guild_invites`, `get_invite` | `create_channel_invite`, `delete_invite` |
+| Scheduled events | `list_scheduled_events`, `get_scheduled_event`, `list_event_users` | `create_scheduled_event`, `update_scheduled_event`, `delete_scheduled_event`, `rsvp_event`, `unrsvp_event` |
+| Friends and relationships | `list_relationships`, `list_mutual_relationships` | `send_friend_request`, `accept_friend_request`, `remove_relationship`, `block_user`, `set_relationship_nickname` |
+| User settings, notes, notifications | `get_my_settings`, `list_my_notes`, `list_notifications` | `update_my_settings`, `update_my_notification_settings`, `set_user_note`, `ack_notification` |
+| Emoji, stickers, audit, commands | `list_guild_emojis`, `list_guild_stickers`, `get_guild_audit_log`, application-command tools | read first; use registry if no listed mutation fits |
+
+For the complete grouped catalog and short recipes, read `API_GUIDE.md` beside
+this file. Do not load it when the table above already answers the request.
+
+## Common recipes
+
+### Read, send, edit, or delete a message
+
+1. Resolve the guild/channel with `list_my_guilds` and
+   `list_guild_channels`, unless verified IDs were supplied.
+2. Use `get_message` for a supplied Discord message URL or message ID; use
+   `list_messages` / search tools for discovery.
+3. For a change, call exactly one of `send_message`, `edit_message`,
+   `delete_message`, or `forward_message`.
+4. Report the approval details and `console.dashboard_url`; after the human
+   decides, call `check_approval`.
+
+A message URL has guild, channel, and message IDs. Parse them, then verify the
+message with `get_message`; do not treat the URL alone as proof of the target.
+
+### Change a guild, channel, member, permission, or role
+
+Read the current object and its containing guild first. For member changes, also
+read the member; for role changes, list roles; for permission changes, read the
+channel. Use `dry_run=true` before complex admin/destructive calls when the user
+would benefit from seeing the exact path and arguments.
+
+### DM or relationship action
+
+Resolve the user with `get_user` / `get_user_profile`, then inspect existing
+private channels or relationships. Relationship/profile/account changes are
+`sensitive` and require the human to type `APPROVE` in the dashboard.
+
+### Thread or scheduled-event action
+
+Resolve the parent channel or guild, list existing threads/events, then act on
+the verified ID. Do not create a replacement merely because a search returned
+no first-page result; paginate or use the more specific get tool.
+
+## Tool and response discipline
+
+- Read tools return `{"status":"ok","data":...}`; inspect `data`, not only the
+  envelope.
+- Mutations return `status: "approval_required"`; this means **nothing has been
+  sent to Discord**.
+- `dry_run=true` sends nothing and creates no approval. Use the real call once
+  after the user confirms the proposed parameters.
+- When an approval is pending, wait for the human. Check it after they say they
+  decided; do not busy-loop and do not retry the original mutation.
+- Terminal states: `completed`, `failed`, `denied`, `cancelled`, `expired`.
+- `cancel_approval` can only make a pending request safer; it can never approve.
+
+## Registry fallback
+
+Do not search the registry when the intent router identifies a tool. When the
+request is unfamiliar:
+
+1. `search_api_endpoints(query="...", status="implemented")`
+2. `get_api_endpoint("<endpoint id>")` for exact method, parameters, risk,
+   limitations, and source.
+3. If only `documented` or `unsupported` entries exist, explain that no tool is
+   available. Never fabricate a tool or raw HTTP call.
+
+Registry statuses:
+
+- `implemented`: one or more MCP tools exist.
+- `documented`: real endpoint, not exposed as a tool in this build.
+- `unsupported`: deliberately excluded; report its recorded limitation.
 
 ## Risk levels
 
-| Risk | Examples | Approval |
+| Risk | Typical operations | Human action |
 |---|---|---|
-| `read` | list messages, get guild, search, list roles | none, runs immediately |
-| `write` | send/edit message, react, pin, create invite, join thread | console click |
-| `admin` | create/update channel, roles, permissions, kick, ban settings, guild update | click + type `APPROVE` |
-| `destructive` | delete message/channel/role/event, leave guild, ban, kick | click + type `APPROVE` |
-| `sensitive` | profile, relationships, blocks, notes, settings, custom status | click + type `APPROVE` |
+| `read` | list/get/search | none |
+| `write` | send/edit/react/pin/join | click Allow |
+| `admin` | channels, roles, permissions, guild administration | type `APPROVE` |
+| `destructive` | delete/leave/kick/ban | type `APPROVE` |
+| `sensitive` | account/profile/friends/blocks/notes/settings | type `APPROVE` |
 
-The risk is fixed in code and in the registry; you cannot lower it and there is no
-parameter that skips the gate.
+Risk is fixed in code and registry data. Never imply it can be downgraded.
 
-The dashboard is human-only. Its URL token is never returned through MCP, and the
-agent cannot use it to approve requests or change dashboard settings.
+## Pagination and response size
 
-## If you are unsure a tool exists
+- `list_messages`: 1–100; use only one of `before`, `after`, or `around`.
+- `list_guild_members`: up to 1000; continue with returned `next_after`.
+- Search: up to 25 per page with `offset`; HTTP 202 can mean the guild index is
+  still building, not that no result exists.
+- Responses above 1 MiB return `truncated: true`; narrow or paginate the query.
 
-Ask the registry instead of guessing:
+## Error routing
 
-- `search_api_endpoints(query="scheduled event", status="implemented")`
-- `search_api_endpoints(status="unsupported")` to see what is excluded and why
-- `get_api_endpoint("<id>")` for the documented parameters, risk and source link
+| Code | Action |
+|---|---|
+| `validation_error` | correct arguments; do not retry unchanged |
+| `read_only_mode` | explain that writes are disabled |
+| `upload_rejected` | use an allowed path or lower file count/size |
+| `discord_unauthorized` | stop; operator must replace the token and restart |
+| `discord_forbidden` | report permission/platform check; never bypass |
+| `discord_not_found` | rediscover and verify the ID |
+| `discord_rate_limited` | wait for `retry_after`, then retry once |
+| `discord_network_error` | for a mutation, inspect the target before any retry |
+| `approval_expired` | propose again only if the user still wants it |
+| `approval_already_decided` | collect the existing result; never replay |
+| `approval_arguments_tampered` | stop and report a security event |
+| `approval_console_unavailable` | dashboard is disabled/unavailable; no write can be approved |
 
-Statuses: `implemented` (a tool exists), `documented` (real endpoint, no tool in
-this build), `unsupported` (deliberately excluded, with a reason). If something is
-`documented` or `unsupported`, say so; do not pretend you can do it.
-
-Known limits: no gateway, so no live events (poll with read tools); no voice; no
-billing/Nitro/payments; no MFA, captcha, phone/email verification or device login;
-no account deletion; no OAuth2; no bulk delete. Discord's own platform checks are
-never bypassed: a 403 with HTML means a security check blocked the request.
-
-## Pagination and size
-
-- `list_messages`: 1-100 per page, use `before` / `after` / `around` (only one).
-- `list_guild_members`: up to 1000, continue with the returned `next_after`.
-- Search endpoints: up to 25 per page with `offset`; a guild index that is still
-  building answers HTTP 202 - retry later instead of assuming no results.
-- Responses above 1 MiB return `{truncated: true, preview, approx_bytes}`. Narrow
-  the query rather than treating the preview as complete.
-
-## Errors and what to do
-
-| Code | Meaning | Action |
-|---|---|---|
-| `validation_error` | bad snowflake, missing field, limit exceeded | fix the arguments, do not retry unchanged |
-| `read_only_mode` | server started with `DISCORD_MCP_READ_ONLY=1` | tell the user writes are disabled |
-| `upload_rejected` | file outside the allowed roots, too large, too many | ask the user to move it or raise the limit |
-| `discord_unauthorized` | 401, token invalid/revoked | stop; the operator must replace the token and restart |
-| `discord_forbidden` | 403, missing permission or platform check | report it; never attempt to bypass |
-| `discord_not_found` | 404 | re-discover the id; the object may be gone or invisible |
-| `discord_rate_limited` | 429 after retries | wait `retry_after`, then retry once |
-| `discord_network_error` | timeout/reset | for POST, check the target before retrying - it may have been applied |
-| `approval_confirmation_required` | high risk without the phrase | the human must type `APPROVE` in the console |
-| `approval_expired` | TTL passed | propose it again only if the user still wants it |
-| `approval_already_decided` | replay or already executed | do not re-approve; check the existing result |
-| `approval_arguments_tampered` | stored arguments changed | treat as a security event and report it |
-| `approval_console_unavailable` | the console is disabled or not running | nothing can be approved; tell the user to restart the server |
-
-## Etiquette
-
-- Read before writing; show the user the target name, not just an id.
-- One change per approval. Do not batch unrelated destructive actions.
-- Prefer the least destructive tool (`edit_message` before `delete_message`,
-  `kick` before `ban`, `close_dm` before leaving a group).
-- If the user asks for something the registry marks unsupported, explain the
-  reason instead of looking for a workaround.
-- Never ask for, print, log or repeat the token, and never ask the user to paste
-  it into chat; it belongs in the server's environment or state directory.
-- `cancel_approval` is available to you, but only for **pending** requests. Use it
-  when the user changes their mind before approval. Approving is impossible from
-  MCP by design.
+Known limits: no gateway/live events, voice, billing/Nitro/payments, MFA,
+captcha, phone/email verification, device login, account deletion, OAuth2, or
+bulk delete. Never work around Discord platform security checks.

@@ -12,6 +12,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import quote
 
 from .api.client import DiscordClient
 from .api.errors import (
@@ -44,16 +45,28 @@ class AppContext:
     started_at: float = field(default_factory=time.time)
     console: Any = None
 
-    def console_info(self) -> dict[str, Any]:
+    def console_info(self, request_id: str | None = None) -> dict[str, Any]:
         if self.console is None or not getattr(self.console, "running", False):
-            return {"enabled": False}
+            return {
+                "enabled": False,
+                "message": "The local dashboard is not running; no operation can be approved.",
+            }
+        safe_url = self.console.safe_url
+        request_url = (
+            f"{safe_url}?request={quote(request_id, safe='')}" if request_id else safe_url
+        )
         return {
             "enabled": True,
-            "url_without_token": self.console.safe_url,
+            "dashboard_url": request_url,
+            "url_without_token": safe_url,
+            "request_id": request_id,
+            "unlock_required": True,
             "message": (
-                "The approval console URL (including its one-time token) was printed to the "
-                "server's stderr and written to the state directory. Ask the human operator "
-                "to open it; the token is deliberately not exposed to the AI."
+                "Give dashboard_url to the human operator. It contains only the request ID "
+                "and opens a safe locked page. "
+                "The authenticated URL and per-process access token are printed to the "
+                "server's stderr and written to approval-console.json; they are deliberately "
+                "not exposed to the AI."
             ),
         }
 
@@ -205,11 +218,12 @@ async def dispatch(spec: ToolSpec, call_args: dict[str, Any]) -> dict[str, Any]:
             "expires_at": public["expires_at"],
             "expires_in_seconds": public["expires_in_seconds"],
             "requires_typed_confirmation": public["requires_typed_confirmation"],
-            "console": context.console_info(),
+            "console": context.console_info(public["approval_id"]),
             "next_step": (
                 "Nothing has been sent to Discord. A human must approve this exact request in "
-                f"the local approval console, then call check_approval with approval_id="
-                f"{public['approval_id']} to collect the result."
+                "the local dashboard. Show them console.dashboard_url (it contains this request "
+                "ID, never the dashboard token). After they decide, call check_approval with "
+                f"approval_id={public['approval_id']} to collect the result."
             ),
             "do_not": "Do not retry this tool call; that creates a second pending request.",
         }
