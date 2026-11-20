@@ -10,6 +10,7 @@ Nothing here ever logs or returns the token. ``Settings.token`` is a
 
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
@@ -289,3 +290,137 @@ def console_token_from_env(environ: Mapping[str, str] | None = None) -> str | No
     env = dict(os.environ if environ is None else environ)
     value = env.get("DISCORD_MCP_CONSOLE_TOKEN")
     return value or None
+
+
+# --------------------------------------------------------------------------
+# Dashboard settings
+# --------------------------------------------------------------------------
+
+DASHBOARD_SETTINGS_FILENAME = "dashboard-settings.json"
+DASHBOARD_CONFIRMATION_PHRASE = "ENABLE WRITES"
+LOG_LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR")
+
+# Fields a page served by the server may never change. Retargeting the API
+# base or moving the console off loopback from that page would let a single
+# click exfiltrate the token or expose approvals on the network.
+DASHBOARD_LOCKED_KEYS = (
+    "token",
+    "api_base",
+    "console_host",
+    "console_port",
+    "state_dir",
+)
+
+
+class DashboardSettings(BaseModel):
+    """The settings a human may edit from the local dashboard.
+
+    Persisted to ``<state>/dashboard-settings.json`` and applied at startup
+    before logging and the HTTP client are built. Fields that only matter at
+    startup (``require_startup_auth_check``) are labelled as such in the UI.
+    """
+
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    read_only: bool = False
+    log_level: str = "INFO"
+    audit_enabled: bool = True
+    require_startup_auth_check: bool = True
+    approval_ttl_seconds: int = Field(default=300, ge=30, le=3600)
+    uploads_enabled: bool = True
+    upload_max_bytes: int = Field(default=25 * 1024 * 1024, ge=1, le=1024 * 1024 * 1024)
+    upload_max_files: int = Field(default=10, ge=1, le=10)
+    http_timeout_seconds: float = Field(default=30.0, gt=0, le=300)
+    http_max_retries: int = Field(default=3, ge=0, le=10)
+    http_max_429_retries: int = Field(default=5, ge=0, le=20)
+
+    @field_validator("log_level")
+    @classmethod
+    def _known_level(cls, value: str) -> str:
+        level = value.strip().upper()
+        if level not in LOG_LEVELS:
+            raise ValueError(f"log_level must be one of {', '.join(LOG_LEVELS)}")
+        return level
+
+
+def dashboard_settings_path(state_dir: str | Path) -> Path:
+    return Path(state_dir) / DASHBOARD_SETTINGS_FILENAME
+
+
+def dashboard_settings_from(settings: Settings) -> DashboardSettings:
+    """Snapshot the editable subset of a live :class:`Settings`."""
+    return DashboardSettings(
+        read_only=settings.read_only,
+        log_level=settings.log_level,
+        audit_enabled=settings.audit_enabled,
+        require_startup_auth_check=settings.require_startup_auth_check,
+        approval_ttl_seconds=settings.approval.ttl_seconds,
+        uploads_enabled=settings.upload.enabled,
+        upload_max_bytes=settings.upload.max_bytes,
+        upload_max_files=settings.upload.max_files,
+        http_timeout_seconds=settings.http.timeout_seconds,
+        http_max_retries=settings.http.max_retries,
+        http_max_429_retries=settings.http.max_rate_limit_retries,
+    )
+
+
+def apply_dashboard_settings(settings: Settings, value: DashboardSettings) -> Settings:
+    """Copy dashboard values onto a live settings object, in place.
+
+    Token, API base and console bind address are intentionally not touched, so
+    a dashboard request can never redirect credentials or widen exposure.
+    """
+    settings.read_only = value.read_only
+    settings.log_level = value.log_level
+    settings.audit_enabled = value.audit_enabled
+    settings.require_startup_auth_check = value.require_startup_auth_check
+    settings.approval.ttl_seconds = value.approval_ttl_seconds
+    settings.upload.enabled = value.uploads_enabled
+    settings.upload.max_bytes = value.upload_max_bytes
+    settings.upload.max_files = value.upload_max_files
+    settings.http.timeout_seconds = value.http_timeout_seconds
+    settings.http.max_retries = value.http_max_retries
+    settings.http.max_rate_limit_retries = value.http_max_429_retries
+    return settings
+
+
+def load_dashboard_settings(state_dir: str | Path) -> DashboardSettings | None:
+    """Read persisted dashboard settings. Missing file means "not configured"."""
+    path = dashboard_settings_path(state_dir)
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return None
+    except OSError as exc:
+        raise ConfigError(f"Could not read dashboard settings {path}: {exc}") from exc
+    try:
+        payload = json.loads(raw)
+    except ValueError as exc:
+        raise ConfigError(f"Dashboard settings {path} are not valid JSON") from exc
+    if not isinstance(payload, dict):
+        raise ConfigError(f"Dashboard settings {path} must be a JSON object")
+    try:
+        return DashboardSettings.model_validate(payload)
+    except ValueError as exc:
+        raise ConfigError(f"Dashboard settings {path} are invalid: {exc}") from exc
+
+
+def save_dashboard_settings(
+    state_dir: str | Path, value: DashboardSettings
+) -> Path:
+    """Write settings atomically with owner-only permissions.
+
+    The file holds no secret (the token is never included), but it does decide
+    whether writes are allowed and where approvals expire, so it stays 0600.
+    """
+    path = dashboard_settings_path(state_dir)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    body = json.dumps(value.model_dump(), indent=2, sort_keys=True) + "\n"
+    temp = path.with_name(path.name + ".tmp")
+    temp.write_text(body, encoding="utf-8")
+    try:
+        os.chmod(temp, 0o600)
+    except OSError:  # pragma: no cover - chmod is a no-op on some filesystems
+        pass
+    os.replace(temp, path)
+    return path

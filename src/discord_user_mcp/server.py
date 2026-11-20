@@ -30,7 +30,12 @@ from .api.client import DiscordClient
 from .api.errors import ConfigError, DiscordUserMCPError
 from .api.registry import get_registry
 from .auth.credentials import startup_check
-from .config import Settings, load_env_file
+from .config import (
+    Settings,
+    apply_dashboard_settings,
+    load_dashboard_settings,
+    load_env_file,
+)
 from .runtime import AppContext, clear_context, execute_approved, set_context
 from .security.approval import ApprovalManager, ApprovalStore
 from .security.audit import AuditLogger
@@ -52,7 +57,7 @@ Read this before calling anything:
 2. Every tool that changes Discord state (risk write/admin/destructive/sensitive) does NOT
    execute when you call it. It creates a pending approval and returns
    `status: "approval_required"` with an `approval_id`.
-3. A human must approve that exact request in a local approval console. You cannot approve,
+3. A human must approve that exact request in the local dashboard. You cannot approve,
    and there is no tool to do so. Never claim an operation succeeded because you called it.
 4. Use `check_approval` with the `approval_id` to collect the result. Do not retry the original
    call: that only creates a second pending request.
@@ -116,7 +121,7 @@ def _banner(context: AppContext, *, auth_note: str | None) -> str:
         lines.append(f"  note: {auth_note}")
     if context.console is not None and context.console.running:
         lines.append("")
-        lines.append("  APPROVAL CONSOLE (open this to approve or deny operations):")
+        lines.append("  LOCAL DASHBOARD (status, approvals, activity and settings):")
         lines.append(f"    {context.console.url}")
         lines.append(
             f"    also written to {settings.state_dir / 'approval-console.json'} (keep private)"
@@ -124,7 +129,7 @@ def _banner(context: AppContext, *, auth_note: str | None) -> str:
     else:
         lines.append("")
         lines.append(
-            "  WARNING: the approval console is disabled. Every mutating tool will refuse to run."
+            "  WARNING: the local dashboard is disabled. Every mutating tool will refuse to run."
         )
     lines.append("")
     return "\n".join(lines)
@@ -133,6 +138,18 @@ def _banner(context: AppContext, *, auth_note: str | None) -> str:
 async def run(settings: Settings | None = None, *, mcp: FastMCP | None = None) -> None:
     """Start the stdio server. Kept importable so tests can drive it in-process."""
     settings = settings or Settings.from_env()
+    # Dashboard changes made in a previous run win over .env defaults, except
+    # that an environment-level read-only lock cannot be undone from the page.
+    read_only_locked = settings.read_only
+    try:
+        stored = load_dashboard_settings(settings.state_dir)
+    except ConfigError as exc:
+        logger.warning("ignoring dashboard settings: %s", exc)
+        stored = None
+    if stored is not None:
+        apply_dashboard_settings(settings, stored)
+    if read_only_locked:
+        settings.read_only = True
     configure_logging(settings.log_level)
     if settings.token is not None:
         register_secret(settings.token.get_secret_value())
@@ -143,6 +160,7 @@ async def run(settings: Settings | None = None, *, mcp: FastMCP | None = None) -
     store = ApprovalStore(settings.state_dir / "approvals.sqlite3")
     approvals = ApprovalManager(settings, store, audit, executor=execute_approved)
     console = ApprovalConsole(settings, approvals, tool_count=len(TOOL_SPECS))
+    console.read_only_locked = read_only_locked
     approvals.console = console
 
     context = AppContext(
@@ -154,6 +172,7 @@ async def run(settings: Settings | None = None, *, mcp: FastMCP | None = None) -
         tool_count=len(TOOL_SPECS),
         console=console,
     )
+    console.context = context
     set_context(context)
 
     auth_note: str | None = None

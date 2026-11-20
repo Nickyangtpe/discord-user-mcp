@@ -115,7 +115,7 @@ turns the file off. The most important knobs:
 | Variable | Default | Meaning |
 |---|---|---|
 | `DISCORD_USER_TOKEN` / `DISCORD_USER_TOKEN_FILE` | unset | The user token. A `Bot ` prefix is rejected. |
-| `DISCORD_MCP_STATE_DIR` | `%LOCALAPPDATA%\discord-user-mcp` | Approvals DB, audit log, console token, default uploads. |
+| `DISCORD_MCP_STATE_DIR` | `%LOCALAPPDATA%\discord-user-mcp` | Approvals DB, audit log, dashboard token/settings, default uploads. |
 | `DISCORD_MCP_APPROVAL_TTL` | `300` | Seconds a pending approval stays valid (30-3600). |
 | `DISCORD_MCP_CONSOLE_ENABLED` | `1` | If `0`, every mutating tool refuses to run. |
 | `DISCORD_MCP_CONSOLE_HOST` / `_PORT` | `127.0.0.1` / `0` | Loopback only; a non-loopback host is rejected. |
@@ -125,6 +125,11 @@ turns the file off. The most important knobs:
 | `DISCORD_MCP_API_BASE` | `https://discord.com/api/v9` | Point at a stub for tests. |
 | `DISCORD_MCP_AUDIT` | `1` | JSONL audit log on/off. |
 | `DISCORD_MCP_ENV_FILE` | `.env` | dotenv path read at startup; `0` disables it. |
+
+Settings changed in the dashboard are stored in
+`<state>/dashboard-settings.json` (0600) and reloaded at startup. They override
+the matching `.env` defaults, with one exception: `DISCORD_MCP_READ_ONLY=1` is a
+hard lock that the dashboard cannot undo.
 
 ## Register with an MCP client
 
@@ -155,19 +160,54 @@ At startup the server prints to **stderr**:
   credential type: Discord USER token (bot tokens are not supported)
   authenticated as: yourname (123456789012345678)
 
-  APPROVAL CONSOLE (open this to approve or deny operations):
+  LOCAL DASHBOARD (status, approvals, activity and settings):
     http://127.0.0.1:54321/?t=<random token>
     also written to ...\approval-console.json (keep private)
 ```
 
 stdout is reserved for the MCP protocol.
 
+## The dashboard
+
+The console URL printed at startup opens a local dashboard with four tabs:
+
+| Tab | What it shows |
+|---|---|
+| Overview | account identity, token source/fingerprint, read-only state, approval TTL, tool and registry counts, rate limits, audit path |
+| Requests | pending operations; approve, deny, or type `APPROVE` for high-risk |
+| Activity | approval outcomes plus the redacted JSONL security trail |
+| Settings | the editable settings, with locked values shown read-only |
+
+It is served by the server on loopback, every request needs the console token,
+and there are no CORS headers. The token stays in the address bar and is never
+exposed to an MCP tool. The page refreshes every three seconds but updates
+countdowns in place, so a button never detaches under your pointer.
+
+The interface supports **Traditional Chinese and English**. It selects a
+language from the browser on first use, provides a language menu in the header,
+and remembers the choice in browser storage. Human-readable operation
+names (for example, `Delete message` / `刪除訊息`) are used as headings. The
+exact tool name (`delete_message`), endpoint, approval ID, risk, argument hash
+and full JSON remain available under **Technical details**, preserving the
+information needed to audit a decision.
+
+Editable settings: read-only mode, log level, audit on/off, startup token
+verification, approval lifetime, upload limits, and HTTP timeout/retry counts.
+
+Locked settings (environment/`.env` only): the token, API base URL, console bind
+address and state directory. Keeping them out of the page means a dashboard
+request cannot redirect the credential or expose approvals on the network.
+
+Turning read-only mode **off** requires typing `ENABLE WRITES`, and is refused
+when `DISCORD_MCP_READ_ONLY=1` is set. Changes apply immediately, except
+`require_startup_auth_check`, which the page reports as needing a restart.
+
 ## Approving an operation
 
 1. The agent calls a mutating tool and gets `status: "approval_required"` with the
    full arguments, a risk label and an expiry.
-2. Open the console URL. The page lists pending requests with their exact
-   parameters. Approve, deny, or (for high-risk) type `APPROVE` first.
+2. Open the dashboard URL and approve, deny, or (for high-risk) type `APPROVE`
+   first.
 3. Approving schedules execution **inside the server**; the agent never sends the
    request itself.
 4. The agent calls `check_approval(approval_id)` to collect the result. The status
@@ -279,7 +319,7 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 .\.python-embed\python.exe -m pytest -q
 ```
 
-97 tests, all against mocks and a stub Discord server (no token, no network):
+106 tests, all against mocks and a stub Discord server (no token, no network):
 
 - configuration and token rejection (bot tokens, placeholders, loopback console)
 - registry consistency (tool ↔ endpoint, risk equality, no invented endpoints)
@@ -288,6 +328,8 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 - approval gate (approve, deny, expiry, tampering, replay, single execution,
   restart fail-closed, audit trail)
 - console (token required, wrong token, typed confirmation, replay, bad bodies)
+- dashboard (status, pending/history, audit, multilingual hardened page, settings persist and apply live,
+  locked/unknown/invalid fields, typed `ENABLE WRITES`, environment read-only lock)
 - tool dispatch (reads run, writes stop, dry runs create nothing, read-only mode)
 - upload path restriction and size limits
 - redaction and audit logging
@@ -300,7 +342,7 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 src/discord_user_mcp/
   server.py            FastMCP wiring, startup order, banner, CLI
   runtime.py           the only path from a tool call to HTTP
-  config.py            env parsing, token resolution, loopback validation
+  config.py            env parsing, token resolution, persisted dashboard settings
   api/
     client.py          httpx client: auth, retries, rate limits, caps
     errors.py          error taxonomy
@@ -310,7 +352,7 @@ src/discord_user_mcp/
   security/
     permissions.py     fixed risk classification
     approval.py        SQLite approval state machine
-    console.py         loopback approval UI + JSON API
+    console.py         loopback multilingual dashboard + JSON API
     audit.py           redacted JSONL audit log
   auth/credentials.py  user-token verification
   tools/               118 tool definitions by area

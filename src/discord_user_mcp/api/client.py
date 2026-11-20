@@ -100,6 +100,17 @@ class DiscordClient:
     def base_url(self) -> str:
         return self.settings.http.base_url.rstrip("/")
 
+    def apply_settings(self) -> None:
+        """Re-read HTTP settings after the dashboard changed them.
+
+        Retry counts are already read per request; only the httpx timeout is
+        fixed at construction, so refresh it here.
+        """
+        self._http.timeout = httpx.Timeout(
+            self.settings.http.timeout_seconds,
+            connect=self.settings.http.connect_timeout_seconds,
+        )
+
     async def close(self) -> None:
         await self._http.aclose()
 

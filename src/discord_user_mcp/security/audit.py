@@ -30,6 +30,16 @@ class AuditLogger:
         if enabled:
             self.path.parent.mkdir(parents=True, exist_ok=True)
 
+    def set_enabled(self, enabled: bool) -> None:
+        """Toggle auditing at runtime (used by the local dashboard)."""
+        self.enabled = bool(enabled)
+        if self.enabled:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    @property
+    def status(self) -> dict[str, Any]:
+        return {"enabled": self.enabled, "path": str(self.path)}
+
     def record(self, event: str, **fields: Any) -> None:
         if not self.enabled:
             return
@@ -72,7 +82,9 @@ class AuditLogger:
             pass
 
     def tail(self, limit: int = 50) -> list[dict[str, Any]]:
-        if not self.enabled or not self.path.exists():
+        # Readable even when auditing is currently off: the existing trail must
+        # stay visible after someone disables logging.
+        if not self.path.exists():
             return []
         limit = max(1, min(limit, 500))
         with self._lock:

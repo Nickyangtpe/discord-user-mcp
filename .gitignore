@@ -23,4 +23,6 @@ dist/
 approvals.sqlite3*
 audit.jsonl*
 approval-console.json
+dashboard-settings.json
+dashboard-settings.json.tmp
 uploads/

@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 
 import httpx
 import pytest
 
+from discord_user_mcp.config import load_dashboard_settings
 from discord_user_mcp.security.approval import ApprovalManager, ApprovalStore, ToolRequest
 from discord_user_mcp.security.audit import AuditLogger
 from discord_user_mcp.security.console import ApprovalConsole
@@ -15,10 +17,12 @@ from discord_user_mcp.security.permissions import Risk
 
 from conftest import make_settings
 
+HEADERS = {"X-Approval-Token": "test-token"}
+
 
 class Setup:
-    def __init__(self, state_dir: Path) -> None:
-        self.settings = make_settings(state_dir)
+    def __init__(self, state_dir: Path, **overrides: object) -> None:
+        self.settings = make_settings(state_dir, **overrides)
         self.audit = AuditLogger(state_dir / "audit.jsonl")
         self.store = ApprovalStore(state_dir / "approvals.sqlite3")
 
@@ -58,7 +62,19 @@ async def test_console_accepts_token_in_header_and_query(console_setup: Setup) -
         assert state.json()["pending"] == []
         page = await http.get("/?t=test-token")
         assert page.status_code == 200
-        assert "approval console" in page.text.lower()
+        assert "dashboard" in page.text.lower()
+
+
+async def test_dashboard_page_is_multilingual_and_hardened(console_setup: Setup) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        page = await http.get("/?t=test-token")
+    assert page.status_code == 200
+    assert '<option value="zh-TW">繁體中文</option>' in page.text
+    assert '<option value="en">English</option>' in page.text
+    assert "discord-mcp-language" in page.text
+    assert "test-token" not in page.text
+    assert "default-src 'none'" in page.headers["content-security-policy"]
+    assert "access-control-allow-origin" not in page.headers
 
 
 async def test_token_file_is_written_privately(console_setup: Setup) -> None:
@@ -179,3 +195,198 @@ async def test_console_rejects_bad_body(console_setup: Setup) -> None:
             json={"id": "not-an-approval"},
         )
         assert wrong_id.status_code == 400
+
+
+# --------------------------------------------------------------------------
+# Dashboard
+# --------------------------------------------------------------------------
+
+
+async def test_dashboard_endpoints_require_the_console_token(
+    console_setup: Setup,
+) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        for path in ("/api/status", "/api/approvals", "/api/audit", "/api/settings"):
+            assert (await http.get(path)).status_code == 401
+        assert (
+            await http.post("/api/settings", json={"log_level": "DEBUG"})
+        ).status_code == 401
+
+
+async def test_dashboard_status_reports_server_state(console_setup: Setup) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        response = await http.get("/api/status", headers=HEADERS)
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["server"]["version"] == "0.1.0"
+    assert body["mode"]["read_only"] is False
+    assert body["approvals"]["pending"] == 0
+    assert body["registry"]["total"] > 0
+    assert body["token"]["bot_tokens_supported"] is False
+    assert body["console"]["url_without_token"].startswith("http://127.0.0.1:")
+    assert body["console"]["token_required"] is True
+
+
+async def test_dashboard_lists_pending_then_history_and_audit(
+    console_setup: Setup,
+) -> None:
+    approval = await console_setup.manager.request(
+        ToolRequest(
+            tool="send_message",
+            endpoint_id="messages.create",
+            risk=Risk.WRITE,
+            summary="Send a message",
+            target="channel_id=123",
+            args={"channel_id": "123", "content": "hi"},
+        )
+    )
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        pending = await http.get(
+            "/api/approvals?status=pending&limit=10", headers=HEADERS
+        )
+        assert pending.status_code == 200, pending.text
+        assert [item["approval_id"] for item in pending.json()["approvals"]] == [
+            approval.id
+        ]
+
+        approved = await http.post("/api/approve", headers=HEADERS, json={"id": approval.id})
+        assert approved.status_code == 200, approved.text
+
+        # The execution task is scheduled on the test loop.
+        await asyncio.gather(*tuple(console_setup.manager._tasks))
+
+        history = await http.get("/api/approvals?limit=10", headers=HEADERS)
+        assert history.status_code == 200, history.text
+        record = history.json()["approvals"][0]
+        assert record["approval_id"] == approval.id
+        assert record["status"] == "completed"
+        assert record["result"] == {"executed": "send_message"}
+
+        audit = await http.get("/api/audit?limit=50", headers=HEADERS)
+    assert audit.status_code == 200, audit.text
+    events = [entry["event"] for entry in audit.json()["entries"]]
+    assert "approval_requested" in events
+    assert "approval_granted" in events
+    assert "execution_completed" in events
+
+
+async def test_dashboard_settings_update_persists_and_is_audited(
+    console_setup: Setup,
+) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        response = await http.post(
+            "/api/settings",
+            headers=HEADERS,
+            json={"approval_ttl_seconds": 120, "audit_enabled": False},
+        )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["settings"]["approval_ttl_seconds"] == 120
+    assert body["settings"]["audit_enabled"] is False
+    assert set(body["changed"]) == {"approval_ttl_seconds", "audit_enabled"}
+    assert body["restart_required"] == []
+
+    # Applied live, not only written to disk.
+    assert console_setup.settings.approval.ttl_seconds == 120
+    assert console_setup.audit.enabled is False
+
+    stored = load_dashboard_settings(console_setup.settings.state_dir)
+    assert stored is not None
+    assert stored.approval_ttl_seconds == 120
+    assert stored.audit_enabled is False
+
+    events = [entry["event"] for entry in console_setup.audit.tail(20)]
+    assert "dashboard_settings_changed" in events
+
+    # Turning auditing back on is applied immediately too.
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        back = await http.post(
+            "/api/settings", headers=HEADERS, json={"audit_enabled": True}
+        )
+    assert back.status_code == 200, back.text
+    assert console_setup.audit.enabled is True
+
+
+async def test_dashboard_settings_reject_locked_unknown_and_invalid(
+    console_setup: Setup,
+) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        for payload in (
+            {"token": "x"},
+            {"api_base": "https://example.invalid"},
+            {"console_port": 8080},
+            {"nonsense": 1},
+            {"approval_ttl_seconds": 5},
+            {"read_only": "yes"},
+        ):
+            response = await http.post("/api/settings", headers=HEADERS, json=payload)
+            assert response.status_code == 400, (payload, response.text)
+    # Nothing was partially applied.
+    assert console_setup.settings.approval.ttl_seconds == 300
+    assert console_setup.settings.http.base_url.startswith("https://discord.com/")
+
+
+async def test_dashboard_requires_typed_confirmation_to_enable_writes(
+    tmp_path: Path,
+) -> None:
+    setup = Setup(tmp_path / "readonly", read_only=True)
+    setup.manager.bind_loop(asyncio.get_running_loop())
+    try:
+        async with httpx.AsyncClient(base_url=setup.console.base_url) as http:
+            denied = await http.post(
+                "/api/settings", headers=HEADERS, json={"read_only": False}
+            )
+            assert denied.status_code == 409, denied.text
+            assert denied.json()["code"] == "settings_confirmation_required"
+            assert setup.settings.read_only is True
+
+            wrong = await http.post(
+                "/api/settings",
+                headers=HEADERS,
+                json={"read_only": False, "confirmation": "yes"},
+            )
+            assert wrong.status_code == 409
+            assert setup.settings.read_only is True
+
+            ok = await http.post(
+                "/api/settings",
+                headers=HEADERS,
+                json={"read_only": False, "confirmation": "ENABLE WRITES"},
+            )
+            assert ok.status_code == 200, ok.text
+            assert setup.settings.read_only is False
+            assert load_dashboard_settings(setup.settings.state_dir).read_only is False
+    finally:
+        setup.console.stop()
+
+
+async def test_dashboard_cannot_override_an_environment_read_only_lock(
+    tmp_path: Path,
+) -> None:
+    setup = Setup(tmp_path / "locked", read_only=True)
+    setup.console.read_only_locked = True
+    setup.manager.bind_loop(asyncio.get_running_loop())
+    try:
+        async with httpx.AsyncClient(base_url=setup.console.base_url) as http:
+            response = await http.post(
+                "/api/settings",
+                headers=HEADERS,
+                json={"read_only": False, "confirmation": "ENABLE WRITES"},
+            )
+    finally:
+        setup.console.stop()
+    assert response.status_code == 409, response.text
+    assert response.json()["code"] == "read_only_locked"
+    assert setup.settings.read_only is True
+
+
+async def test_dashboard_settings_snapshot_never_contains_the_token(
+    console_setup: Setup,
+) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        response = await http.get("/api/settings", headers=HEADERS)
+    assert response.status_code == 200, response.text
+    text = response.text
+    assert console_setup.settings.token is not None
+    assert console_setup.settings.token.get_secret_value() not in text
+    assert "token" not in response.json()["settings"]

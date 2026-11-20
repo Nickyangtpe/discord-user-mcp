@@ -1,6 +1,6 @@
 ---
 name: discord-user
-description: Operate a Discord user account through the discord-user-mcp server. Use when the user asks you to read or change something on their own Discord account (guilds, channels, messages, DMs, friends, roles, scheduled events), when you need to find the right tool for a Discord operation, or when a Discord tool returned approval_required and you must wait for the human approval console. Covers the approval protocol, risk levels, pagination, registry lookup and error codes.
+description: Operate a Discord user account through the discord-user-mcp server. Use when the user asks you to read or change something on their own Discord account (guilds, channels, messages, DMs, friends, roles, scheduled events), when you need to find the right tool for a Discord operation, or when a Discord tool returned approval_required and you must wait for the human approval dashboard. Covers the approval protocol, risk levels, pagination, registry lookup and error codes.
 ---
 
 # Discord user operations
@@ -15,7 +15,7 @@ You cannot perform a write. You can only **propose** one.
 
 Every tool with risk `write`, `admin`, `destructive` or `sensitive` creates a
 pending approval and returns without contacting Discord. A human approves it in a
-local console. Until `check_approval` reports `completed`, the operation has **not
+local dashboard. Until `check_approval` reports `completed`, the operation has **not
 happened**. Never tell the user it did.
 
 ## Standard loop
@@ -29,8 +29,8 @@ happened**. Never tell the user it did.
 4. **Propose the change.** Call the mutating tool once. Use `dry_run=true` first
    when you want to show the user the exact request without creating a request.
 5. **Report the approval id and what it authorises.** The response contains the
-   full arguments, the risk label, the expiry and the console status. Ask the
-   operator to approve it in the console.
+   full arguments, the risk label, the expiry and the dashboard status. Ask the
+   operator to approve it in the dashboard.
 6. **Poll.** `check_approval(approval_id)` until the status is terminal:
    `completed` (use `result`), `failed` (read `error`), `denied`, `cancelled` or
    `expired`.
@@ -50,6 +50,9 @@ second pending approval and duplicates any side effect once both are approved.
 
 The risk is fixed in code and in the registry; you cannot lower it and there is no
 parameter that skips the gate.
+
+The dashboard is human-only. Its URL token is never returned through MCP, and the
+agent cannot use it to approve requests or change dashboard settings.
 
 ## If you are unsure a tool exists
 
