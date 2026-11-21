@@ -7,7 +7,6 @@ endpoint it claims to implement.
 
 from __future__ import annotations
 
-import json
 from typing import Annotated, Any, Mapping, Sequence
 
 from pydantic import Field
@@ -25,9 +24,6 @@ OptSnowflake = Annotated[
     Field(default=None, description="Optional Discord snowflake id"),
 ]
 Content = Annotated[str, Field(min_length=1, max_length=2000)]
-
-MAX_RESPONSE_BYTES = 1024 * 1024
-
 
 def client() -> DiscordClient:
     from ..runtime import get_context
@@ -60,32 +56,6 @@ async def call(
     )
 
 
-def cap(payload: Any) -> Any:
-    """Keep a single tool response below 1 MiB of JSON.
-
-    The cap is explicit in the payload so the agent knows data was dropped and
-    can narrow the query instead of assuming the list is complete.
-    """
-    try:
-        encoded = json.dumps(payload, ensure_ascii=False, default=str)
-    except (TypeError, ValueError):
-        return payload
-    if len(encoded.encode("utf-8")) <= MAX_RESPONSE_BYTES:
-        return payload
-    preview = payload
-    if isinstance(payload, list):
-        preview = payload[:5]
-    elif isinstance(payload, dict):
-        preview = {key: value for key, value in list(payload.items())[:8]}
-    return {
-        "truncated": True,
-        "reason": f"response exceeded {MAX_RESPONSE_BYTES} bytes",
-        "hint": "Narrow the request (smaller limit, pagination cursor, or search filters).",
-        "approx_bytes": len(encoded.encode("utf-8")),
-        "preview": preview,
-    }
-
-
 def validate(fn, *values: tuple[str, str]) -> None:
     for field, value in values:
         if value is not None:
@@ -108,7 +78,6 @@ __all__ = [
     "OptSnowflake",
     "Snowflake",
     "call",
-    "cap",
     "clean_params",
     "client",
     "content_or_none",

@@ -7,9 +7,12 @@ import inspect
 import logging
 import re
 from dataclasses import dataclass, field
-from typing import Any, Awaitable, Callable
+from typing import Annotated, Any, Awaitable, Callable
+
+from pydantic import Field
 
 from ..security.permissions import Risk
+from ..utils.responses import HARD_RESPONSE_BYTES, MIN_RESPONSE_BYTES
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +72,20 @@ def define_tool(
         if name in TOOL_SPECS:
             raise ValueError(f"duplicate tool name {name}")
         signature = inspect.signature(func)
+        annotations = inspect.get_annotations(func, eval_str=True)
+        signature = signature.replace(
+            parameters=[parameter.replace(annotation=annotations.get(parameter.name, parameter.annotation))
+                        for parameter in signature.parameters.values()],
+            return_annotation=annotations.get("return", signature.return_annotation),
+        )
+        budget_type = Annotated[int | None, Field(
+            ge=MIN_RESPONSE_BYTES, le=HARD_RESPONSE_BYTES, strict=True,
+            description="Maximum UTF-8 JSON response bytes for this call. Omit for the server default. "
+                        "Clamped to the operator's ceiling; includes tool envelope and response metadata.",
+        )]
+        signature = signature.replace(parameters=[*signature.parameters.values(), inspect.Parameter(
+            "response_max_bytes", inspect.Parameter.KEYWORD_ONLY, default=None, annotation=budget_type
+        )])
         spec: ToolSpec
 
         @functools.wraps(func)
@@ -78,9 +95,25 @@ def define_tool(
             call_args = dict(bound.arguments)
             # Late import: runtime imports TOOL_SPECS, so a module-level import
             # here would be circular.
-            from ..runtime import dispatch
+            from ..runtime import dispatch, get_context
+            from ..utils.responses import limit_response, resolve_budget
 
-            return await dispatch(spec, call_args)
+            requested = call_args.pop("response_max_bytes")
+            settings = get_context().settings
+            try:
+                maximum = resolve_budget(requested, default=settings.response_default_bytes,
+                                         maximum=settings.response_max_bytes)
+            except ValueError as exc:
+                result = {"status": "error", "tool": name,
+                          "error": {"code": "validation_error", "message": str(exc), "retryable": False}}
+                return limit_response(result, maximum=min(settings.response_default_bytes, settings.response_max_bytes),
+                                      server_maximum=settings.response_max_bytes)
+            result = await dispatch(spec, call_args)
+            return limit_response(result, maximum=maximum, requested=requested,
+                                  server_maximum=settings.response_max_bytes)
+
+        wrapper.__signature__ = signature  # type: ignore[attr-defined]
+        wrapper.__annotations__ = {**annotations, "response_max_bytes": budget_type}
 
         spec = ToolSpec(
             name=name,

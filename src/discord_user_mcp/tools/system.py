@@ -95,6 +95,12 @@ async def get_server_status() -> Any:
             "uploads_enabled": context.settings.upload.enabled,
         },
         "tools": {"registered": len(TOOL_SPECS)},
+        "response_limits": {
+            "default_bytes": context.settings.response_default_bytes,
+            "max_bytes": context.settings.response_max_bytes,
+            "parameter": "response_max_bytes",
+            "measurement": "UTF-8 JSON tool content, including envelope and metadata; excludes JSON-RPC framing",
+        },
         "registry": registry.stats(),
         "approvals": {"pending": len(pending)},
         "rate_limits": {

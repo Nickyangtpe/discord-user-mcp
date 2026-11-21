@@ -16,10 +16,11 @@ import re
 from pathlib import Path
 from typing import Mapping, MutableMapping
 
-from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator
+from pydantic import BaseModel, ConfigDict, Field, SecretStr, field_validator, model_validator
 
 from .api.errors import ConfigError
 from .utils.redact import register_secret
+from .utils.responses import DEFAULT_RESPONSE_BYTES, HARD_RESPONSE_BYTES, MIN_RESPONSE_BYTES
 
 APP_NAME = "discord-user-mcp"
 DEFAULT_API_BASE = "https://discord.com/api/v9"
@@ -217,9 +218,17 @@ class Settings(BaseModel):
     require_startup_auth_check: bool = True
     log_level: str = "INFO"
     audit_enabled: bool = True
+    response_default_bytes: int = Field(default=DEFAULT_RESPONSE_BYTES, ge=MIN_RESPONSE_BYTES, le=HARD_RESPONSE_BYTES, strict=True)
+    response_max_bytes: int = Field(default=HARD_RESPONSE_BYTES, ge=MIN_RESPONSE_BYTES, le=HARD_RESPONSE_BYTES, strict=True)
     approval: ApprovalSettings = Field(default_factory=ApprovalSettings)
     http: HttpSettings = Field(default_factory=HttpSettings)
     upload: UploadSettings = Field(default_factory=UploadSettings)
+
+    @model_validator(mode="after")
+    def _response_budget_order(self) -> "Settings":
+        if self.response_default_bytes > self.response_max_bytes:
+            raise ValueError("response_default_bytes cannot exceed response_max_bytes")
+        return self
 
     def require_token(self) -> str:
         if self.token is None:
@@ -279,6 +288,8 @@ class Settings(BaseModel):
             require_startup_auth_check=not _env_bool(env, "DISCORD_MCP_SKIP_AUTH_CHECK", False),
             log_level=env.get("DISCORD_MCP_LOG_LEVEL", "INFO"),
             audit_enabled=_env_bool(env, "DISCORD_MCP_AUDIT", True),
+            response_default_bytes=_env_int(env, "DISCORD_MCP_RESPONSE_DEFAULT_BYTES", DEFAULT_RESPONSE_BYTES),
+            response_max_bytes=_env_int(env, "DISCORD_MCP_RESPONSE_MAX_BYTES", HARD_RESPONSE_BYTES),
             approval=approval,
             http=http,
             upload=upload,
@@ -333,6 +344,14 @@ class DashboardSettings(BaseModel):
     http_timeout_seconds: float = Field(default=30.0, gt=0, le=300)
     http_max_retries: int = Field(default=3, ge=0, le=10)
     http_max_429_retries: int = Field(default=5, ge=0, le=20)
+    response_default_bytes: int = Field(default=DEFAULT_RESPONSE_BYTES, ge=MIN_RESPONSE_BYTES, le=HARD_RESPONSE_BYTES)
+    response_max_bytes: int = Field(default=HARD_RESPONSE_BYTES, ge=MIN_RESPONSE_BYTES, le=HARD_RESPONSE_BYTES)
+
+    @model_validator(mode="after")
+    def _response_budget_order(self) -> "DashboardSettings":
+        if self.response_default_bytes > self.response_max_bytes:
+            raise ValueError("response_default_bytes cannot exceed response_max_bytes")
+        return self
 
     @field_validator("log_level")
     @classmethod
@@ -361,6 +380,8 @@ def dashboard_settings_from(settings: Settings) -> DashboardSettings:
         http_timeout_seconds=settings.http.timeout_seconds,
         http_max_retries=settings.http.max_retries,
         http_max_429_retries=settings.http.max_rate_limit_retries,
+        response_default_bytes=settings.response_default_bytes,
+        response_max_bytes=settings.response_max_bytes,
     )
 
 
@@ -381,6 +402,11 @@ def apply_dashboard_settings(settings: Settings, value: DashboardSettings) -> Se
     settings.http.timeout_seconds = value.http_timeout_seconds
     settings.http.max_retries = value.http_max_retries
     settings.http.max_rate_limit_retries = value.http_max_429_retries
+    # Legacy dashboard files lack these fields; preserve new environment limits.
+    if "response_default_bytes" in value.model_fields_set:
+        settings.response_default_bytes = value.response_default_bytes
+    if "response_max_bytes" in value.model_fields_set:
+        settings.response_max_bytes = value.response_max_bytes
     return settings
 
 

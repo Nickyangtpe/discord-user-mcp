@@ -145,7 +145,11 @@ async def test_full_approval_round_trip(tmp_path: Path) -> None:
                 assert len(tools.tools) >= 110
                 assert not any("approve" in tool.name for tool in tools.tools)
 
-                me = payload_of(await session.call_tool("get_current_user", {}))
+                me_wire = await session.call_tool("get_current_user", {"response_max_bytes": 1024})
+                me = payload_of(me_wire)
+                assert len(me_wire.content[0].text.encode("utf-8")) <= 1024
+                assert me["response"]["effective_max_bytes"] == 1024
+                assert me["response"]["returned_bytes"] == len(me_wire.content[0].text.encode("utf-8"))
                 assert me["status"] == "ok"
                 assert me["data"]["username"] == "e2e-user"
 

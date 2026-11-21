@@ -447,6 +447,8 @@ const STRINGS = {
     'field.uploadFiles':'單次檔案數量上限', 'field.httpTimeout':'HTTP 逾時時間',
     'field.networkRetries':'網路錯誤重試次數', 'field.rateRetries':'速率限制重試次數',
     'field.logLevel':'系統記錄等級',
+    'field.responseDefault':'預設回傳大小', 'field.responseDefaultHelp':'模型未指定時使用的位元組上限；不可超過最大回傳大小。',
+    'field.responseMax':'最大回傳大小', 'field.responseMaxHelp':'模型可透過 response_max_bytes 選擇大小，但不可超過此上限（最大 16 MiB）。',
     'group.security':'安全控制', 'group.securityHelp':'控制寫入權限、Token 驗證與稽核行為。',
     'group.approval':'允許與附件', 'group.approvalHelp':'設定請求的有效時間及附件限制。',
     'group.network':'連線與診斷', 'group.networkHelp':'調整網路容錯與伺服器診斷等級。',
@@ -536,6 +538,8 @@ const STRINGS = {
     'field.uploadFiles':'Maximum files per request', 'field.httpTimeout':'HTTP timeout',
     'field.networkRetries':'Network-error retries', 'field.rateRetries':'Rate-limit retries',
     'field.logLevel':'Log level',
+    'field.responseDefault':'Default response bytes', 'field.responseDefaultHelp':'Used when the model does not choose a budget; cannot exceed the maximum.',
+    'field.responseMax':'Maximum response bytes', 'field.responseMaxHelp':'The model can choose response_max_bytes, capped at this ceiling (up to 16 MiB).',
     'group.security':'Security controls', 'group.securityHelp':'Write access, token verification, and auditing.',
     'group.approval':'Approvals and uploads', 'group.approvalHelp':'Request lifetime and attachment limits.',
     'group.network':'Connectivity and diagnostics', 'group.networkHelp':'Network resilience and server diagnostics.',
@@ -680,6 +684,8 @@ const FIELD_DEFS = [
   {key:'http_timeout_seconds', group:'network', label:'field.httpTimeout', type:'number', min:1, max:300},
   {key:'http_max_retries', group:'network', label:'field.networkRetries', type:'number', min:0, max:10},
   {key:'http_max_429_retries', group:'network', label:'field.rateRetries', type:'number', min:0, max:20},
+  {key:'response_default_bytes', group:'network', label:'field.responseDefault', help:'field.responseDefaultHelp', type:'number', min:1024, max:16777216},
+  {key:'response_max_bytes', group:'network', label:'field.responseMax', help:'field.responseMaxHelp', type:'number', min:1024, max:16777216},
   {key:'log_level', group:'network', label:'field.logLevel', type:'select',
    options:['DEBUG','INFO','WARNING','ERROR']}
 ];
@@ -1939,6 +1945,10 @@ class ApprovalConsole:
                 "audit_path": str(audit.path),
             },
             "tools": {"registered": self.tool_count},
+            "response_limits": {
+                "default_bytes": settings.response_default_bytes,
+                "max_bytes": settings.response_max_bytes,
+            },
             "registry": registry,
             "approvals": {
                 "pending": len(self.manager.list(statuses=["pending"], limit=200)),

@@ -424,7 +424,23 @@ Risk is fixed in code and registry data. Never imply it can be downgraded.
 - `list_guild_members`: up to 1000; continue with returned `next_after`.
 - Search: up to 25 per page with `offset`; HTTP 202 can mean the guild index is
   still building, not that no result exists.
-- Responses above 1 MiB return `truncated: true`; narrow or paginate the query.
+- Every tool accepts optional `response_max_bytes`. Choose a budget appropriate
+  to the task: 4 MiB by default, up to the operator's ceiling (absolute maximum
+  16 MiB). Valid requests are integers from 1024 to 16777216 bytes. For example,
+  use `response_max_bytes=8388608` when a larger read is needed; smaller focused
+  reads generally need less. Omit the parameter to use the server default.
+- `get_server_status` exposes `data.response_limits`. Requests above the
+  operator ceiling are clamped, not permission to increase it. Only the human
+  dashboard/configuration can change these limits.
+- The budget covers UTF-8 JSON tool content, including the envelope and root
+  `response` metadata, not JSON-RPC framing. Inspect `response.truncated`,
+  `effective_max_bytes`, `server_max_bytes`, `original_bytes`, and `returned_bytes`.
+  A truncated structural prefix is incomplete even if its JSON is valid.
+- If truncated, increase the budget within the ceiling or narrow/paginate reads.
+  For a completed mutation, call `check_approval` with the same approval ID and
+  a larger budget. Never repeat the mutation to collect a larger response.
+- Budgets affect presentation only: they are not Discord arguments, do not alter
+  approved parameters, and cannot bypass the human approval gate.
 
 ## Error routing
 

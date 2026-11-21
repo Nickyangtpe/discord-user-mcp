@@ -21,6 +21,25 @@ from conftest import make_settings
 HEADERS = {"X-Approval-Token": "test-token"}
 
 
+async def test_dashboard_response_budgets_require_auth_and_apply_live(console_setup) -> None:
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        values = {"response_default_bytes": 4096, "response_max_bytes": 8192}
+        assert (await http.post("/api/settings", json=values)).status_code == 401
+        saved = await http.post("/api/settings", headers=HEADERS, json=values)
+        assert saved.status_code == 200, saved.text
+        for bad in ({"response_default_bytes": 9000}, {"response_max_bytes": 1023},
+                    {"response_max_bytes": 16777217}, {"response_default_bytes": True}):
+            rejected = await http.post("/api/settings", headers=HEADERS, json=bad)
+            assert rejected.status_code == 400
+        status = (await http.get("/api/status", headers=HEADERS)).json()
+    assert status["response_limits"] == {"default_bytes": 4096, "max_bytes": 8192}
+    assert console_setup.settings.response_default_bytes == 4096
+    assert console_setup.settings.response_max_bytes == 8192
+    stored = load_dashboard_settings(console_setup.settings.state_dir)
+    assert stored.response_default_bytes == 4096
+    assert stored.response_max_bytes == 8192
+
+
 @pytest.mark.parametrize("error", [ConnectionResetError(), BrokenPipeError()])
 def test_console_suppresses_expected_disconnects(error: Exception) -> None:
     with patch("discord_user_mcp.security.console.sys.exc_info", return_value=(type(error), error, None)):

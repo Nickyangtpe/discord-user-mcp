@@ -7,7 +7,6 @@ and returns without touching the network.
 
 from __future__ import annotations
 
-import json
 import logging
 import time
 from dataclasses import dataclass, field
@@ -29,9 +28,6 @@ from .tools.specs import TOOL_SPECS, ToolSpec
 from .utils.ids import InvalidArgument
 
 logger = logging.getLogger(__name__)
-
-MAX_RESPONSE_BYTES = 1024 * 1024
-
 
 @dataclass
 class AppContext:
@@ -112,34 +108,12 @@ def _ok(spec: ToolSpec, data: Any) -> dict[str, Any]:
         "status": "ok",
         "tool": spec.name,
         "endpoint": spec.endpoint_id or "local",
-        "data": cap_payload(data),
+        "data": data,
     }
 
 
 def _error(spec: ToolSpec, error: DiscordUserMCPError) -> dict[str, Any]:
     return {"status": "error", "tool": spec.name, "error": error.to_dict()}
-
-
-def cap_payload(payload: Any) -> Any:
-    try:
-        encoded = json.dumps(payload, ensure_ascii=False, default=str)
-    except (TypeError, ValueError):
-        return payload
-    if len(encoded.encode("utf-8")) <= MAX_RESPONSE_BYTES:
-        return payload
-    if isinstance(payload, list):
-        preview: Any = payload[:5]
-    elif isinstance(payload, dict):
-        preview = dict(list(payload.items())[:8])
-    else:
-        preview = str(payload)[:1000]
-    return {
-        "truncated": True,
-        "reason": f"response exceeded {MAX_RESPONSE_BYTES} bytes",
-        "hint": "Narrow the request (smaller limit, cursor, or search filters).",
-        "approx_bytes": len(encoded.encode("utf-8")),
-        "preview": preview,
-    }
 
 
 # --------------------------------------------------------------------------

@@ -417,9 +417,42 @@ poll with read tools.
 - `5xx` is retried with exponential backoff and jitter.
 - Network errors are retried only for idempotent methods. A failed `POST` is
   reported with a warning that it may already have been applied.
-- Responses over 1 MiB are replaced by an explicit
-  `{truncated: true, approx_bytes, preview}` envelope rather than silently cut.
+- Every tool accepts optional `response_max_bytes`: the model chooses a budget
+  per call, bounded by the operator's ceiling. Oversized results retain a
+  structural prefix and explicitly set `response.truncated=true`.
 - Attachments may only be read from `DISCORD_MCP_UPLOAD_ROOTS`.
+
+### Model-selected response size
+
+The default is **4 MiB**; the absolute maximum is **16 MiB**. The model may
+request any integer budget from **1024 to 16777216 bytes**, for example:
+
+```json
+{"channel_id":"123456789012345678","limit":100,"response_max_bytes":8388608}
+```
+
+The operator can lower the default and ceiling in the dashboard's network
+settings or through `DISCORD_MCP_RESPONSE_DEFAULT_BYTES` and
+`DISCORD_MCP_RESPONSE_MAX_BYTES`. The default must not exceed the ceiling.
+Saved dashboard settings override environment values for these fields; older
+dashboard files without these fields preserve the environment limits.
+Model requests above the operator ceiling are clamped; requests outside the
+absolute range are rejected before any Discord request or approval is created.
+No MCP tool can change the ceiling.
+
+The budget measures **UTF-8 JSON tool content**, including the full result
+envelope and metadata, but not JSON-RPC transport framing. Every result includes
+`response.truncated`, `requested_max_bytes`, `effective_max_bytes`,
+`server_max_bytes`, `original_bytes` (before adding metadata), and `returned_bytes`.
+Approval IDs and execution state are prioritized over bulk data when trimming.
+Always inspect `response.truncated` before treating a list or object as complete.
+
+Increase the budget or narrow/paginate reads when needed. For an already
+executed mutation, collect the existing result with
+`check_approval(approval_id=..., response_max_bytes=...)`; **never repeat the
+mutation to retrieve more data**. The budget is not sent to Discord or included
+in the approval's parameter hash. Restart the MCP server after upgrading so
+clients can reload the new tool schemas.
 
 ## Error shape
 
@@ -452,11 +485,14 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 .\.python-embed\python.exe -m pytest -q
 ```
 
-362 tests using mocks and a local stub Discord server (no real token or Discord requests).
+417 tests using mocks and a local stub Discord server (no real token or Discord requests).
 Every added read checks routing and serialization. Every added mutation checks
 human approval, real executor dispatch, denial, dry run, read-only mode, expiry,
 argument tampering and replay prevention. The suite also registers all 257 tools
 with FastMCP and verifies their concrete parameter schemas.
+Response-budget tests cover nested/Unicode data, exact serialized sizes, MCP
+stdio conversion, strict validation, operator clamping, dashboard persistence,
+legacy settings and larger approval-result retrieval without re-execution.
 The JavaScript locale regression tests require Node.js; pytest reports them as
 skipped if Node.js is unavailable.
 
