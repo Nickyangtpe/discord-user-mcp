@@ -125,9 +125,13 @@ def _banner(context: AppContext, *, auth_note: str | None) -> str:
         lines.append("")
         lines.append("  LOCAL DASHBOARD (status, approvals, activity and settings):")
         lines.append(f"    {context.console.url}")
-        lines.append(
-            f"    also written to {settings.state_dir / 'approval-console.json'} (keep private)"
-        )
+        if settings.approval.write_token_file:
+            lines.append(f"    token file: {context.console.token_file} (keep private)")
+        else:
+            lines.append(
+                "    token file: disabled (DISCORD_MCP_CONSOLE_TOKEN_FILE=0); "
+                "copy the URL above now"
+            )
     else:
         lines.append("")
         lines.append(

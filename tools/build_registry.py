@@ -22,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INVENTORY = ROOT / "research" / "endpoint-inventory.json"
 OVERRIDES = ROOT / "research" / "registry_overrides.json"
+EXTENDED = ROOT / "src" / "discord_user_mcp" / "api" / "extended_tools.json"
 OUT = ROOT / "src" / "discord_user_mcp" / "api" / "registry_data.json"
 
 VALID_RISKS = {"read", "write", "destructive", "sensitive", "admin"}
@@ -87,6 +88,7 @@ PAGE_CATEGORY = {
 }
 
 PAGE_POLICY_REASON = {
+    "_typography": "Documentation formatting examples, not callable Discord API endpoints.",
     "billing": "Financial endpoints (Nitro, payment sources, invoices) are excluded by policy so an agent can never spend money or read payment data.",
     "payment": "Payment endpoints are excluded by policy.",
     "subscription": "Subscription management is excluded by policy (can spend money).",
@@ -175,6 +177,36 @@ def main() -> int:
     inventory = json.loads(INVENTORY.read_text(encoding="utf-8"))
     overrides = json.loads(OVERRIDES.read_text(encoding="utf-8"))
     by_key = {(e["method"], e["url"]): e for e in inventory["endpoints"]}
+    by_route = {(e["method"], convert_path(e["url"])): e for e in inventory["endpoints"]}
+
+    # This is a fixed, reviewed allowlist, never a raw HTTP interface. Fail the
+    # build if any route or selected wire field is absent from the source docs.
+    for item in json.loads(EXTENDED.read_text(encoding="utf-8")):
+        if item["method"] != "GET" and item.get("risk", "read") == "read":
+            raise ValueError(f"extended tool {item['name']}: mutations must require approval")
+        doc = by_route.get((item["method"], item["path"]))
+        if doc is None:
+            raise ValueError(f"extended tool {item['name']}: route absent from docs")
+        params = parse_params(doc, include_response=False)
+        for section, key in (("query", "query"), ("json", "body")):
+            documented = {
+                re.split(r"[?\s]", field["name"], maxsplit=1)[0]
+                for field in params.get(section, [])
+            }
+            missing = set(item.get(key, {})) - documented
+            if missing:
+                raise ValueError(f"{item['name']}: undocumented {section} fields {missing}")
+        overrides["implemented"].append({
+            "id": "extended." + item["name"],
+            "method": item["method"],
+            "url": doc["url"],
+            "risk": item.get("risk", "read"),
+            "tools": [item["name"]],
+            "summary": doc.get("title", item["name"]),
+            "reason": "Curated user-token HTTP operation. Community documentation; "
+                      "availability depends on permissions and Discord rollout. "
+                      "Validated with mock HTTP, not a live Discord account.",
+        })
 
     curated: dict[tuple[str, str], dict] = {}
     problems: list[str] = []

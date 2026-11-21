@@ -154,18 +154,38 @@ Most clients take a command plus its environment. Example:
 At startup the server prints to **stderr**:
 
 ```
-  discord-user-mcp 0.1.0 - Discord user API MCP server
-  tools: 118   read-only: no   approval TTL: 300s
+  discord-user-mcp 0.3.0 - Discord user API MCP server
+  tools: 257   read-only: no   approval TTL: 300s
   token source: env:DISCORD_USER_TOKEN   fingerprint: sha256:1a2b3c4d5e6f
   credential type: Discord USER token (bot tokens are not supported)
   authenticated as: yourname (123456789012345678)
 
   LOCAL DASHBOARD (status, approvals, activity and settings):
     http://127.0.0.1:54321/?t=<random token>
-    also written to ...\approval-console.json (keep private)
+    token file: C:\Users\you\AppData\Local\discord-user-mcp\approval-console.json (keep private)
 ```
 
-stdout is reserved for the MCP protocol.
+stdout is reserved for the MCP protocol. If your MCP client hides stderr, the
+token file path above is the reliable place to look.
+
+### Where the dashboard token lives
+
+The file is always `<state_dir>/approval-console.json`. The default `state_dir`
+is your OS's per-user local data folder, so on Windows it is normally:
+
+```text
+%LOCALAPPDATA%\discord-user-mcp\approval-console.json
+```
+
+`DISCORD_MCP_STATE_DIR` moves it. It is created when the dashboard starts,
+contains the authenticated URL, the token and the server PID, and is written with
+owner-only permissions. `DISCORD_MCP_CONSOLE_TOKEN_FILE=0` disables the file, in
+which case the startup URL is the only copy.
+
+You do not have to remember the path: the startup banner prints it, the locked
+pages shows the file path, the **Overview** tab shows it under *Token file*, and
+`get_server_status` returns it as `mode.approval_console.token_file`. Only the
+path is shared with the agent; the file contents (the token) are not.
 
 ## The dashboard
 
@@ -173,7 +193,7 @@ The console URL printed at startup opens a local dashboard with four tabs:
 
 | Tab | What it shows |
 |---|---|
-| Overview | account identity, token source/fingerprint, read-only state, approval TTL, tool and registry counts, rate limits, audit path |
+| Overview | account identity, token source/fingerprint, read-only state, approval TTL, tool and registry counts, rate limits, token file and audit path |
 | Requests | pending operations; approve, deny, or type `APPROVE` for high-risk |
 | Activity | approval outcomes plus the redacted JSONL security trail |
 | Settings | the editable settings, with locked values shown read-only |
@@ -233,6 +253,7 @@ The AI-facing handoff should look like this Markdown:
 - **Risk:** destructive
 - **Approval ID:** `ap_...`
 - **Dashboard:** <http://127.0.0.1:54321/?request=ap_...>
+- **Token file:** `<state_dir>/approval-console.json` (path only; the AI does not read it)
 
 Open the dashboard locally and unlock it using the server startup link or
 `approval-console.json`. The dashboard access token is deliberately unavailable
@@ -293,42 +314,54 @@ If the console is closed or disabled, nothing can be approved. That is deliberat
 
 ## Agent skill and API routing
 
-`skills/discord-user/SKILL.md` is the short operational router loaded by an AI
-client. It maps user intent to the correct discovery/read tool before a mutation,
-defines the approval handoff, and requires the agent to include the safe
-request-specific Dashboard address.
+`skills/discord-user/SKILL.md` is the whole agent-facing skill — one file, so a
+client never loads a router that points at a guide it did not fetch. It contains:
 
-`skills/discord-user/API_GUIDE.md` is the detailed API map. It groups all **118
-tools** by domain:
+- the safety rules and approval handoff (including the safe Dashboard address);
+- an intent router table for common requests;
+- the complete **257-tool** catalog grouped by domain:
+  - server, registry and approvals;
+  - users, account, profile and settings;
+  - guilds and channels, messages, search, pins and polls;
+  - direct messages, members, moderation and roles;
+  - threads, reactions, invites and scheduled events;
+  - friends, relationships, assets, audit and application commands;
+- short recipes, pagination rules and an error-code routing table.
 
-- server, registry and approvals;
-- users, account, profile and settings;
-- guilds, channels, messages and DMs;
-- members, moderation and roles;
-- threads, reactions, pins and polls;
-- invites and scheduled events;
-- friends, relationships, assets, audit and application commands.
-
-The skill uses a fast path: known intents go directly through the router, while
-unfamiliar requests fall back to `search_api_endpoints` and `get_api_endpoint`.
-It never invents a tool or substitutes arbitrary HTTP.
+Known intents go straight through the router; unfamiliar requests fall back to
+`search_api_endpoints` and `get_api_endpoint`. The skill never invents a tool or
+substitutes arbitrary HTTP.
 
 ## Tools
 
-118 MCP tools: 54 read-only and 64 gated. By risk:
+257 MCP tools: 152 read-only and 105 gated. By risk:
 
 | Risk | Count | Gate |
 |---|---|---|
-| `read` | 54 | runs immediately |
-| `write` | 25 | approval |
-| `admin` | 18 | approval + typed `APPROVE` |
-| `destructive` | 11 | approval + typed `APPROVE` |
-| `sensitive` | 10 | approval + typed `APPROVE` |
+| `read` | 152 | runs immediately |
+| `write` | 35 | approval |
+| `admin` | 34 | approval + typed `APPROVE` |
+| `destructive` | 20 | approval + typed `APPROVE` |
+| `sensitive` | 16 | approval + typed `APPROVE` |
 
-Coverage by area: guilds and members (23), threads (11), messages (10), channels
-(9), scheduled events (8), reactions (6), relationships (6), DMs (5), invites (5),
-users and profiles (7), settings (3), slash-command discovery (2), notifications
-(2), search (2), audit log, emoji, stickers, read state.
+Coverage includes guilds, members, roles, join requests, templates, widgets,
+welcome screens, AutoMod, forum tags, public/private threads, messages, saved
+messages, pins, polls, announcement crossposting, scheduled events, reactions,
+relationships, DMs, invites, profiles, connections, notification snapshots,
+integrations, emoji, stickers, soundboard metadata, stage metadata, application
+discovery, guild discovery, games and activity statistics.
+
+The 139 added tools use a fixed, reviewed catalog in
+`src/discord_user_mcp/api/extended_tools.json`. Each gets an endpoint-specific,
+typed MCP schema; callers cannot select a raw URL, method or arbitrary body.
+Inputs are validated before approval and again at execution. Connection access
+tokens, refresh tokens and client secrets are redacted from returned data.
+Optional null/omitted update fields are not sent; these tools expose bounded
+subsets rather than claiming every documented field is supported.
+
+**Testing is mock-only:** a registered tool has a real HTTP implementation, but
+live availability still depends on Discord permissions, account eligibility and
+feature rollout. No live Discord account was used to verify these endpoints.
 
 Every mutating tool accepts `dry_run=true`, which shows the exact method, path and
 payload an approval would authorise without creating a request.
@@ -339,20 +372,23 @@ Local tools (no Discord traffic): `get_server_status`, `search_api_endpoints`,
 
 ### The endpoint registry
 
-`src/discord_user_mcp/api/registry_data.json` describes **979 documented
-endpoints** parsed from the community user-API documentation at
+`src/discord_user_mcp/api/registry_data.json` contains **979 extracted registry
+entries** from the community user-API documentation at
 <https://docs.discord.food> (the `discord-userdoccers` MDX sources):
 
 | Status | Count | Meaning |
 |---|---|---|
-| `implemented` | 104 | has one or more MCP tools |
-| `documented` | 667 | real endpoint, not exposed as a tool in this build |
-| `unsupported` | 208 | deliberately excluded, with the reason recorded |
+| `implemented` | 243 | has one or more MCP tools |
+| `documented` | 523 | documented endpoint, not exposed as a tool in this build |
+| `unsupported` | 213 | deliberately excluded, including 5 formatting examples |
 
 The registry is generated by `tools/build_registry.py` from
-`research/endpoint-inventory.json` plus `research/registry_overrides.json`. The
+`research/endpoint-inventory.json`, `research/registry_overrides.json` and
+`src/discord_user_mcp/api/extended_tools.json`. The
 build **fails** if an override names an endpoint the documentation does not
-contain, so no fabricated endpoint can enter the registry. Tests enforce that
+contain. Extended tools also check every selected query/body field against the
+documentation, and reject read-only classifications on mutating methods.
+Tests enforce that
 every tool maps to a declared endpoint, that no endpoint is claimed without a
 tool, and that every tool's risk matches the curated classification.
 
@@ -416,7 +452,11 @@ Stable codes: `config_error`, `validation_error`, `read_only_mode`,
 .\.python-embed\python.exe -m pytest -q
 ```
 
-116 tests using mocks and a local stub Discord server (no real token or Discord requests).
+362 tests using mocks and a local stub Discord server (no real token or Discord requests).
+Every added read checks routing and serialization. Every added mutation checks
+human approval, real executor dispatch, denial, dry run, read-only mode, expiry,
+argument tampering and replay prevention. The suite also registers all 257 tools
+with FastMCP and verifies their concrete parameter schemas.
 The JavaScript locale regression tests require Node.js; pytest reports them as
 skipped if Node.js is unavailable.
 
@@ -461,13 +501,12 @@ src/discord_user_mcp/
     console.py         loopback multilingual dashboard + JSON API
     audit.py           redacted JSONL audit log
   auth/credentials.py  user-token verification
-  tools/               118 tool definitions by area
+  tools/               257 tool definitions by area
   utils/               snowflake/emoji validation, redaction
 tools/                 registry + inventory builders (development only)
 research/              extracted docs inventory and curation overrides
 skills/discord-user/
-  SKILL.md             fast intent router, approval and dashboard protocol
-  API_GUIDE.md         complete 118-tool domain guide
+  SKILL.md             intent router + complete 257-tool catalog (one file)
 tests/                 pytest suite
 ```
 

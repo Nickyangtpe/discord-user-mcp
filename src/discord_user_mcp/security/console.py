@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import asyncio
 import hmac
+import html
 import json
 import logging
 import os
@@ -98,6 +99,12 @@ LOCKED_PAGE = """<!doctype html>
   .brand-identity { display:flex; align-items:center; gap:11px; }
   select { max-width:120px; padding:6px; color:var(--muted); background:var(--bg);
     border:1px solid var(--line); border-radius:5px; }
+  .locate { margin-top:18px; padding-top:16px; border-top:1px solid var(--line); font-size:12px; }
+  .locate-label { display:block; margin-bottom:6px; color:var(--muted); }
+  .locate code { display:block; padding:9px 10px; overflow-wrap:anywhere; user-select:all;
+    color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:5px;
+    font:12px/1.5 ui-monospace,Consolas,monospace; }
+  .locate p { margin:8px 0 0; font-size:11px; }
 </style>
 </head>
 <body>
@@ -110,6 +117,12 @@ LOCKED_PAGE = """<!doctype html>
   <div class="controls"><input id="access-token" type="password" autocomplete="off" spellcheck="false"><button id="unlock" data-i18n="unlock">Unlock</button></div>
   <div class="error" id="error" role="alert"></div>
   <div class="hint" data-i18n="hint">Find it in the server startup output or approval-console.json. The AI deliberately cannot retrieve this token.</div>
+  <div class="locate">
+    <span class="locate-label" data-i18n="locateLabel">Token file on this machine</span>
+    <code>%%TOKEN_FILE%%</code>
+    <p data-i18n="locateHelp">The file contains the authenticated dashboard URL and token. It is created at startup with owner-only permissions; keep it private.</p>
+    <p class="warn">%%TOKEN_FILE_NOTE%%</p>
+  </div>
 </main>
 <script>
 const input = document.getElementById('access-token');
@@ -119,11 +132,15 @@ const LOCKED_STRINGS = {
   'en': {subtitle:'Local security dashboard', title:'Dashboard locked',
     description:'This safe address does not contain approval credentials. Enter the local dashboard access token to continue.',
     token:'Dashboard access token', unlock:'Unlock', missing:'Enter the access token.',
-    hint:'Find it in the server startup output or approval-console.json. The AI deliberately cannot retrieve this token.'},
+    hint:'Find it in the server startup output or approval-console.json. The AI deliberately cannot retrieve this token.',
+    locateLabel:'Token file on this machine',
+    locateHelp:'The file contains the authenticated dashboard URL and token. It is created at startup with owner-only permissions; keep it private.'},
   'zh-TW': {subtitle:'本機安全控制台', title:'控制台已鎖定',
     description:'此安全位址不含批准憑證。請輸入本機 Dashboard 存取權杖以繼續。',
     token:'Dashboard 存取權杖', unlock:'解鎖', missing:'請輸入存取權杖。',
-    hint:'可在伺服器啟動訊息或 approval-console.json 找到；AI 無法取得此權杖。'}
+    hint:'可在伺服器啟動訊息或 approval-console.json 找到；AI 無法取得此權杖。',
+    locateLabel:'本機權杖檔案位置',
+    locateHelp:'此檔案包含已驗證的 Dashboard 網址與權杖，於啟動時建立並僅限擁有者讀取；請勿分享。'}
 };
 let lockedLocale = String(navigator.language || '').toLowerCase().startsWith('zh') ? 'zh-TW' : 'en';
 try {
@@ -408,7 +425,7 @@ if (token) {
   window.history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
 }
 const TAB_NAMES = ['overview', 'approvals', 'activity', 'settings'];
-const state = {tab: 'overview', settings: null, pendingSignature: null, historySignature: null, auditSignature: null};
+const state = {tab: 'overview', settings: null, pendingSignature: null, historySignature: null, auditSignature: null, overviewSignature: null};
 const statusEl = document.getElementById('status');
 const toastEl = document.getElementById('toast');
 
@@ -465,6 +482,7 @@ const STRINGS = {
     'overview.rateRoutes':'追蹤速率限制', 'overview.routes':'{value} 個路由',
     'overview.globalLimit':'全域限制', 'common.none':'無', 'common.unset':'未設定', 'overview.registry':'端點目錄',
     'overview.registryValue':'{total}（{implemented} 已實作）', 'overview.auditPath':'稽核記錄位置',
+    'overview.tokenFile':'權杖檔案位置', 'overview.tokenFileDisabled':'未啟用（僅顯示於啟動訊息）',
     'request.targetLabel':'目標：', 'request.expiresIn':'{time}後逾時', 'request.idLabel':'ID ',
     'request.technical':'查看技術細節', 'request.allow':'允許並執行', 'request.deny':'拒絕',
     'request.highRiskPlaceholder':'高風險操作：輸入 {phrase}',
@@ -552,6 +570,7 @@ const STRINGS = {
     'overview.rateRoutes':'Tracked rate limits', 'overview.routes':'{value} routes',
     'overview.globalLimit':'Global limit', 'common.none':'None', 'common.unset':'Not configured', 'overview.registry':'Endpoint registry',
     'overview.registryValue':'{total} ({implemented} implemented)', 'overview.auditPath':'Audit log path',
+    'overview.tokenFile':'Token file', 'overview.tokenFileDisabled':'Disabled (startup output only)',
     'request.targetLabel':'Target: ', 'request.expiresIn':'expires in {time}', 'request.idLabel':'ID ',
     'request.technical':'View technical details', 'request.allow':'Allow and execute', 'request.deny':'Deny',
     'request.highRiskPlaceholder':'High-risk operation: type {phrase}',
@@ -643,8 +662,9 @@ function changeLocale(next) {
       '; Max-Age=31536000; Path=/; SameSite=Strict';
   } catch (_) {}
   applyStaticTranslations();
-  // Translate the existing DOM, including empty states. Do not discard draft
-  // settings, typed approval phrases, expanded details, or reveal choices.
+  // Overview rows are generated, not tagged, so rebuild them once in the new
+  // language. Everything the human typed or expanded is left alone.
+  state.overviewSignature = null;
   refreshStatus();
 }
 
@@ -688,7 +708,13 @@ const TOOL_LABELS_ZH = {accept_friend_request:'接受好友邀請', send_friend_
   mark_channel_read:'將頻道標為已讀', trigger_typing:'顯示輸入中狀態',
   rsvp_event:'參加排定活動', unrsvp_event:'取消參加排定活動',
   remove_relationship:'移除好友關係', ack_notification:'確認通知',
-  update_channel_permissions:'更新頻道權限', delete_channel_permission:'刪除頻道權限'};
+   update_channel_permissions:'更新頻道權限', delete_channel_permission:'刪除頻道權限',
+   follow_announcement_channel:'追蹤公告頻道', crosspost_message:'發佈公告訊息',
+   save_message:'儲存訊息', unsave_message:'取消儲存訊息', end_poll:'結束投票',
+   ack_channel_pins:'將釘選訊息標為已讀', mark_guild_read:'將伺服器標為已讀',
+   delete_recent_mention:'移除最近提及', sync_guild_template:'同步伺服器範本',
+   sync_guild_integration:'同步伺服器整合', ignore_user:'忽略使用者', unignore_user:'取消忽略使用者',
+   restore_notification_settings_snapshot:'還原通知設定快照'};
 const ACTION_LABELS = {accept:'接受', ack:'確認', add:'新增', ban:'封禁', block:'封鎖', cancel:'取消',
   check:'查看', close:'關閉', create:'建立', delete:'刪除', edit:'編輯', forward:'轉寄', join:'加入',
   kick:'移出', leave:'離開', mark:'標記', open:'開啟', pin:'釘選', remove:'移除', reorder:'重新排序',
@@ -705,7 +731,13 @@ const OBJECT_LABELS = {friend_request:'好友邀請', notification:'通知', gro
   custom_status:'自訂狀態', my_guild_nickname:'伺服器暱稱', relationship_nickname:'好友暱稱',
   user:'使用者', guild:'伺服器', dm:'私訊', user_note:'使用者備註',
   thread_from_message:'訊息討論串', typing:'輸入中狀態', my_account:'帳號',
-  my_notification_settings:'通知設定', my_profile:'個人資料', my_settings:'使用者設定', poll:'投票'};
+   my_notification_settings:'通知設定', my_profile:'個人資料', my_settings:'使用者設定', poll:'投票',
+   forum_tag:'論壇標籤', thread_settings:'討論串設定', guild_template:'伺服器範本',
+   guild_widget:'伺服器小工具', guild_vanity_invite:'伺服器自訂邀請', guild_welcome_screen:'伺服器歡迎畫面',
+   guild_automod_rule:'伺服器自動管理規則', guild_incident_actions:'伺服器事件應對設定',
+   guild_emoji:'伺服器表情符號', guild_sticker:'伺服器貼圖', guild_soundboard_sound:'伺服器音效',
+   stage_instance:'舞台活動', channel_integration:'頻道整合', guild_integration:'伺服器整合',
+   friend_suggestion:'好友建議', notification_settings_snapshot:'通知設定快照'};
 
 function toast(msg, bad) {
   toastEl.renderLocale = () => { toastEl.textContent = typeof msg === 'function' ? msg() : msg; };
@@ -874,12 +906,26 @@ function card(title, pairs) {
   return box;
 }
 
-function statCard(label, value, note) {
+function statCard(label, value, note, key) {
   const box = el('div', 'card stat');
   box.appendChild(el('div', 'stat-label', label));
-  box.appendChild(el('div', 'stat-value', value));
+  const amount = el('div', 'stat-value', value);
+  if (key) amount.dataset[key] = '';
+  box.appendChild(amount);
   box.appendChild(el('div', 'stat-note', note));
   return box;
+}
+
+function overviewSignature(s) {
+  // Uptime and short-lived limiter state tick constantly; everything else only
+  // changes when a real decision happens. Keeping this signature stable lets
+  // revealed values and expanded details survive the three-second refresh.
+  return JSON.stringify([
+    s.approvals.pending, s.mode.read_only, s.mode.audit_enabled,
+    s.mode.approval_ttl_seconds, s.mode.uploads_enabled, s.mode.audit_path,
+    s.tools.registered, s.registry, s.identity, s.token, s.console,
+    Math.ceil(s.rate_limits.global_blocked_for_seconds || 0)
+  ]);
 }
 
 function renderOverview(s) {
@@ -912,7 +958,7 @@ function renderOverview(s) {
   stats.appendChild(statCard(t('overview.tools'), String(s.tools.registered),
     t('overview.endpointCount', {value:byStatus.implemented || 0})));
   stats.appendChild(statCard(t('overview.uptime'), formatDuration(s.server.uptime_seconds),
-    t('overview.version', {value:s.server.version})));
+    t('overview.version', {value:s.server.version}), 'uptime'));
   root.appendChild(stats);
 
   const columns = el('div', 'two-col');
@@ -930,6 +976,9 @@ function renderOverview(s) {
       ? t('duration.seconds', {value:s.rate_limits.global_blocked_for_seconds}) : t('common.none')],
     [t('overview.registry'), t('overview.registryValue', {
       total:registry.total || 0, implemented:byStatus.implemented || 0})],
+    [t('overview.tokenFile'), protectedValue(s.console && s.console.token_file_enabled === false
+      ? t('overview.tokenFileDisabled')
+      : ((s.console && s.console.token_file) || t('common.unset')))],
     [t('overview.auditPath'), protectedValue(s.mode.audit_path || t('common.unset'))]
   ]));
   root.appendChild(columns);
@@ -1324,10 +1373,21 @@ async function refreshStatus() {
     const s = await api('/api/status');
     statusEl.textContent = t('status.running', {
       pending:s.approvals.pending, uptime:formatDuration(s.server.uptime_seconds)});
+    statusEl.dataset.i18nValues = JSON.stringify({
+      pending:s.approvals.pending, uptime:formatDuration(s.server.uptime_seconds)});
+    statusEl.dataset.i18n = 'status.running';
     const navCount = document.getElementById('nav-count');
     navCount.textContent = String(s.approvals.pending);
     navCount.style.display = s.approvals.pending ? 'inline-flex' : 'none';
-    renderOverview(s);
+    const signature = overviewSignature(s);
+    if (signature !== state.overviewSignature) {
+      state.overviewSignature = signature;
+      renderOverview(s);
+    } else {
+      // Only the clock moved: update the number instead of rebuilding the page.
+      const uptime = document.querySelector('#overview [data-uptime]');
+      if (uptime) uptime.textContent = formatDuration(s.server.uptime_seconds);
+    }
     if (state.tab === 'approvals') loadApprovals();
     if (state.tab === 'activity') { loadHistory(); loadAudit(); }
   } catch (err) {
@@ -1340,10 +1400,13 @@ document.querySelectorAll('nav button').forEach(btn => {
 });
 document.getElementById('language').addEventListener('change', event => changeLocale(event.target.value));
 window.addEventListener('hashchange', () => activate(location.hash.slice(1)));
+// A dashboard left in a background tab costs nothing while it is hidden, and
+// shows current data as soon as the human looks at it again.
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshStatus(); });
 applyStaticTranslations();
 activate(location.hash.slice(1) || (requestedApproval ? 'approvals' : 'overview'));
 refreshStatus();
-setInterval(refreshStatus, 3000);
+setInterval(() => { if (!document.hidden) refreshStatus(); }, 3000);
 </script>
 </body>
 </html>
@@ -1387,6 +1450,24 @@ class _Handler(BaseHTTPRequestHandler):
         # the next request on a persistent connection.
         self.close_connection = True
         self._json(status, {"code": code, "message": message})
+
+    def _locked_page(self) -> bytes:
+        console = self.server.console  # type: ignore[attr-defined]
+        token_file = console.token_file
+        note = (
+            ""
+            if console.settings.approval.write_token_file
+            else (
+                "Token-file output is disabled (DISCORD_MCP_CONSOLE_TOKEN_FILE=0). "
+                "Use the authenticated URL printed at startup. / "
+                "權杖檔案輸出已停用，請使用啟動時顯示的已驗證網址。"
+            )
+        )
+        page = (
+            LOCKED_PAGE.replace("%%TOKEN_FILE%%", html.escape(str(token_file)))
+            .replace("%%TOKEN_FILE_NOTE%%", html.escape(note))
+        )
+        return page.encode("utf-8")
 
     def _supplied_token(self) -> str:
         supplied = self.headers.get("X-Approval-Token") or ""
@@ -1454,7 +1535,7 @@ class _Handler(BaseHTTPRequestHandler):
             if not self._supplied_token():
                 self._send(
                     HTTPStatus.OK,
-                    LOCKED_PAGE.encode("utf-8"),
+                    self._locked_page(),
                     "text/html; charset=utf-8",
                 )
                 return
@@ -1722,6 +1803,12 @@ class ApprovalConsole:
             "Open that URL to approve or deny pending Discord operations and to change "
             "server settings. The token in it is the only way in; it is never exposed to the AI."
         )
+        if self.settings.approval.write_token_file:
+            logger.warning("Token file (owner-readable): %s", self.token_file)
+        else:
+            logger.warning(
+                "Token-file output is disabled; the authenticated URL above is the only copy."
+            )
 
     def stop(self) -> None:
         if self._server is not None:
@@ -1752,10 +1839,15 @@ class ApprovalConsole:
     def safe_url(self) -> str:
         return self.base_url
 
+    @property
+    def token_file(self) -> Path:
+        """Absolute path of the credential file (the file itself is gitignored)."""
+        return (Path(self.settings.state_dir) / "approval-console.json").resolve()
+
     def _write_token_file(self) -> None:
         if not self.settings.approval.write_token_file:
             return
-        path = Path(self.settings.state_dir) / "approval-console.json"
+        path = self.token_file
         payload = {
             "url": self.url,
             "token": self.token,
@@ -1856,6 +1948,8 @@ class ApprovalConsole:
                 "url_without_token": self.safe_url,
                 "token_required": True,
                 "read_only_locked": self.read_only_locked,
+                "token_file": str(self.token_file),
+                "token_file_enabled": self.settings.approval.write_token_file,
             },
         }
 

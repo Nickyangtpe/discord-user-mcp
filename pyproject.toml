@@ -1,6 +1,6 @@
 [project]
 name = "discord-user-mcp"
-version = "0.1.0"
+version = "0.3.0"
 description = "MCP server that exposes the Discord user (self-bot) HTTP API to AI agents behind a mandatory human approval gate"
 readme = "README.md"
 requires-python = ">=3.12"

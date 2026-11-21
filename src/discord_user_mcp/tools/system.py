@@ -12,6 +12,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import Field
 
+from .. import __version__
 from ..api.errors import ValidationError
 from ..api.registry import Endpoint, get_registry
 from ..security.approval import iso
@@ -76,7 +77,7 @@ async def get_server_status() -> Any:
     return {
         "ok": True,
         "server": {
-            "version": "0.1.0",
+            "version": __version__,
             "uptime_seconds": int(time.time() - context.started_at),
             "started_at": iso(context.started_at),
         },

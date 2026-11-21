@@ -40,13 +40,14 @@ def redact(text: str) -> str:
 def redact_value(value: object, *, depth: int = 0) -> object:
     """Recursively scrub strings inside JSON-like structures."""
     if depth > 12:
-        return value
+        return REDACTED
     if isinstance(value, str):
         return redact(value)
     if isinstance(value, dict):
         cleaned = {}
         for key, item in value.items():
-            if str(key).lower() in {"token", "authorization", "password", "secret", "cookie"}:
+            normalized = str(key).lower().replace("-", "_")
+            if normalized in {"token", "authorization", "password", "secret", "cookie"} or normalized.endswith(("_token", "_secret")):
                 cleaned[key] = REDACTED
             else:
                 cleaned[key] = redact_value(item, depth=depth + 1)

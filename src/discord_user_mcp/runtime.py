@@ -52,10 +52,11 @@ class AppContext:
                 "message": "The local dashboard is not running; no operation can be approved.",
             }
         safe_url = self.console.safe_url
+        token_file = getattr(self.console, "token_file", None)
         request_url = (
             f"{safe_url}?request={quote(request_id, safe='')}" if request_id else safe_url
         )
-        return {
+        payload = {
             "enabled": True,
             "dashboard_url": request_url,
             "url_without_token": safe_url,
@@ -65,10 +66,20 @@ class AppContext:
                 "Give dashboard_url to the human operator. It contains only the request ID "
                 "and opens a safe locked page. "
                 "The authenticated URL and per-process access token are printed to the "
-                "server's stderr and written to approval-console.json; they are deliberately "
-                "not exposed to the AI."
+                "server's stderr and written to approval-console.json in the state "
+                "directory; the token itself is deliberately not exposed to the AI."
             ),
         }
+        if token_file is not None:
+            payload["token_file"] = str(token_file)
+            payload["message"] = (
+                "Give dashboard_url to the human operator. It contains only the request ID "
+                "and opens a safe locked page. The authenticated URL and per-process access "
+                f"token are printed to the server's stderr and written to {token_file}; tell "
+                "the human that path if they cannot find the token. The token itself is "
+                "deliberately not exposed to the AI."
+            )
+        return payload
 
 
 _CTX: AppContext | None = None

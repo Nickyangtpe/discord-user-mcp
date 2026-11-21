@@ -83,6 +83,8 @@ async def test_safe_dashboard_address_opens_a_locked_landing_page(
     assert page.status_code == 200
     assert "Dashboard locked" in page.text
     assert "approval-console.json" in page.text
+    assert str(console_setup.console.token_file) in page.text
+    assert console_setup.console.token_file.is_absolute()
     assert "requestId" in page.text
     assert "test-token" not in page.text
     assert api.status_code == 401
@@ -111,10 +113,37 @@ async def test_dashboard_page_is_multilingual_and_hardened(console_setup: Setup)
 
 
 async def test_token_file_is_written_privately(console_setup: Setup) -> None:
-    path = console_setup.settings.state_dir / "approval-console.json"
+    path = console_setup.console.token_file
     payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload["token"] == "test-token"
     assert payload["url"].startswith("http://127.0.0.1:")
+
+
+async def test_status_and_locked_page_point_at_the_token_file(console_setup: Setup) -> None:
+    path = console_setup.console.token_file
+    async with httpx.AsyncClient(base_url=console_setup.console.base_url) as http:
+        status = await http.get("/api/status", headers=HEADERS)
+        page = await http.get("/")
+    assert status.status_code == 200, status.text
+    console = status.json()["console"]
+    assert console["token_file"] == str(path)
+    assert console["token_file_enabled"] is True
+    assert str(path) in page.text
+    assert "test-token" not in page.text
+
+
+async def test_locked_page_reports_disabled_token_file(tmp_path: Path) -> None:
+    setup = Setup(tmp_path / "no-file", approval={"write_token_file": False})
+    setup.manager.bind_loop(asyncio.get_running_loop())
+    try:
+        async with httpx.AsyncClient(base_url=setup.console.base_url) as http:
+            page = await http.get("/")
+            status = await http.get("/api/status", headers=HEADERS)
+    finally:
+        setup.console.stop()
+    assert "DISCORD_MCP_CONSOLE_TOKEN_FILE=0" in page.text
+    assert not setup.console.token_file.exists()
+    assert status.json()["console"]["token_file_enabled"] is False
 
 
 async def test_console_approves_a_pending_request(console_setup: Setup) -> None:
@@ -273,7 +302,7 @@ async def test_dashboard_status_reports_server_state(console_setup: Setup) -> No
         response = await http.get("/api/status", headers=HEADERS)
     assert response.status_code == 200, response.text
     body = response.json()
-    assert body["server"]["version"] == "0.1.0"
+    assert body["server"]["version"] == "0.3.0"
     assert body["mode"]["read_only"] is False
     assert body["approvals"]["pending"] == 0
     assert body["registry"]["total"] > 0

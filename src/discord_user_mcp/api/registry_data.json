@@ -11,13 +11,13 @@
       "title": "DELETE Example",
       "summary": "DELETE Example",
       "risk": null,
-      "status": "documented",
+      "status": "unsupported",
       "tools": [],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Documentation formatting examples, not callable Discord API endpoints.",
       "source": "https://docs.discord.food/resources/_typography"
     },
     {
@@ -28,13 +28,13 @@
       "title": "PATCH Example",
       "summary": "PATCH Example",
       "risk": null,
-      "status": "documented",
+      "status": "unsupported",
       "tools": [],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Documentation formatting examples, not callable Discord API endpoints.",
       "source": "https://docs.discord.food/resources/_typography"
     },
     {
@@ -45,13 +45,13 @@
       "title": "POST Example",
       "summary": "POST Example",
       "risk": null,
-      "status": "documented",
+      "status": "unsupported",
       "tools": [],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Documentation formatting examples, not callable Discord API endpoints.",
       "source": "https://docs.discord.food/resources/_typography"
     },
     {
@@ -62,13 +62,13 @@
       "title": "PUT Example",
       "summary": "PUT Example",
       "risk": null,
-      "status": "documented",
+      "status": "unsupported",
       "tools": [],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Documentation formatting examples, not callable Discord API endpoints.",
       "source": "https://docs.discord.food/resources/_typography"
     },
     {
@@ -79,13 +79,13 @@
       "title": "Everything All At Once",
       "summary": "Everything All At Once",
       "risk": null,
-      "status": "documented",
+      "status": "unsupported",
       "tools": [],
       "params": {},
       "oauth2_scope": "scope",
       "supports_bot": true,
       "deprecated": true,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Documentation formatting examples, not callable Discord API endpoints.",
       "source": "https://docs.discord.food/resources/_typography"
     },
     {
@@ -1522,20 +1522,22 @@
       "source": "https://docs.discord.food/resources/application"
     },
     {
-      "id": "applications.application.assets.get",
+      "id": "extended.list_application_assets",
       "method": "GET",
       "path": "/applications/{application_id}/assets",
       "category": "application",
       "title": "Get Application Assets",
-      "summary": "Returns a list of [application assets](#application-asset-object) for the given application ID. User must be the owner of the application or developer of the owning team.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Application Assets",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_application_assets"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application"
     },
     {
@@ -2156,15 +2158,17 @@
       "source": "https://docs.discord.food/resources/application"
     },
     {
-      "id": "applications.application.public.get",
+      "id": "extended.get_public_application",
       "method": "GET",
       "path": "/applications/{application_id}/public",
       "category": "application",
       "title": "Get Partial Application",
-      "summary": "Returns a partial [application](#application-object) object for the given ID with all public application fields.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Partial Application",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_public_application"
+      ],
       "params": {
         "query": [
           {
@@ -2178,7 +2182,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application"
     },
     {
@@ -3444,37 +3448,41 @@
       "source": "https://docs.discord.food/resources/application"
     },
     {
-      "id": "users.me.applications.role-connections.get",
+      "id": "extended.list_user_application_role_connections",
       "method": "GET",
       "path": "/users/@me/applications/role-connections",
       "category": "application",
       "title": "List User Application Role Connections",
-      "summary": "Returns a list of [application role connection](#application-role-connection-object) objects for the user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Application Role Connections",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_user_application_role_connections"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application"
     },
     {
-      "id": "users.me.applications.application.role-connection.get",
+      "id": "extended.get_user_application_role_connection",
       "method": "GET",
       "path": "/users/@me/applications/{application_id}/role-connection",
       "category": "application",
       "title": "Get User Application Role Connection",
-      "summary": "Returns an [application role connection](#application-role-connection-object) object for the user, without optional fields.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get User Application Role Connection",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_user_application_role_connection"
+      ],
       "params": {},
       "oauth2_scope": "role_connections.write",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application"
     },
     {
@@ -3516,15 +3524,17 @@
       "source": "https://docs.discord.food/resources/application"
     },
     {
-      "id": "application-directory-static.applications.application.get",
+      "id": "extended.get_application_directory_entry",
       "method": "GET",
       "path": "/application-directory-static/applications/{application_id}",
       "category": "application-directory",
       "title": "Get Application Directory Application",
-      "summary": "Returns a partial [application](/resources/application#application-object) object for the given ID.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Application Directory Application",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_application_directory_entry"
+      ],
       "params": {
         "query": [
           {
@@ -3550,19 +3560,21 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
-      "id": "application-directory-static.applications.application.similar.get",
+      "id": "extended.list_similar_applications",
       "method": "GET",
       "path": "/application-directory-static/applications/{application_id}/similar",
       "category": "application-directory",
       "title": "List Application Directory Similar Applications",
-      "summary": "Returns applications similar to the given application ID.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Application Directory Similar Applications",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_similar_applications"
+      ],
       "params": {
         "query": [
           {
@@ -3583,24 +3595,46 @@
             "required": false,
             "description": "The [language](/reference#locales) to return similar applications in (default \"en-US\")"
           }
+        ],
+        "response": [
+          {
+            "name": "applications",
+            "type": "array[[application](/resources/application#application-object)]",
+            "required": true,
+            "description": "Applications that are similar to the current application"
+          },
+          {
+            "name": "num_pages",
+            "type": "integer",
+            "required": true,
+            "description": "The number of pages containing similar applications (max 1000)"
+          },
+          {
+            "name": "load_id",
+            "type": "string",
+            "required": true,
+            "description": "The unique identifier for the application directory recommendations"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
-      "id": "application-directory-static.categories.get",
+      "id": "extended.list_application_directory_categories",
       "method": "GET",
       "path": "/application-directory-static/categories",
       "category": "application-directory",
       "title": "List Application Directory Categories",
-      "summary": "Returns a list of [application directory category](#application-directory-category-object) objects representing the available application categories.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Application Directory Categories",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_application_directory_categories"
+      ],
       "params": {
         "query": [
           {
@@ -3614,7 +3648,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
@@ -3668,15 +3702,17 @@
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
-      "id": "application-directory-static.search.get",
+      "id": "extended.search_application_directory",
       "method": "GET",
       "path": "/application-directory-static/search",
       "category": "application-directory",
       "title": "Search Applications Directory",
-      "summary": "Returns the application directory search results.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Search Applications Directory",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "search_application_directory"
+      ],
       "params": {
         "query": [
           {
@@ -3745,12 +3781,44 @@
             "required": false,
             "description": "[Where](#application-directory-request-surface) the request came from"
           }
+        ],
+        "response": [
+          {
+            "name": "results",
+            "type": "[results](#application-directory-search-results-structure) object",
+            "required": true,
+            "description": "The results of the search"
+          },
+          {
+            "name": "num_pages",
+            "type": "integer",
+            "required": true,
+            "description": "The total number of pages the search yielded (max 1000)"
+          },
+          {
+            "name": "counts_by_category",
+            "type": "map[integer, integer]",
+            "required": true,
+            "description": "Total results per directory category ID"
+          },
+          {
+            "name": "type",
+            "type": "integer",
+            "required": true,
+            "description": "The type of [entry](#application-directory-item-type) item it is"
+          },
+          {
+            "name": "load_id",
+            "type": "string",
+            "required": true,
+            "description": "The unique identifier for the application directory search"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
@@ -3780,20 +3848,22 @@
       "source": "https://docs.discord.food/resources/application-directory"
     },
     {
-      "id": "applications.application.application-command-index.get",
+      "id": "extended.get_application_command_index",
       "method": "GET",
       "path": "/applications/{application_id}/application-command-index",
       "category": "applications",
       "title": "Get Application Command Index",
-      "summary": "Returns an [application command index](#application-command-index-object) object for the given application ID, containing all of the application's available commands. User must have the application authorized on their account.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Application Command Index",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_application_command_index"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-commands"
     },
     {
@@ -4325,20 +4395,22 @@
       "source": "https://docs.discord.food/resources/application-commands"
     },
     {
-      "id": "channels.channel.application-command-index.get",
+      "id": "extended.get_channel_application_command_index",
       "method": "GET",
       "path": "/channels/{channel_id}/application-command-index",
       "category": "applications",
       "title": "Get Channel Application Command Index",
-      "summary": "Returns an [application command index](#application-command-index-object) object for the given private channel ID. In a bot DM, this will return the commands available from the application associated with the bot. In a group DM, it will query the integrations authorized to the ch",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Channel Application Command Index",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_channel_application_command_index"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/application-commands"
     },
     {
@@ -5382,20 +5454,22 @@
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
-      "id": "guilds.guild.auto-moderation.rules.get",
+      "id": "extended.list_guild_automod_rules",
       "method": "GET",
       "path": "/guilds/{guild_id}/auto-moderation/rules",
       "category": "automod",
       "title": "List Guild AutoMod Rules",
-      "summary": "Returns a list of [automod rule](#automod-rule-object) objects for the configured rules in the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild AutoMod Rules",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_automod_rules"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
@@ -5493,37 +5567,41 @@
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
-      "id": "guilds.guild.auto-moderation.rules.automod_rule.delete",
+      "id": "extended.delete_guild_automod_rule",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/auto-moderation/rules/{automod_rule_id}",
       "category": "automod",
       "title": "Delete Guild AutoMod Rule",
-      "summary": "Deletes a rule in the guild. Returns a 204 empty response on success. Requires the `MANAGE_GUILD` permission. Fires an [Auto Moderation Rule Delete](/gateway/gateway-events#auto-moderation-rule-delete) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild AutoMod Rule",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_automod_rule"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
-      "id": "guilds.guild.auto-moderation.rules.automod_rule.get",
+      "id": "extended.get_guild_automod_rule",
       "method": "GET",
       "path": "/guilds/{guild_id}/auto-moderation/rules/{automod_rule_id}",
       "category": "automod",
       "title": "Get Guild AutoMod Rule",
-      "summary": "Returns an [automod rule](#automod-rule-object) object for the given rule ID in the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild AutoMod Rule",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_automod_rule"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
@@ -5589,15 +5667,17 @@
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
-      "id": "guilds.guild.incident-actions.put",
+      "id": "extended.update_guild_incident_actions",
       "method": "PUT",
       "path": "/guilds/{guild_id}/incident-actions",
       "category": "automod",
       "title": "Modify AutoMod Incident Actions",
-      "summary": "Sets the incident actions for the guild. Requires the `MANAGE_GUILD` permission. Fires a [Guild Update](/gateway/gateway-events#guild-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify AutoMod Incident Actions",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_incident_actions"
+      ],
       "params": {
         "json": [
           {
@@ -5612,12 +5692,26 @@
             "required": false,
             "description": "When DMs will be re-enabled (max 24 hours from now)"
           }
+        ],
+        "response": [
+          {
+            "name": "invites_disabled_until",
+            "type": "ISO8601 timestamp",
+            "required": true,
+            "description": "When invites will be re-enabled (max 24 hours from now)"
+          },
+          {
+            "name": "dms_disabled_until",
+            "type": "ISO8601 timestamp",
+            "required": true,
+            "description": "When DMs will be re-enabled (max 24 hours from now)"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/auto-moderation"
     },
     {
@@ -7520,15 +7614,17 @@
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.followers.post",
+      "id": "extended.follow_announcement_channel",
       "method": "POST",
       "path": "/channels/{channel_id}/followers",
       "category": "channel",
       "title": "Follow Channel",
-      "summary": "Follows a News Channel to send messages to a target channel. Requires the `MANAGE_WEBHOOKS` permission in the target channel. Returns a [followed channel](#followed-channel-object) object on success. Fires a [Webhooks Update](/gateway/gateway-events#webhooks-update) Gateway event",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Follow Channel",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "follow_announcement_channel"
+      ],
       "params": {
         "json": [
           {
@@ -7542,7 +7638,7 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
@@ -7777,15 +7873,17 @@
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.tags.post",
+      "id": "extended.create_forum_tag",
       "method": "POST",
       "path": "/channels/{channel_id}/tags",
       "category": "channel",
       "title": "Create Channel Tag",
-      "summary": "Creates a new tag in the thread-only channel. Requires the `MANAGE_CHANNELS` permission. Returns a [channel](#channel-object) object on success. Fires a [Channel Update](/gateway/gateway-events#channel-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Create Channel Tag",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "create_forum_tag"
+      ],
       "params": {
         "json": [
           {
@@ -7817,36 +7915,40 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.tags.forum_tag.delete",
+      "id": "extended.delete_forum_tag",
       "method": "DELETE",
       "path": "/channels/{channel_id}/tags/{forum_tag_id}",
       "category": "channel",
       "title": "Delete Channel Tag",
-      "summary": "Deletes a tag in the thread-only channel. Requires the `MANAGE_CHANNELS` permission. Returns a [channel](#channel-object) object on success. Fires a [Channel Update](/gateway/gateway-events#channel-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Channel Tag",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_forum_tag"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.tags.forum_tag.put",
+      "id": "extended.update_forum_tag",
       "method": "PUT",
       "path": "/channels/{channel_id}/tags/{forum_tag_id}",
       "category": "channel",
       "title": "Modify Channel Tag",
-      "summary": "Replaces a tag in the thread-only channel. Requires the `MANAGE_CHANNELS` permission. Returns a [channel](#channel-object) object on success. Fires a [Channel Update](/gateway/gateway-events#channel-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Channel Tag",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_forum_tag"
+      ],
       "params": {
         "json": [
           {
@@ -7878,19 +7980,21 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.thread-members.me.settings.patch",
+      "id": "extended.update_thread_settings",
       "method": "PATCH",
       "path": "/channels/{channel_id}/thread-members/@me/settings",
       "category": "channel",
       "title": "Modify Thread Settings",
-      "summary": "Updates the current user's thread settings. User must be a member of the thread. Returns a [thread member](#thread-member-object) on success, or a 204 empty response if nothing changed. Fires a [Thread Member Update](/gateway/gateway-events#thread-member-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Thread Settings",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "update_thread_settings"
+      ],
       "params": {
         "json": [
           {
@@ -7916,19 +8020,21 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.thread-members.user.get",
+      "id": "extended.get_thread_member",
       "method": "GET",
       "path": "/channels/{channel_id}/thread-members/{user_id}",
       "category": "channel",
       "title": "Get Thread Member",
-      "summary": "Returns a [thread member](#thread-member-object) object for the specified user if they are a member of the thread. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Thread Member",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_thread_member"
+      ],
       "params": {
         "query": [
           {
@@ -7942,19 +8048,21 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.threads.archived.private.get",
+      "id": "extended.list_private_archived_threads",
       "method": "GET",
       "path": "/channels/{channel_id}/threads/archived/private",
       "category": "channel",
       "title": "List Private Archived Threads",
-      "summary": "Returns archived threads in the channel that are of [type](#channel-type) `PRIVATE_THREAD`. Threads are ordered by `archive_timestamp`, in descending order. Requires both the `READ_MESSAGE_HISTORY` and `MANAGE_THREADS` permissions.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Private Archived Threads",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_private_archived_threads"
+      ],
       "params": {
         "query": [
           {
@@ -7969,12 +8077,32 @@
             "required": false,
             "description": "Max number of threads to return (2-100, default 50)"
           }
+        ],
+        "response": [
+          {
+            "name": "threads",
+            "type": "array[[channel](#channel-object) object]",
+            "required": true,
+            "description": "The private, archived threads"
+          },
+          {
+            "name": "members",
+            "type": "array[[thread member](#thread-member-object) object]",
+            "required": true,
+            "description": "A thread member object for each returned thread the current user has joined"
+          },
+          {
+            "name": "has_more",
+            "type": "boolean",
+            "required": true,
+            "description": "Whether there are potentially additional threads that could be returned on a subsequent call"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
@@ -8012,15 +8140,17 @@
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "channels.channel.users.me.threads.archived.private.get",
+      "id": "extended.list_joined_private_archived_threads",
       "method": "GET",
       "path": "/channels/{channel_id}/users/@me/threads/archived/private",
       "category": "channel",
       "title": "List Joined Private Archived Threads",
-      "summary": "Returns archived threads in the channel that are of [type](#channel-type) `PRIVATE_THREAD`, and the user has joined. Threads are ordered by their `id`, in descending order. Requires the `READ_MESSAGE_HISTORY` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Joined Private Archived Threads",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_joined_private_archived_threads"
+      ],
       "params": {
         "query": [
           {
@@ -8035,12 +8165,32 @@
             "required": false,
             "description": "Max number of threads to return (2-100, default 50)"
           }
+        ],
+        "response": [
+          {
+            "name": "threads",
+            "type": "array[[channel](#channel-object) object]",
+            "required": true,
+            "description": "The private, archived threads the current user has joined"
+          },
+          {
+            "name": "members",
+            "type": "array[[thread member](#thread-member-object) object]",
+            "required": true,
+            "description": "A thread member object for each returned thread the current user has joined"
+          },
+          {
+            "name": "has_more",
+            "type": "boolean",
+            "required": true,
+            "description": "Whether there are potentially additional threads that could be returned on a subsequent call"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
@@ -8304,20 +8454,22 @@
       "source": "https://docs.discord.food/resources/channel"
     },
     {
-      "id": "guilds.guild.top-read-channels.get",
+      "id": "extended.list_guild_top_read_channels",
       "method": "GET",
       "path": "/guilds/{guild_id}/top-read-channels",
       "category": "channel",
       "title": "List Guild Top Read Channels",
-      "summary": "Returns a list of snowflakes representing up to 10 of the top read channels in the guild. If the user is not in the guild, the guild must be discoverable.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Top Read Channels",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_top_read_channels"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": true,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/channel"
     },
     {
@@ -9530,20 +9682,22 @@
       "source": "https://docs.discord.food/resources/connected-accounts"
     },
     {
-      "id": "users.me.connections.get",
+      "id": "extended.list_my_connections",
       "method": "GET",
       "path": "/users/@me/connections",
       "category": "connections",
       "title": "List User Connections",
-      "summary": "Returns a list of [connection](#connection-object) objects.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Connections",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_connections"
+      ],
       "params": {},
       "oauth2_scope": "connections",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/connected-accounts"
     },
     {
@@ -9781,20 +9935,22 @@
       "source": "https://docs.discord.food/resources/connected-accounts"
     },
     {
-      "id": "users.me.linked-connections.get",
+      "id": "extended.list_my_linked_connections",
       "method": "GET",
       "path": "/users/@me/linked-connections",
       "category": "connections",
       "title": "List User Linked Connections",
-      "summary": "This endpoint is only usable with an OAuth2 access token with the `connections` scope.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Linked Connections",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_linked_connections"
+      ],
       "params": {},
       "oauth2_scope": "connections",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/connected-accounts"
     },
     {
@@ -9824,54 +9980,60 @@
       "source": "https://docs.discord.food/resources/desktop"
     },
     {
-      "id": "channels.channel.directory-entries.get",
+      "id": "extended.list_directory_entries",
       "method": "GET",
       "path": "/channels/{channel_id}/directory-entries",
       "category": "discovery",
       "title": "List Directory Entries",
-      "summary": "Returns a list of [directory entry](#directory-entry-object) objects in the given directory channel. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Directory Entries",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_directory_entries"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/directory-entry"
     },
     {
-      "id": "channels.channel.directory-entries.counts.get",
+      "id": "extended.get_directory_counts",
       "method": "GET",
       "path": "/channels/{channel_id}/directory-entries/counts",
       "category": "discovery",
       "title": "Get Directory Counts",
-      "summary": "Returns a mapping of [directory categories](#directory-category) to their entry count in the given directory channel. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Directory Counts",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_directory_counts"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/directory-entry"
     },
     {
-      "id": "channels.channel.directory-entries.list.get",
+      "id": "extended.list_partial_directory_entries",
       "method": "GET",
       "path": "/channels/{channel_id}/directory-entries/list",
       "category": "discovery",
       "title": "List Partial Directory Entries",
-      "summary": "Returns a list of partial [directory entry](#directory-entry-object) objects in the given directory channel. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Partial Directory Entries",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_partial_directory_entries"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/directory-entry"
     },
     {
@@ -9909,20 +10071,22 @@
       "source": "https://docs.discord.food/resources/directory-entry"
     },
     {
-      "id": "channels.channel.directory-entry.entity.get",
+      "id": "extended.get_directory_entry",
       "method": "GET",
       "path": "/channels/{channel_id}/directory-entry/{entity_id}",
       "category": "discovery",
       "title": "Get Directory Entry",
-      "summary": "Returns a [directory entry](#directory-entry-object) object for the given entity ID in the directory channel. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Directory Entry",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_directory_entry"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/directory-entry"
     },
     {
@@ -10046,15 +10210,17 @@
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "discoverable-guilds.search.get",
+      "id": "extended.search_discoverable_guilds",
       "method": "GET",
       "path": "/discoverable-guilds/search",
       "category": "discovery",
       "title": "Search Discoverable Guilds",
-      "summary": "Returns a list of [discoverable guild](#discoverable-guild-object) objects that match the query.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Search Discoverable Guilds",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "search_discoverable_guilds"
+      ],
       "params": {
         "query": [
           {
@@ -10086,19 +10252,21 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "discovery.categories.get",
+      "id": "extended.list_discovery_categories",
       "method": "GET",
       "path": "/discovery/categories",
       "category": "discovery",
       "title": "List Discovery Categories",
-      "summary": "Returns a list of [discovery category](#discovery-category-object) objects representing the available discovery categories.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Discovery Categories",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_discovery_categories"
+      ],
       "params": {
         "query": [
           {
@@ -10118,19 +10286,21 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "discovery.search.get",
+      "id": "extended.search_published_guilds",
       "method": "GET",
       "path": "/discovery/search",
       "category": "discovery",
       "title": "Search Published Guilds",
-      "summary": "Returns a list of [discoverable guild](#discoverable-guild-object) objects that have a landing web page and match the query. This endpoint is a proxy for [searching using the Algolia API](#searching-discovery). See the [Algolia Search documentation](https://www.algolia.com/doc/re",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Search Published Guilds",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "search_published_guilds"
+      ],
       "params": {
         "query": [
           {
@@ -10156,7 +10326,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
@@ -10186,20 +10356,43 @@
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "discovery.guild.get",
+      "id": "extended.get_discovery_slug",
       "method": "GET",
       "path": "/discovery/{guild_id}",
       "category": "discovery",
       "title": "Get Discovery Slug",
-      "summary": "Returns information about a guild's landing web page or monetization store page. This endpoint requires the guild to either be discoverable and [published](#discovery-metadata-object) or have the [`CREATOR_STORE_PAGE` guild feature](/resources/guild#guild-features).",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Discovery Slug",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_discovery_slug"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "slug",
+            "type": "string",
+            "required": true,
+            "description": "The guild's discovery slug; can be appended to `https://discord.com/servers/` to get the guild's discovery page"
+          },
+          {
+            "name": "guild",
+            "type": "[discoverable guild](#discoverable-guild-object) object",
+            "required": false,
+            "description": "The guild information, if the guild is discoverable"
+          },
+          {
+            "name": "store_page",
+            "type": "[monetization store page](#monetization-store-page-structure) object",
+            "required": false,
+            "description": "The guild's monetization store page, if enabled"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
@@ -10254,20 +10447,22 @@
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "guilds.guild.discovery-metadata.get",
+      "id": "extended.get_guild_discovery_metadata",
       "method": "GET",
       "path": "/guilds/{guild_id}/discovery-metadata",
       "category": "discovery",
       "title": "Get Guild Discovery Metadata",
-      "summary": "Returns the [discovery metadata](#discovery-metadata-object) object for the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Discovery Metadata",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_discovery_metadata"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
@@ -10333,37 +10528,41 @@
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "guilds.guild.discovery-requirements.get",
+      "id": "extended.get_guild_discovery_requirements",
       "method": "GET",
       "path": "/guilds/{guild_id}/discovery-requirements",
       "category": "discovery",
       "title": "Get Guild Discovery Requirements",
-      "summary": "Returns the [discovery requirements](#discovery-requirements-object) object for the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Discovery Requirements",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_discovery_requirements"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
-      "id": "guilds.guild.profile.get",
+      "id": "extended.get_guild_profile",
       "method": "GET",
       "path": "/guilds/{guild_id}/profile",
       "category": "discovery",
       "title": "Get Guild Profile",
-      "summary": "Returns a [guild profile](#guild-profile-object) object for the given guild ID. User must be a member of the guild or the guild must be discoverable or have a [`PUBLIC` or `PUBLIC_WITH_RECRUITMENT` visibility](#guild-visibility).",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Profile",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_profile"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/discovery"
     },
     {
@@ -10631,37 +10830,62 @@
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "emojis.emoji.guild.get",
+      "id": "extended.get_emoji_guild",
       "method": "GET",
       "path": "/emojis/{emoji_id}/guild",
       "category": "emoji",
       "title": "Get Emoji Guild",
-      "summary": "Returns a [discoverable guild](/resources/discovery#discoverable-guild-object) object for the guild that owns the given emoji. This endpoint requires the guild to be discoverable, not be [auto-removed](/resources/discovery#discoverable-guild-object), and have [guild expression di",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Emoji Guild",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_emoji_guild"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "emojis.emoji.source.get",
+      "id": "extended.get_emoji_source",
       "method": "GET",
       "path": "/emojis/{emoji_id}/source",
       "category": "emoji",
       "title": "Get Emoji Source",
-      "summary": "Returns an object containing information on the guild or application that owns the given emoji. If the source is a guild, this endpoint requires the guild to be discoverable, not be [auto-removed](/resources/discovery#discoverable-guild-object), and have [guild expression discove",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Emoji Source",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_emoji_source"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "type",
+            "type": "string",
+            "required": true,
+            "description": "The [type of emoji source](#emoji-source-type)"
+          },
+          {
+            "name": "guild",
+            "type": "?[emoji guild](#emoji-guild-structure) object",
+            "required": true,
+            "description": "The guild that owns the given emoji"
+          },
+          {
+            "name": "application",
+            "type": "?[emoji application](#emoji-application-structure) object",
+            "required": true,
+            "description": "The application that owns the given emoji"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
@@ -10722,49 +10946,55 @@
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "guilds.guild.emojis.emoji.delete",
+      "id": "extended.delete_guild_emoji",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/emojis/{emoji_id}",
       "category": "emoji",
       "title": "Delete Guild Emoji",
-      "summary": "Deletes the given emoji. For emoji created by the current user, requires either the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission. For other emojis, requires the `MANAGE_EXPRESSIONS` permission. Returns a 204 empty response on success. Fires a [Guild Emojis Update](/gat",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild Emoji",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_emoji"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "guilds.guild.emojis.emoji.get",
+      "id": "extended.get_guild_emoji",
       "method": "GET",
       "path": "/guilds/{guild_id}/emojis/{emoji_id}",
       "category": "emoji",
       "title": "Get Guild Emoji",
-      "summary": "Returns an [emoji](#emoji-object) object for the given guild and emoji IDs. Includes the `user` field if the user has the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Emoji",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_emoji"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "guilds.guild.emojis.emoji.patch",
+      "id": "extended.update_guild_emoji",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/emojis/{emoji_id}",
       "category": "emoji",
       "title": "Modify Guild Emoji",
-      "summary": "Modifies the given emoji. For emoji created by the current user, requires either the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission. For other emojis, requires the `MANAGE_EXPRESSIONS` permission. Returns the updated [emoji](#emoji-object) object on success. Fires a [Gui",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Emoji",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_emoji"
+      ],
       "params": {
         "json": [
           {
@@ -10784,24 +11014,35 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
-      "id": "guilds.guild.top-emojis.get",
+      "id": "extended.list_guild_top_emojis",
       "method": "GET",
       "path": "/guilds/{guild_id}/top-emojis",
       "category": "emoji",
       "title": "List Guild Top Emojis",
-      "summary": "Returns the most-used emojis for the given guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Guild Top Emojis",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_top_emojis"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "items",
+            "type": "array[[top emoji](#top-emoji-structure) object]",
+            "required": true,
+            "description": "The most-used emojis for the guild"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/emoji"
     },
     {
@@ -11247,15 +11488,17 @@
       "source": "https://docs.discord.food/resources/guild-scheduled-event"
     },
     {
-      "id": "guilds.guild.scheduled-events.event.users.counts.get",
+      "id": "extended.get_scheduled_event_user_counts",
       "method": "GET",
       "path": "/guilds/{guild_id}/scheduled-events/{event_id}/users/counts",
       "category": "events",
       "title": "Get Guild Scheduled Event User Count",
-      "summary": "Returns the number of users subscribed to a guild scheduled event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Scheduled Event User Count",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_scheduled_event_user_counts"
+      ],
       "params": {
         "query": [
           {
@@ -11264,24 +11507,40 @@
             "required": false,
             "description": "The IDs of the exceptions to return counts for (max 10)"
           }
+        ],
+        "response": [
+          {
+            "name": "guild_scheduled_event_count",
+            "type": "integer",
+            "required": true,
+            "description": "The number of users subscribed to the guild scheduled event"
+          },
+          {
+            "name": "guild_scheduled_event_exception_counts",
+            "type": "map[snowflake, integer]",
+            "required": true,
+            "description": "The number of users subscribed to each exception"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-scheduled-event"
     },
     {
-      "id": "guilds.guild.scheduled-events.event.guild_scheduled_event_exception.users.get",
+      "id": "extended.list_scheduled_event_exception_users",
       "method": "GET",
       "path": "/guilds/{guild_id}/scheduled-events/{event_id}/{guild_scheduled_event_exception_id}/users",
       "category": "events",
       "title": "List Guild Scheduled Event Exception Users",
-      "summary": "Returns a list of [guild scheduled event user](#guild-scheduled-event-user-object) objects subscribed to a specific guild scheduled event exception.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Scheduled Event Exception Users",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_scheduled_event_exception_users"
+      ],
       "params": {
         "query": [
           {
@@ -11313,7 +11572,7 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-scheduled-event"
     },
     {
@@ -11360,15 +11619,17 @@
       "source": "https://docs.discord.food/resources/guild-scheduled-event"
     },
     {
-      "id": "users.me.scheduled-events.get",
+      "id": "extended.list_my_scheduled_events",
       "method": "GET",
       "path": "/users/@me/scheduled-events",
       "category": "events",
       "title": "List User Guild Scheduled Events",
-      "summary": "Returns an array of [guild scheduled event user](#guild-scheduled-event-user-object) objects for the current user for a given guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Guild Scheduled Events",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_scheduled_events"
+      ],
       "params": {
         "query": [
           {
@@ -11382,7 +11643,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-scheduled-event"
     },
     {
@@ -11873,49 +12134,70 @@
       "source": "https://docs.discord.food/resources/game"
     },
     {
-      "id": "games.detectable.get",
+      "id": "extended.list_detectable_games",
       "method": "GET",
       "path": "/games/detectable",
       "category": "game",
       "title": "List Detectable Games",
-      "summary": "Returns a list of [detectable application](/resources/game#detectable-application-object) objects representing games that can be detected by Discord for rich presence.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Detectable Games",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_detectable_games"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/game"
     },
     {
-      "id": "games.detectable.exclusions.get",
+      "id": "extended.list_detectable_game_exclusions",
       "method": "GET",
       "path": "/games/detectable/exclusions",
       "category": "game",
       "title": "List Detectable Game Exclusions",
-      "summary": "Returns the patterns which should be ignored when detecting games.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Detectable Game Exclusions",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_detectable_game_exclusions"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "executables",
+            "type": "array[string]",
+            "required": true,
+            "description": "Names of ignored processes"
+          },
+          {
+            "name": "patterns",
+            "type": "array[string]",
+            "required": true,
+            "description": "Regular expression patterns to match against process names"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/game"
     },
     {
-      "id": "games.game.get",
+      "id": "extended.get_game",
       "method": "GET",
       "path": "/games/{game_id}",
       "category": "game",
       "title": "Get Game",
-      "summary": "Returns a [game](#game-object) object for the given application ID.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Game",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_game"
+      ],
       "params": {
         "query": [
           {
@@ -11929,19 +12211,21 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/game"
     },
     {
-      "id": "games.game.announcements.get",
+      "id": "extended.list_game_announcements",
       "method": "GET",
       "path": "/games/{game_id}/announcements",
       "category": "game",
       "title": "List Game Announcements",
-      "summary": "Returns messages in the game's announcements channel.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Game Announcements",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_game_announcements"
+      ],
       "params": {
         "query": [
           {
@@ -11950,12 +12234,32 @@
             "required": true,
             "description": "Max number of messages to return (1-50, default 50)"
           }
+        ],
+        "response": [
+          {
+            "name": "guild_id",
+            "type": "?snowflake",
+            "required": true,
+            "description": "The ID of the guild"
+          },
+          {
+            "name": "channel_id",
+            "type": "?snowflake",
+            "required": true,
+            "description": "The ID of the channel"
+          },
+          {
+            "name": "messages",
+            "type": "array[[message](/resources/message#message-object) object]",
+            "required": true,
+            "description": "The messages in the announcements channel"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/game"
     },
     {
@@ -12174,20 +12478,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.templates.template_code.get",
+      "id": "extended.get_guild_template",
       "method": "GET",
       "path": "/guilds/templates/{template_code}",
       "category": "guild",
       "title": "Get Guild Template",
-      "summary": "Returns a [guild template](#guild-template-object) object for the given code.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Template",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_template"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
@@ -12491,15 +12797,17 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.bans.search.get",
+      "id": "extended.search_guild_bans",
       "method": "GET",
       "path": "/guilds/{guild_id}/bans/search",
       "category": "guild",
       "title": "Search Guild Bans",
-      "summary": "Returns a list of [ban](#ban-object) objects whose username or display name contains a provided string. Requires the `BAN_MEMBERS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Search Guild Bans",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "search_guild_bans"
+      ],
       "params": {
         "query": [
           {
@@ -12525,7 +12833,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -12548,20 +12856,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.bans.user.get",
+      "id": "extended.get_guild_ban",
       "method": "GET",
       "path": "/guilds/{guild_id}/bans/{user_id}",
       "category": "guild",
       "title": "Get Guild Ban",
-      "summary": "Returns a [ban](#ban-object) object for the given user. Requires the `BAN_MEMBERS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Ban",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_ban"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -12599,20 +12909,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.basic.get",
+      "id": "extended.get_basic_guild",
       "method": "GET",
       "path": "/guilds/{guild_id}/basic",
       "category": "guild",
       "title": "Get Guild Basic",
-      "summary": "Returns a partial [guild](#guild-object) object for the given guild ID. If the user is not in the guild, the guild must be discoverable.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Basic",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_basic_guild"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -13645,20 +13957,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.new-member-actions.get",
+      "id": "extended.list_guild_new_member_actions",
       "method": "GET",
       "path": "/guilds/{guild_id}/new-member-actions",
       "category": "guild",
       "title": "Get Guild New Member Actions",
-      "summary": "If it exists, returns a [new member actions progress](#new-member-actions-progress-object) object for the user in the guild, representing the user's progress towards completing the new member actions. Otherwise, returns a 204 empty response.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild New Member Actions",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_new_member_actions"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -13688,20 +14002,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.new-member-welcome.get",
+      "id": "extended.get_guild_new_member_welcome",
       "method": "GET",
       "path": "/guilds/{guild_id}/new-member-welcome",
       "category": "guild",
       "title": "Get Guild New Member Welcome",
-      "summary": "If it exists, returns the [new member welcome](#new-member-welcome-object) object for the guild. Otherwise, returns a 204 empty response. Requires the `MANAGE_GUILD` permission if the feature is disabled, otherwise no permission is required.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild New Member Welcome",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_new_member_welcome"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -13749,20 +14065,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.onboarding.get",
+      "id": "extended.get_guild_onboarding",
       "method": "GET",
       "path": "/guilds/{guild_id}/onboarding",
       "category": "guild",
       "title": "Get Guild Onboarding",
-      "summary": "Returns the [onboarding](#onboarding-object) object for the guild. Requires the `MANAGE_GUILD` permission if the feature is disabled, otherwise requires that the user is a member of the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Onboarding",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_onboarding"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -14376,15 +14694,17 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.requests.get",
+      "id": "extended.list_guild_join_requests",
       "method": "GET",
       "path": "/guilds/{guild_id}/requests",
       "category": "guild",
       "title": "List Guild Join Requests",
-      "summary": "Returns a list of join requests for the guild for manual approval. Requires the `KICK_MEMBERS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Join Requests",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_join_requests"
+      ],
       "params": {
         "query": [
           {
@@ -14411,12 +14731,26 @@
             "required": false,
             "description": "Get join requests after this request ID"
           }
+        ],
+        "response": [
+          {
+            "name": "guild_join_requests",
+            "type": "array[[guild join request](#guild-join-request-object)]",
+            "required": true,
+            "description": "The join requests for the guild"
+          },
+          {
+            "name": "total",
+            "type": "integer",
+            "required": false,
+            "description": "The total number of join requests that match the query"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -14463,20 +14797,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.requests.me.get",
+      "id": "extended.get_my_guild_join_request",
       "method": "GET",
       "path": "/guilds/{guild_id}/requests/@me",
       "category": "guild",
       "title": "Get Current User Guild Join Request",
-      "summary": "Returns a partial [guild join request](#guild-join-request-object) object representing the current user's active join request for the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Current User Guild Join Request",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_my_guild_join_request"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -14529,20 +14865,31 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.requests.me.cooldown.get",
+      "id": "extended.get_guild_join_request_cooldown",
       "method": "GET",
       "path": "/guilds/{guild_id}/requests/@me/cooldown",
       "category": "guild",
       "title": "Get Guild Join Request Cooldown",
-      "summary": "Returns the remaining time until the current user can submit another join request for the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Guild Join Request Cooldown",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_join_request_cooldown"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "cooldown",
+            "type": "integer",
+            "required": true,
+            "description": "How long (in seconds) the user has to wait until the current user can submit a join request"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -14563,20 +14910,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.requests.users.user.get",
+      "id": "extended.list_user_guild_join_requests",
       "method": "GET",
       "path": "/guilds/{guild_id}/requests/users/{user_id}",
       "category": "guild",
       "title": "List User Guild Join Requests",
-      "summary": "Returns a list of [guild join request](#guild-join-request-object) objects that the user has submitted to the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Guild Join Requests",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_user_guild_join_requests"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15201,37 +15550,41 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.roles.connections-configurations.get",
+      "id": "extended.list_guild_role_connections",
       "method": "GET",
       "path": "/guilds/{guild_id}/roles/connections-configurations",
       "category": "guild",
       "title": "List Guild Role Connections Configurations",
-      "summary": "Returns a list of [role connection rule](#role-connection-rule-structure) objects representing the role connections for the guild. User must be a member of the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Role Connections Configurations",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_role_connections"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.roles.member-counts.get",
+      "id": "extended.get_guild_role_member_counts",
       "method": "GET",
       "path": "/guilds/{guild_id}/roles/member-counts",
       "category": "guild",
       "title": "Get Guild Role Member Counts",
-      "summary": "Returns a mapping of role IDs to their respective member counts. User must be a member of the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Role Member Counts",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_role_member_counts"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15366,20 +15719,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.roles.role.connections.configuration.get",
+      "id": "extended.get_guild_role_connection_config",
       "method": "GET",
       "path": "/guilds/{guild_id}/roles/{role_id}/connections/configuration",
       "category": "guild",
       "title": "Get Guild Role Connection Configuration",
-      "summary": "Returns a [role connection configuration](#role-connection-configuration-object) object representing the role connection for the given role. Requires the `MANAGE_ROLES` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Role Connection Configuration",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_role_connection_config"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15400,20 +15755,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.roles.role.connections.eligibility.get",
+      "id": "extended.get_guild_role_connection_eligibility",
       "method": "GET",
       "path": "/guilds/{guild_id}/roles/{role_id}/connections/eligibility",
       "category": "guild",
       "title": "Get Guild Role Connection Eligibility",
-      "summary": "Returns a [role connection configuration](#role-connection-configuration-object) object with extra fields representing the user's eligibility to link the given role. User must be a member of the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Role Connection Eligibility",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_role_connection_eligibility"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15434,20 +15791,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.roles.role.member-ids.get",
+      "id": "extended.list_guild_role_members",
       "method": "GET",
       "path": "/guilds/{guild_id}/roles/{role_id}/member-ids",
       "category": "guild",
       "title": "List Guild Role Members",
-      "summary": "Returns a list of member IDs that have the specified [role](#role-object), up to a maximum of 100. User must be a member of the guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Role Members",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_role_members"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15535,32 +15894,36 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.templates.get",
+      "id": "extended.list_guild_templates",
       "method": "GET",
       "path": "/guilds/{guild_id}/templates",
       "category": "guild",
       "title": "List Guild Templates",
-      "summary": "Returns an array of [guild template](#guild-template-object) objects. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Templates",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_templates"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
-      "id": "guilds.guild.templates.post",
+      "id": "extended.create_guild_template",
       "method": "POST",
       "path": "/guilds/{guild_id}/templates",
       "category": "guild",
       "title": "Create Guild Template",
-      "summary": "Creates a template for the guild. Requires the `MANAGE_GUILD` permission. Returns the created [guild template](#guild-template-object) object on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Create Guild Template",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "create_guild_template"
+      ],
       "params": {
         "json": [
           {
@@ -15580,36 +15943,40 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
-      "id": "guilds.guild.templates.template_code.delete",
+      "id": "extended.delete_guild_template",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/templates/{template_code}",
       "category": "guild",
       "title": "Delete Guild Template",
-      "summary": "Deletes the template. Requires the `MANAGE_GUILD` permission. Returns the deleted [guild template](#guild-template-object) object on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild Template",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_template"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
-      "id": "guilds.guild.templates.template_code.patch",
+      "id": "extended.update_guild_template",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/templates/{template_code}",
       "category": "guild",
       "title": "Modify Guild Template",
-      "summary": "Modifies the template's metadata. Requires the `MANAGE_GUILD` permission. Returns the updated [guild template](#guild-template-object) object on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Template",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_template"
+      ],
       "params": {
         "json": [
           {
@@ -15629,70 +15996,102 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
-      "id": "guilds.guild.templates.template_code.put",
+      "id": "extended.sync_guild_template",
       "method": "PUT",
       "path": "/guilds/{guild_id}/templates/{template_code}",
       "category": "guild",
       "title": "Sync Guild Template",
-      "summary": "Syncs the template to the guild's current state. Requires the `MANAGE_GUILD` permission. Returns the updated [guild template](#guild-template-object) object on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Sync Guild Template",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "sync_guild_template"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild-template"
     },
     {
-      "id": "guilds.guild.top-games.get",
+      "id": "extended.list_guild_top_games",
       "method": "GET",
       "path": "/guilds/{guild_id}/top-games",
       "category": "guild",
       "title": "List Guild Top Games",
-      "summary": "Returns up to 20 of the top most played games for the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Guild Top Games",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_top_games"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "top_games",
+            "type": "array[[game activity](#game-activity-structure) object]",
+            "required": true,
+            "description": "The top games played in the guild"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.vanity-url.get",
+      "id": "extended.get_guild_vanity_invite",
       "method": "GET",
       "path": "/guilds/{guild_id}/vanity-url",
       "category": "guild",
       "title": "Get Guild Vanity Invite",
-      "summary": "Returns the vanity invite for the guild. The guild must have the `VANITY_URL` or `GUILD_WEB_PAGE_VANITY_URL` feature. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Guild Vanity Invite",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_vanity_invite"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "code",
+            "type": "?string",
+            "required": true,
+            "description": "The vanity invite code for the guild"
+          },
+          {
+            "name": "uses",
+            "type": "integer",
+            "required": true,
+            "description": "The number of times this invite has been used"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.vanity-url.patch",
+      "id": "extended.update_guild_vanity_invite",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/vanity-url",
       "category": "guild",
       "title": "Modify Guild Vanity Invite",
-      "summary": "Modifies the vanity invite for the guild. The guild must have the `VANITY_URL` or `GUILD_WEB_PAGE_VANITY_URL` feature. Guilds without the `VANITY_URL` feature can only clear their vanity invite. Requires both the `MANAGE_GUILD` and `CREATE_INSTANT_INVITE` permissions. Fires a [Gu",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Vanity Invite",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_vanity_invite"
+      ],
       "params": {
         "json": [
           {
@@ -15701,41 +16100,59 @@
             "required": true,
             "description": "The vanity invite code for the guild (2-25 characters, alphanumeric and `-`)"
           }
+        ],
+        "response": [
+          {
+            "name": "code",
+            "type": "?string",
+            "required": true,
+            "description": "The vanity invite code for the guild"
+          },
+          {
+            "name": "uses",
+            "type": "integer",
+            "required": true,
+            "description": "The number of times this invite has been used (now 0)"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.welcome-screen.get",
+      "id": "extended.get_guild_welcome_screen",
       "method": "GET",
       "path": "/guilds/{guild_id}/welcome-screen",
       "category": "guild",
       "title": "Get Guild Welcome Screen",
-      "summary": "Returns the [welcome screen](#welcome-screen-object) object for the guild. Requires the `MANAGE_GUILD` permission if the welcome screen is not yet enabled, otherwise no permission is required.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Welcome Screen",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_welcome_screen"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.welcome-screen.patch",
+      "id": "extended.update_guild_welcome_screen",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/welcome-screen",
       "category": "guild",
       "title": "Modify Guild Welcome Screen",
-      "summary": "Modifies the guild's welcome screen. Requires the `MANAGE_GUILD` permission. Returns the updated [welcome screen](#welcome-screen-object) object. May fire a [Guild Update](/gateway/gateway-events#guild-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Welcome Screen",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_welcome_screen"
+      ],
       "params": {
         "json": [
           {
@@ -15761,36 +16178,40 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.widget.get",
+      "id": "extended.get_guild_widget_settings",
       "method": "GET",
       "path": "/guilds/{guild_id}/widget",
       "category": "guild",
       "title": "Get Guild Widget Settings",
-      "summary": "Returns a [guild widget settings](#guild-widget-settings-structure) object for the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Widget Settings",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_widget_settings"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.widget.patch",
+      "id": "extended.update_guild_widget",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/widget",
       "category": "guild",
       "title": "Modify Guild Widget",
-      "summary": "Modifies the widget settings for the guild. Requires the `MANAGE_GUILD` permission. Returns the updated [guild widget settings](#guild-widget-settings-structure) object on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Widget",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_widget"
+      ],
       "params": {
         "json": [
           {
@@ -15810,24 +16231,26 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "guilds.guild.widget.json.get",
+      "id": "extended.get_guild_widget",
       "method": "GET",
       "path": "/guilds/{guild_id}/widget.json",
       "category": "guild",
       "title": "Get Guild Widget",
-      "summary": "Returns a [guild widget](#guild-widget-object) object for the given guild ID. The guild must have the widget enabled. May fire an [Invite Create](/gateway/gateway-events#invite-create) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Widget",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_widget"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -15889,20 +16312,22 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "join-requests.guild_join_request.get",
+      "id": "extended.get_guild_join_request",
       "method": "GET",
       "path": "/join-requests/{guild_join_request_id}",
       "category": "guild",
       "title": "Get Guild Join Request",
-      "summary": "Returns a [guild join request](#guild-join-request-object) object for the given request ID. Requires the `KICK_MEMBERS` permission if the request is not for the current user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Join Request",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_join_request"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
@@ -16033,54 +16458,60 @@
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "users.me.join-request-guilds.get",
+      "id": "extended.list_my_join_request_guilds",
       "method": "GET",
       "path": "/users/@me/join-request-guilds",
       "category": "guild",
       "title": "List Join Request Guilds",
-      "summary": "Returns a list of partial [guild](#guild-object) objects representing [non-previewable guilds](#guild-previewing) the current user has pending join requests for.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Join Request Guilds",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_join_request_guilds"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/guild"
     },
     {
-      "id": "channels.channel.integrations.get",
+      "id": "extended.list_channel_integrations",
       "method": "GET",
       "path": "/channels/{channel_id}/integrations",
       "category": "integration",
       "title": "List Channel Integrations",
-      "summary": "Returns a list of [integration](#integration-object) objects for the private channel.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Channel Integrations",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_channel_integrations"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "channels.channel.integrations.integration.delete",
+      "id": "extended.delete_channel_integration",
       "method": "DELETE",
       "path": "/channels/{channel_id}/integrations/{integration_id}",
       "category": "integration",
       "title": "Delete Channel Integration",
-      "summary": "Removes the given integration ID from the channel. Returns a 204 empty response on success. Fires an [Integration Delete](#integration-object) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Channel Integration",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_channel_integration"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
@@ -16201,20 +16632,22 @@
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "guilds.guild.integrations.get",
+      "id": "extended.list_guild_integrations",
       "method": "GET",
       "path": "/guilds/{guild_id}/integrations",
       "category": "integration",
       "title": "List Guild Integrations",
-      "summary": "Returns a list of [integration](#integration-object) objects for the guild. Requires the `MANAGE_GUILD` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Guild Integrations",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_integrations"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
@@ -16250,32 +16683,36 @@
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "guilds.guild.integrations.integration.delete",
+      "id": "extended.delete_guild_integration",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/integrations/{integration_id}",
       "category": "integration",
       "title": "Delete Guild Integration",
-      "summary": "Removes the given integration ID from the guild. Deletes any associated webhooks and kicks the associated bot (if there is one). Requires the `MANAGE_GUILD` permission. Returns a 204 empty response on success. Fires [Guild Integrations Update](/gateway/gateway-events#guild-integr",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild Integration",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_integration"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "guilds.guild.integrations.integration.patch",
+      "id": "extended.update_guild_integration",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/integrations/{integration_id}",
       "category": "integration",
       "title": "Modify Guild Integration",
-      "summary": "Modifies the behavior and settings of the integration in the guild. Requires the `MANAGE_GUILD` permission. Returns a 204 empty response on success. Fires [Guild Integrations Update](#integration-object) and [Integration Update](#integration-object) Gateway events.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Integration",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_integration"
+      ],
       "params": {
         "json": [
           {
@@ -16301,24 +16738,26 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "guilds.guild.integrations.integration.sync.post",
+      "id": "extended.sync_guild_integration",
       "method": "POST",
       "path": "/guilds/{guild_id}/integrations/{integration_id}/sync",
       "category": "integration",
       "title": "Sync Guild Integration",
-      "summary": "Syncs an integration for the guild. Requires the `MANAGE_GUILD` permission. Returns a 204 empty response on success. Fires [Guild Integrations Update](/gateway/gateway-events#guild-integrations-update) and [Integration Update](/gateway/gateway-events#integration-update) Gateway e",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Sync Guild Integration",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "sync_guild_integration"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
@@ -16356,20 +16795,22 @@
       "source": "https://docs.discord.food/resources/integration"
     },
     {
-      "id": "users.me.guilds.integration-application-ids.get",
+      "id": "extended.list_my_integration_application_ids",
       "method": "GET",
       "path": "/users/@me/guilds/integration-application-ids",
       "category": "integration",
       "title": "Get Guild Integration Application IDs",
-      "summary": "Returns a mapping of guild IDs to lists of application IDs attached to the integrations in the current user's guilds.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Integration Application IDs",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_integration_application_ids"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/integration"
     },
     {
@@ -16578,15 +17019,17 @@
       "source": "https://docs.discord.food/resources/invite"
     },
     {
-      "id": "invites.invite_code.post",
+      "id": "extended.accept_invite",
       "method": "POST",
       "path": "/invites/{invite_code}",
       "category": "invite",
       "title": "Accept Invite",
-      "summary": "Accepts an invite to a [guild](#invite-guild-object), [group DM](/resources/channel#channel-object), or [DM](/resources/channel#channel-object). Returns an [invite](#invite-object) object on success. May fire a [Guild Create](/gateway/gateway-events#guild-create), [Guild Member A",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Accept Invite",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "accept_invite"
+      ],
       "params": {
         "json": [
           {
@@ -16600,41 +17043,54 @@
       "oauth2_scope": "guilds.join",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/invite"
     },
     {
-      "id": "invites.invite_code.friend-members.get",
+      "id": "extended.list_invite_friend_members",
       "method": "GET",
       "path": "/invites/{invite_code}/friend-members",
       "category": "invite",
       "title": "List Invite Friend Members",
-      "summary": "Returns the user IDs of friends in the target guild. Always returns an empty array for group DMs and friend invites.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Invite Friend Members",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_invite_friend_members"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "friend_member_ids",
+            "type": "array[snowflake]",
+            "required": true,
+            "description": "User IDs of friends in the target guild"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/invite"
     },
     {
-      "id": "invites.invite_code.target-users.get",
+      "id": "extended.list_invite_target_users",
       "method": "GET",
       "path": "/invites/{invite_code}/target-users",
       "category": "invite",
       "title": "List Invite Target Users",
-      "summary": "Returns the IDs of the users allowed to see and accept the given invite. Invite must have a target users file associated with it. Requires the `MANAGE_GUILD` or `VIEW_AUDIT_LOG` permission if the requestor is not the inviter. Return a CSV file with the header `user_id` and each u",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Invite Target Users",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_invite_target_users"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/invite"
     },
     {
@@ -16664,20 +17120,22 @@
       "source": "https://docs.discord.food/resources/invite"
     },
     {
-      "id": "invites.invite_code.target-users.job-status.get",
+      "id": "extended.get_invite_target_users_job_status",
       "method": "GET",
       "path": "/invites/{invite_code}/target-users/job-status",
       "category": "invite",
       "title": "Get Invite Target Users Job Status",
-      "summary": "Returns an [invite target users job](#invite-target-users-job-object) object for the given invite. Invite must have a target users file associated with it. Requires the `MANAGE_GUILD` or `VIEW_AUDIT_LOG` permission if the requestor is not the inviter.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Invite Target Users Job Status",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_invite_target_users_job_status"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/invite"
     },
     {
@@ -16698,20 +17156,22 @@
       "source": "https://docs.discord.food/resources/invite"
     },
     {
-      "id": "users.me.invites.get",
+      "id": "extended.list_my_invites",
       "method": "GET",
       "path": "/users/@me/invites",
       "category": "invite",
       "title": "List User Invites",
-      "summary": "Returns a list of friend [invite](#invite-object) objects (with [invite metadata](#invite-metadata-object)) for the current user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Invites",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_invites"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/invite"
     },
     {
@@ -17276,20 +17736,31 @@
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.media-post-preview.get",
+      "id": "extended.get_channel_media_preview",
       "method": "GET",
       "path": "/channels/{channel_id}/media-post-preview",
       "category": "message",
       "title": "Get Channel Media Preview",
-      "summary": "Returns information on the media of a post (thread) in a media channel. The media channel must be a paywalled role subscription benefit. If the user is not in the guild, the guild must be discoverable.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Channel Media Preview",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_channel_media_preview"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "media",
+            "type": "[media preview](#media-preview-structure) object",
+            "required": true,
+            "description": "The preview of the media in the thread's first message"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
@@ -17490,15 +17961,17 @@
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.messages.pins.get",
+      "id": "extended.list_message_pins",
       "method": "GET",
       "path": "/channels/{channel_id}/messages/pins",
       "category": "message",
       "title": "List Message Pins",
-      "summary": "Returns all message pins in the channel. Requires the `VIEW_CHANNEL` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Message Pins",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_message_pins"
+      ],
       "params": {
         "query": [
           {
@@ -17513,12 +17986,26 @@
             "required": false,
             "description": "Max number of pins to return (1-50, default 50)"
           }
+        ],
+        "response": [
+          {
+            "name": "items",
+            "type": "array[[message pin](#message-pin-object) object]",
+            "required": true,
+            "description": "The message pins in the channel"
+          },
+          {
+            "name": "has_more",
+            "type": "boolean",
+            "required": true,
+            "description": "Whether there are potentially additional message pins that could be returned on a subsequent call"
+          }
         ]
       },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
@@ -17679,20 +18166,22 @@
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.messages.message.crosspost.post",
+      "id": "extended.crosspost_message",
       "method": "POST",
       "path": "/channels/{channel_id}/messages/{message_id}/crosspost",
       "category": "message",
       "title": "Crosspost Message",
-      "summary": "Crossposts a message in a News Channel to following channels. Requires the `SEND_MESSAGES` permission if the current user sent the message, or additionally the `MANAGE_MESSAGES` permission for all other messages. Returns a [message](#message-object) object on success. Fires a [Me",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Crosspost Message",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "crosspost_message"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
@@ -17730,20 +18219,55 @@
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.messages.message.interaction-data.get",
+      "id": "extended.get_message_interaction_data",
       "method": "GET",
       "path": "/channels/{channel_id}/messages/{message_id}/interaction-data",
       "category": "message",
       "title": "Get Message Interaction Data",
-      "summary": "Returns information about the interaction that created the given message.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get Message Interaction Data",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_message_interaction_data"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "id",
+            "type": "snowflake",
+            "required": true,
+            "description": "The ID of the interaction"
+          },
+          {
+            "name": "type",
+            "type": "integer",
+            "required": true,
+            "description": "The [type of interaction](/interactions/receiving-and-responding#interaction-type)"
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "required": true,
+            "description": "The name of the [application command](/interactions/application-commands#application-command-object) executed (including subcommands and subcommand groups)"
+          },
+          {
+            "name": "application_command",
+            "type": "[application command](/interactions/application-commands#application-command-object) object",
+            "required": true,
+            "description": "The [application command](/interactions/application-commands#application-command-object) executed"
+          },
+          {
+            "name": "options",
+            "type": "array[[application command data option](/interactions/receiving-and-responding#application-command-data-option-structure) object]",
+            "required": false,
+            "description": "The options provided to the command, if any"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
@@ -17836,37 +18360,50 @@
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.polls.message.expire.post",
+      "id": "extended.end_poll",
       "method": "POST",
       "path": "/channels/{channel_id}/polls/{message_id}/expire",
       "category": "message",
       "title": "End Poll",
-      "summary": "Immediately ends the poll. You cannot end polls from other users. Returns a [message](#message-object) object. Fires a [Message Update](/gateway/gateway-events#message-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "End Poll",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "end_poll"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
-      "id": "channels.channel.summaries.get",
+      "id": "extended.list_conversation_summaries",
       "method": "GET",
       "path": "/channels/{channel_id}/summaries",
       "category": "message",
       "title": "List Conversation Summaries",
-      "summary": "Get a list of up to 50 latest conversation summaries for a text channel in reverse chronological order. Requires the `READ_MESSAGE_HISTORY` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Conversation Summaries",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_conversation_summaries"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "summaries",
+            "type": "array[[conversation summary](#conversation-summary-object) object]",
+            "required": true,
+            "description": "The conversation summaries for the channel (max 50)"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/message"
     },
     {
@@ -18334,15 +18871,17 @@
       "source": "https://docs.discord.food/resources/notification-center"
     },
     {
-      "id": "users.me.notification-center.items.notification.delete",
+      "id": "extended.delete_notification",
       "method": "DELETE",
       "path": "/users/@me/notification-center/items/{notification_id}",
       "category": "notifications",
       "title": "Delete Notification Center Item",
-      "summary": "Deletes a notification center item. Returns a 204 empty response on success. Fires a [Notification Center Item Delete](/gateway/gateway-events#notification-center-item-delete) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Notification Center Item",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "delete_notification"
+      ],
       "params": {
         "json": [
           {
@@ -18356,7 +18895,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/notification-center"
     },
     {
@@ -19203,20 +19742,22 @@
       "source": "https://docs.discord.food/resources/presence"
     },
     {
-      "id": "activities.statistics.applications.application.get",
+      "id": "extended.list_application_activity_statistics",
       "method": "GET",
       "path": "/activities/statistics/applications/{application_id}",
       "category": "presence",
       "title": "List Application Activity Statistics",
-      "summary": "Returns a list of [application activity statistics](#application-activity-statistics-structure) objects representing the user's friends and affine users that have played the given game.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Application Activity Statistics",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_application_activity_statistics"
+      ],
       "params": {},
       "oauth2_scope": "activities.read",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/presence"
     },
     {
@@ -19286,20 +19827,22 @@
       "source": "https://docs.discord.food/resources/presence"
     },
     {
-      "id": "users.me.activities.statistics.applications.get",
+      "id": "extended.list_my_activity_statistics",
       "method": "GET",
       "path": "/users/@me/activities/statistics/applications",
       "category": "presence",
       "title": "List User Application Activity Statistics",
-      "summary": "Returns a list of [user application activity statistics](#user-application-activity-statistics-structure) objects representing games the user has played.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List User Application Activity Statistics",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_my_activity_statistics"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/presence"
     },
     {
@@ -20718,20 +21261,22 @@
       "source": "https://docs.discord.food/resources/read-state"
     },
     {
-      "id": "channels.channel.pins.ack.post",
+      "id": "extended.ack_channel_pins",
       "method": "POST",
       "path": "/channels/{channel_id}/pins/ack",
       "category": "read_state",
       "title": "Acknowledge Pinned Messages",
-      "summary": "Acknowledges the currently pinned messages in a channel. Returns a 204 empty response on success. Fires a [Channel Pins Ack](/gateway/gateway-events#channel-pins-ack) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Acknowledge Pinned Messages",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "ack_channel_pins"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/read-state"
     },
     {
@@ -20767,20 +21312,22 @@
       "source": "https://docs.discord.food/resources/read-state"
     },
     {
-      "id": "guilds.guild.ack.post",
+      "id": "extended.mark_guild_read",
       "method": "POST",
       "path": "/guilds/{guild_id}/ack",
       "category": "read_state",
       "title": "Acknowledge Guild",
-      "summary": "Updates all read states in a guild to acknowledge all features and messages. Fires multiple [Message Ack](/gateway/gateway-events#message-ack) and [Guild Feature Ack](/gateway/gateway-events#guild-feature-ack) Gateway events.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Acknowledge Guild",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "mark_guild_read"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": true,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/read-state"
     },
     {
@@ -21079,54 +21626,60 @@
       "source": "https://docs.discord.food/resources/receiving-and-responding"
     },
     {
-      "id": "friend-suggestions.get",
+      "id": "extended.list_friend_suggestions",
       "method": "GET",
       "path": "/friend-suggestions",
       "category": "relationships",
       "title": "List Friend Suggestions",
-      "summary": "Returns a list of [friend suggestion](#friend-suggestion-object) objects for the current user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Friend Suggestions",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_friend_suggestions"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
-      "id": "friend-suggestions.user.delete",
+      "id": "extended.remove_friend_suggestion",
       "method": "DELETE",
       "path": "/friend-suggestions/{user_id}",
       "category": "relationships",
       "title": "Remove Friend Suggestion",
-      "summary": "Removes a friend suggestion for the current user. Returns a 204 empty response on success. Fires a [Friend Suggestion Delete](/gateway/gateway-events#friend-suggestion-delete) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Remove Friend Suggestion",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "remove_friend_suggestion"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
-      "id": "users.me.game-relationships.get",
+      "id": "extended.list_game_relationships",
       "method": "GET",
       "path": "/users/@me/game-relationships",
       "category": "relationships",
       "title": "List Game Relationships",
-      "summary": "Returns a list of [game relationship](#game-relationship-object) objects for the current user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Game Relationships",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_game_relationships"
+      ],
       "params": {},
       "oauth2_scope": "relationships.read",
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
@@ -21449,37 +22002,41 @@
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
-      "id": "users.me.relationships.user.ignore.delete",
+      "id": "extended.unignore_user",
       "method": "DELETE",
       "path": "/users/@me/relationships/{user_id}/ignore",
       "category": "relationships",
       "title": "Unignore User",
-      "summary": "Unignores a user. Returns a 204 empty response on success. Fires a [Relationship Update](/gateway/gateway-events#relationship-update) or [Relationship Remove](/gateway/gateway-events#relationship-remove) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Unignore User",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "unignore_user"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
-      "id": "users.me.relationships.user.ignore.put",
+      "id": "extended.ignore_user",
       "method": "PUT",
       "path": "/users/@me/relationships/{user_id}/ignore",
       "category": "relationships",
       "title": "Ignore User",
-      "summary": "[Ignores](https://support.discord.com/hc/en-us/articles/28084948873623) a user. Returns a 204 empty response on success. Fires a [Relationship Add](/gateway/gateway-events#relationship-add) or [Relationship Update](/gateway/gateway-events#relationship-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Ignore User",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "ignore_user"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/relationships"
     },
     {
@@ -22782,20 +23339,22 @@
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.consent.get",
+      "id": "extended.get_my_consents",
       "method": "GET",
       "path": "/users/@me/consent",
       "category": "settings",
       "title": "Get User Consents",
-      "summary": "Returns a [consents](#consents-object) object representing the tracking features the requestor has consented to.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get User Consents",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_my_consents"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
@@ -22831,20 +23390,22 @@
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.email-settings.get",
+      "id": "extended.get_my_email_settings",
       "method": "GET",
       "path": "/users/@me/email-settings",
       "category": "settings",
       "title": "Get Email Settings",
-      "summary": "Returns the requester's [email settings](#email-settings-object) object.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Email Settings",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_my_email_settings"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
@@ -22945,32 +23506,36 @@
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.notification-settings.snapshots.get",
+      "id": "extended.list_notification_settings_snapshots",
       "method": "GET",
       "path": "/users/@me/notification-settings/snapshots",
       "category": "settings",
       "title": "List Notification Settings Snapshots",
-      "summary": "Returns a list of [notification settings snapshot](#notification-settings-snapshot-object) objects for the user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Notification Settings Snapshots",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_notification_settings_snapshots"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.notification-settings.snapshots.post",
+      "id": "extended.create_notification_settings_snapshot",
       "method": "POST",
       "path": "/users/@me/notification-settings/snapshots",
       "category": "settings",
       "title": "Create Notification Settings Snapshot",
-      "summary": "Creates a new notification settings snapshot for the user. Returns a list of [notification settings snapshot](#notification-settings-snapshot-object) objects on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Create Notification Settings Snapshot",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "create_notification_settings_snapshot"
+      ],
       "params": {
         "json": [
           {
@@ -22984,41 +23549,45 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.notification-settings.snapshots.notification_settings_snapshot.delete",
+      "id": "extended.delete_notification_settings_snapshot",
       "method": "DELETE",
       "path": "/users/@me/notification-settings/snapshots/{notification_settings_snapshot_id}",
       "category": "settings",
       "title": "Delete Notification Settings Snapshot",
-      "summary": "Deletes a notification settings snapshot. Returns a list of [notification settings snapshot](#notification-settings-snapshot-object) objects on success.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Notification Settings Snapshot",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "delete_notification_settings_snapshot"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
-      "id": "users.me.notification-settings.snapshots.notification_settings_snapshot.restore-guilds.post",
+      "id": "extended.restore_notification_settings_snapshot",
       "method": "POST",
       "path": "/users/@me/notification-settings/snapshots/{notification_settings_snapshot_id}/restore-guilds",
       "category": "settings",
       "title": "Restore Notification Settings Snapshot",
-      "summary": "Restores a notification settings snapshot. Returns a mapping of guild IDs to [user guild settings](#user-guild-settings-object) objects on success. Fires multiple [User Guild Settings Update](/gateway/gateway-events#user-guild-settings-update) Gateway events.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Restore Notification Settings Snapshot",
+      "risk": "sensitive",
+      "status": "implemented",
+      "tools": [
+        "restore_notification_settings_snapshot"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user-settings"
     },
     {
@@ -23389,20 +23958,31 @@
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "guilds.guild.soundboard-sounds.get",
+      "id": "extended.list_guild_soundboard_sounds",
       "method": "GET",
       "path": "/guilds/{guild_id}/soundboard-sounds",
       "category": "soundboard",
       "title": "List Guild Soundboard Sounds",
-      "summary": "Returns an object containing a list of [soundboard sound](#soundboard-sound-object) objects for the given guild. Includes the `user` field if the user has the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Guild Soundboard Sounds",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_soundboard_sounds"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "items",
+            "type": "array[[soundboard sound](#soundboard-sound-object) object]",
+            "required": true,
+            "description": "The soundboard sounds in the guild"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
@@ -23456,49 +24036,55 @@
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "guilds.guild.soundboard-sounds.sound.delete",
+      "id": "extended.delete_guild_soundboard_sound",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/soundboard-sounds/{sound_id}",
       "category": "soundboard",
       "title": "Delete Guild Soundboard Sound",
-      "summary": "For sounds created by the current user, requires either the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission. For other sounds, requires the `MANAGE_EXPRESSIONS` permission. Returns a 204 empty response on success. Fires a [Guild Soundboard Sound Delete](/gateway/gateway-e",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild Soundboard Sound",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_soundboard_sound"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "guilds.guild.soundboard-sounds.sound.get",
+      "id": "extended.get_guild_soundboard_sound",
       "method": "GET",
       "path": "/guilds/{guild_id}/soundboard-sounds/{sound_id}",
       "category": "soundboard",
       "title": "Get Guild Soundboard Sound",
-      "summary": "Returns a [soundboard sound](#soundboard-sound-object) object for the given guild and sound ID. Includes the `user` field if the user has the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Soundboard Sound",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_soundboard_sound"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "guilds.guild.soundboard-sounds.sound.patch",
+      "id": "extended.update_guild_soundboard_sound",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/soundboard-sounds/{sound_id}",
       "category": "soundboard",
       "title": "Modify Guild Soundboard Sound",
-      "summary": "Modifies the given soundboard sound. For sounds created by the current user, requires either the `CREATE_EXPRESSIONS` or MANAGE_EXPRESSIONS permission. For other sounds, requires the `MANAGE_EXPRESSIONS` permission. Returns the updated [soundboard sound](#soundboard-sound-object)",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Soundboard Sound",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_soundboard_sound"
+      ],
       "params": {
         "json": [
           {
@@ -23530,41 +24116,45 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "soundboard-default-sounds.get",
+      "id": "extended.list_default_soundboard_sounds",
       "method": "GET",
       "path": "/soundboard-default-sounds",
       "category": "soundboard",
       "title": "List Default Soundboard Sounds",
-      "summary": "Returns a list of [soundboard sound](#soundboard-sound-object) objects that can be used by all users.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "List Default Soundboard Sounds",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_default_soundboard_sounds"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
-      "id": "soundboard-sounds.sound.guild.guild.get",
+      "id": "extended.get_soundboard_sound_guild",
       "method": "GET",
       "path": "/soundboard-sounds/{sound_id}/guild/{guild_id}",
       "category": "soundboard",
       "title": "Get Soundboard Sound Guild",
-      "summary": "Returns a [discoverable guild](/resources/discovery#discoverable-guild-object) object for the guild that owns the given sound. This endpoint requires the guild to be discoverable, not be [auto-removed](/resources/discovery#discoverable-guild-object), and have [guild expression di",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Soundboard Sound Guild",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_soundboard_sound_guild"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/soundboard"
     },
     {
@@ -23618,49 +24208,55 @@
       "source": "https://docs.discord.food/resources/stage-instance"
     },
     {
-      "id": "stage-instances.channel.delete",
+      "id": "extended.delete_stage_instance",
       "method": "DELETE",
       "path": "/stage-instances/{channel_id}",
       "category": "stage",
       "title": "Delete Stage Instance",
-      "summary": "Deletes the stage instance and associated invite. Requires the user to be a moderator of the stage channel. Returns a 204 empty response on success. Fires a [Stage Instance Delete](/gateway/gateway-events#stage-instance-delete) and optionally an [Invite Delete](/gateway/gateway-e",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Stage Instance",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_stage_instance"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/stage-instance"
     },
     {
-      "id": "stage-instances.channel.get",
+      "id": "extended.get_stage_instance",
       "method": "GET",
       "path": "/stage-instances/{channel_id}",
       "category": "stage",
       "title": "Get Stage Instance",
-      "summary": "Gets the stage instance associated with the stage channel, if it exists. Returns a [stage instance](#stage-instance-object) object.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Stage Instance",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_stage_instance"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/stage-instance"
     },
     {
-      "id": "stage-instances.channel.patch",
+      "id": "extended.update_stage_instance",
       "method": "PATCH",
       "path": "/stage-instances/{channel_id}",
       "category": "stage",
       "title": "Modify Stage Instance",
-      "summary": "Updates fields of an existing stage instance. Requires the user to be a moderator of the stage channel. Returns the updated [stage instance](#stage-instance-object) object on success. Fires a [Stage Instance Update](/gateway/gateway-events#stage-instance-update) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Stage Instance",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_stage_instance"
+      ],
       "params": {
         "json": [
           {
@@ -23680,7 +24276,7 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/stage-instance"
     },
     {
@@ -23747,49 +24343,55 @@
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "guilds.guild.stickers.sticker.delete",
+      "id": "extended.delete_guild_sticker",
       "method": "DELETE",
       "path": "/guilds/{guild_id}/stickers/{sticker_id}",
       "category": "sticker",
       "title": "Delete Guild Sticker",
-      "summary": "Deletes the given sticker. For stickers created by the current user, requires either the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission. For other stickers, requires the `MANAGE_EXPRESSIONS` permission. Returns a 204 empty response on success. Fires a [Guild Stickers Upd",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Guild Sticker",
+      "risk": "destructive",
+      "status": "implemented",
+      "tools": [
+        "delete_guild_sticker"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "guilds.guild.stickers.sticker.get",
+      "id": "extended.get_guild_sticker",
       "method": "GET",
       "path": "/guilds/{guild_id}/stickers/{sticker_id}",
       "category": "sticker",
       "title": "Get Guild Sticker",
-      "summary": "Returns a [sticker](#sticker-object) object for the given guild and sticker IDs. Includes the `user` field if the user has the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Guild Sticker",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_guild_sticker"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "guilds.guild.stickers.sticker.patch",
+      "id": "extended.update_guild_sticker",
       "method": "PATCH",
       "path": "/guilds/{guild_id}/stickers/{sticker_id}",
       "category": "sticker",
       "title": "Modify Guild Sticker",
-      "summary": "Modifies the given sticker. For stickers created by the current user, requires either the `CREATE_EXPRESSIONS` or `MANAGE_EXPRESSIONS` permission. For other stickers, requires the `MANAGE_EXPRESSIONS` permission. Returns the updated [sticker](#sticker-object) object on success. F",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Modify Guild Sticker",
+      "risk": "admin",
+      "status": "implemented",
+      "tools": [
+        "update_guild_sticker"
+      ],
       "params": {
         "json": [
           {
@@ -23815,75 +24417,92 @@
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "sticker-packs.get",
+      "id": "extended.list_sticker_packs",
       "method": "GET",
       "path": "/sticker-packs",
       "category": "sticker",
       "title": "List Sticker Packs",
-      "summary": "Returns the list of [sticker packs](#sticker-pack-object) available to use.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Sticker Packs",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_sticker_packs"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "sticker_packs",
+            "type": "array[[sticker pack](#sticker-pack-object) object]",
+            "required": true,
+            "description": "The sticker packs available"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "sticker-packs.sticker_pack.get",
+      "id": "extended.get_sticker_pack",
       "method": "GET",
       "path": "/sticker-packs/{sticker_pack_id}",
       "category": "sticker",
       "title": "Get Sticker Pack",
-      "summary": "Returns a [sticker pack](#sticker-pack-object) object for the given pack ID.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Sticker Pack",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_sticker_pack"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "stickers.sticker.get",
+      "id": "extended.get_sticker",
       "method": "GET",
       "path": "/stickers/{sticker_id}",
       "category": "sticker",
       "title": "Get Sticker",
-      "summary": "Returns a [sticker](#sticker-object) object for the given sticker ID.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Sticker",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_sticker"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": true,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
-      "id": "stickers.sticker.guild.get",
+      "id": "extended.get_sticker_guild",
       "method": "GET",
       "path": "/stickers/{sticker_id}/guild",
       "category": "sticker",
       "title": "Get Sticker Guild",
-      "summary": "Returns a [discoverable guild](/resources/discovery#discoverable-guild-object) object for the guild that owns the given sticker. This endpoint requires the guild to be discoverable, not be [auto-removed](/resources/discovery#discoverable-guild-object), and have [guild expression ",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Get Sticker Guild",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_sticker_guild"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/sticker"
     },
     {
@@ -26960,54 +27579,87 @@
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.affinities.channels.get",
+      "id": "extended.list_channel_affinities",
       "method": "GET",
       "path": "/users/@me/affinities/channels",
       "category": "user",
       "title": "List Channel Affinities",
-      "summary": "Returns the current user's affinity scores for their participated channels. Affinity scores are a measure of how likely a user is to interact with a channel.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Channel Affinities",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_channel_affinities"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "channel_affinities",
+            "type": "array[[channel affinity](#channel-affinity-structure) object]",
+            "required": true,
+            "description": "The user's affinity scores for their channels"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.affinities.guilds.get",
+      "id": "extended.list_guild_affinities",
       "method": "GET",
       "path": "/users/@me/affinities/guilds",
       "category": "user",
       "title": "List Guild Affinities",
-      "summary": "Returns the current user's affinity scores for their joined guilds. Affinity scores are a measure of how likely a user is to interact with a guild.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Guild Affinities",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_guild_affinities"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "guild_affinities",
+            "type": "array[[guild affinity](#guild-affinity-structure) object]",
+            "required": true,
+            "description": "The user's affinity scores for their guilds"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.affinities.users.get",
+      "id": "extended.list_user_affinities",
       "method": "GET",
       "path": "/users/@me/affinities/users",
       "category": "user",
       "title": "List User Affinities",
-      "summary": "Returns the current user's affinity scores for other users. Affinity scores are a measure of how likely a user is to be friends with another user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List User Affinities",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_user_affinities"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "user_affinities",
+            "type": "array[[user affinity](#user-affinity-structure) object]",
+            "required": true,
+            "description": "The user's affinity scores for other users"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
@@ -27060,20 +27712,31 @@
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.avatars.get",
+      "id": "extended.list_recent_avatars",
       "method": "GET",
       "path": "/users/@me/avatars",
       "category": "user",
       "title": "List Recent Avatars",
-      "summary": "Returns the user's 6 most recent avatars.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Recent Avatars",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_recent_avatars"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "avatars",
+            "type": "array[[avatar](#avatar-structure) object]",
+            "required": true,
+            "description": "The recent avatars for the user"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
@@ -27255,20 +27918,22 @@
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.mentions.message.delete",
+      "id": "extended.delete_recent_mention",
       "method": "DELETE",
       "path": "/users/@me/mentions/{message_id}",
       "category": "user",
       "title": "Delete Recent Mention",
-      "summary": "Acknowledges a message the current user has been mentioned in. Returns a 204 empty response on success. Fires a [Recent Mention Delete](/gateway/gateway-events#recent-mention-delete) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Delete Recent Mention",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "delete_recent_mention"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
@@ -27479,20 +28144,43 @@
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.notes.user.get",
+      "id": "extended.get_user_note",
       "method": "GET",
       "path": "/users/@me/notes/{user_id}",
       "category": "user",
       "title": "Get User Note",
-      "summary": "Returns the note for the given user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "Get User Note",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "get_user_note"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "note",
+            "type": "string",
+            "required": true,
+            "description": "The note (max 256 characters)"
+          },
+          {
+            "name": "note_user_id",
+            "type": "snowflake",
+            "required": true,
+            "description": "The ID of the user the note is on"
+          },
+          {
+            "name": "user_id",
+            "type": "snowflake",
+            "required": true,
+            "description": "The ID of the user who created the note (always the current user)"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
@@ -27610,49 +28298,64 @@
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.saved-messages.get",
+      "id": "extended.list_saved_messages",
       "method": "GET",
       "path": "/users/@me/saved-messages",
       "category": "user",
       "title": "List Saved Messages",
-      "summary": "Returns message bookmarks and reminders for the current user.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
-      "params": {},
+      "summary": "List Saved Messages",
+      "risk": "read",
+      "status": "implemented",
+      "tools": [
+        "list_saved_messages"
+      ],
+      "params": {
+        "response": [
+          {
+            "name": "results",
+            "type": "array[[saved message](#saved-message-structure) object]",
+            "required": true,
+            "description": "The list of saved messages"
+          }
+        ]
+      },
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.saved-messages.channel.message.delete",
+      "id": "extended.unsave_message",
       "method": "DELETE",
       "path": "/users/@me/saved-messages/{channel_id}/{message_id}",
       "category": "user",
       "title": "Unsave Message",
-      "summary": "Unsaves a message for the current user. Returns a 204 empty response on success. Fires a [Saved Message Delete](/gateway/gateway-events#saved-message-delete) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Unsave Message",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "unsave_message"
+      ],
       "params": {},
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
-      "id": "users.me.saved-messages.channel.message.put",
+      "id": "extended.save_message",
       "method": "PUT",
       "path": "/users/@me/saved-messages/{channel_id}/{message_id}",
       "category": "user",
       "title": "Save Message",
-      "summary": "Saves a message for the current user. Returns a [saved message](#saved-message-structure) object on success. Fires a [Saved Message Create](/gateway/gateway-events#saved-message-create) Gateway event.",
-      "risk": null,
-      "status": "documented",
-      "tools": [],
+      "summary": "Save Message",
+      "risk": "write",
+      "status": "implemented",
+      "tools": [
+        "save_message"
+      ],
       "params": {
         "json": [
           {
@@ -27666,7 +28369,7 @@
       "oauth2_scope": null,
       "supports_bot": false,
       "deprecated": false,
-      "limitations": "Documented in the community user-API docs; this build does not expose it as a tool.",
+      "limitations": "Curated user-token HTTP operation. Community documentation; availability depends on permissions and Discord rollout. Validated with mock HTTP, not a live Discord account.",
       "source": "https://docs.discord.food/resources/user"
     },
     {
